@@ -50,7 +50,7 @@ class ConnectedSWFObject(object):
     @connection.setter
     def connection(self, conn):
         if isinstance(conn, Connection):
-            self._connexion = conn
+            self._connection = conn
 
     def exists(self):
         """Checks if the connected swf object exists amazon-side"""
