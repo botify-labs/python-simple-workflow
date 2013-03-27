@@ -3,7 +3,7 @@
 import boto.swf
 
 
-class Connexion(object):
+class Connection(object):
     """Holds an authenticated AWS Simple Workflow connexion
 
     Encapsulates a boto.swf.layer1 connexion object as `layer`
@@ -30,3 +30,17 @@ class Connexion(object):
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key
         )
+
+
+class ConnectedSWFObject(object):
+    def __init__(self, *args, **kwargs):
+        self._connection = kwargs.pop('connection', None)
+
+    @property
+    def connection(self):
+        return self._connection
+
+    @connection.setter
+    def connection(self, conn):
+        if isinstance(conn, Connection):
+            self._connexion = conn
