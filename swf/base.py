@@ -2,6 +2,8 @@
 
 import boto.swf
 
+from .utils import requires_connection
+
 
 class Connection(object):
     """Holds an authenticated AWS Simple Workflow connexion
@@ -33,8 +35,13 @@ class Connection(object):
 
 
 class ConnectedSWFObject(object):
-    def __init__(self, *args, **kwargs):
-        self._connection = kwargs.pop('connection', None)
+    """Authenticated object interface
+
+    Once inherited, implements the AWS authentication
+    into the child, adding a `connection` property.
+    """
+    def __init__(self, connection=None):
+        self._connection = connection
 
     @property
     def connection(self):
@@ -44,3 +51,15 @@ class ConnectedSWFObject(object):
     def connection(self, conn):
         if isinstance(conn, Connection):
             self._connexion = conn
+
+    def exists(self):
+        """Checks if the connected swf object exists amazon-side"""
+        raise NotImplemented
+
+    def save(self):
+        """Creates the connected swf object amazon side"""
+        raise NotImplemented
+
+    def deprecate(self):
+        """Deprecates the connected swf object amazon side"""
+        raise NotImplemented
