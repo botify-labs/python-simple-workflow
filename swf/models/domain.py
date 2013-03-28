@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from boto.exception import SWFResponseError
+from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 
 from swf.core import ConnectedSWFObject
-from swf.utils import requires_connection
+from swf.exceptions import AlreadyExistsError, DoesNotExistError
 
 
 class Domain(ConnectedSWFObject):
@@ -26,39 +26,28 @@ class Domain(ConnectedSWFObject):
     REGISTERED = "REGISTERED"
     DEPRECATED = "DEPRECATED"
 
-    def __init__(self, name, retention_period,
-                 description=None, *args, **kwargs):
+    def __init__(self, name, status=REGISTERED, description=None,
+                 retention_period=30, *args, **kwargs):
         super(Domain, self).__init__(*args, **kwargs)
 
         self.name = name
+        self.status = status
         self.retention_period = retention_period
         self.description = description
 
-    @property
-    @requires_connection
-    def exists(self):
-        """Checks if the domain exists amazon-side"""
-        try:
-            self.connection.layer.describe_domain(self.name)
-        except SWFResponseError as e:
-            # If resource does not exist, amazon throws 400 with
-            # UnknownResourceFault exception
-            if e.body['__type'] == 'com.amazonaws.swf.base.model#UnknownResourceFault':
-                return False
-            # Any other errors should raise
-            else:
-                raise e
-
-        return True
-
-    @requires_connection
     def save(self):
         """Creates the domain amazon side"""
-        self.connection.layer.register_domain(self.name,
-                                              self.retention_period,
-                                              self.description)
+        try:
+            self.connection.register_domain(self.name,
+                                            str(self.retention_period),
+                                            self.description)
+        except SWFDomainAlreadyExistsError:
+            raise AlreadyExistsError("Domain %s already exists amazon-side" % self.name)
 
-    @requires_connection
     def delete(self):
         """Deprecates the domain amazon side"""
-        self.connection.layer.deprecate_domain(self.name)
+        try:
+            self.connection.deprecate_domain(self.name)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)

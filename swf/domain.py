@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from boto.exception import SWFResponseError
-
 from .base import ConnectedSWFObject
-from .utils import requires_connection
+from swf.querysets.domain import DomainQuery
+from .utils import cached_property
 
 
 class Domain(ConnectedSWFObject):
@@ -35,14 +34,18 @@ class Domain(ConnectedSWFObject):
         self.retention_period = retention_period
         self.description = description
 
-    @requires_connection
+    @cached_property
+    def exists(self):
+        if DomainQuery(self.connection).get(self.name):
+            return True
+        return False
+
     def save(self):
         """Creates the domain amazon side"""
-        self.connection.layer.register_domain(self.name,
-                                              self.retention_period,
-                                              self.description)
+        self.connection.register_domain(self.name,
+                                        self.retention_period,
+                                        self.description)
 
-    @requires_connection
     def delete(self):
         """Deprecates the domain amazon side"""
-        self.connection.layer.deprecate_domain(self.name)
+        self.connection.deprecate_domain(self.name)

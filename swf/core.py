@@ -1,35 +1,19 @@
 # -*- coding:utf-8 -*-
 
-import boto.swf
+from boto.swf.layer1 import Layer1
+
+AWS_CREDENTIALS = {
+    'aws_access_key_id': None,
+    'aws_secret_access_key': None
+}
 
 
-class Connection(object):
-    """Holds an authenticated AWS Simple Workflow connexion
-
-    Encapsulates a boto.swf.layer1 connexion object as `layer`
-    attribute. Allows to access common swf api Layer1 methods
-    through an authenticated session.
-
-    Params
-    ------
-    * aws_access_key_id:
-        * type: String
-        * value: Aws access key id credential to authenticate with
-
-    * aws_secret_access_key:
-        * type: String
-        * value: Aws secret access key to authenticate with
-    """
-    def __init__(self, aws_access_key_id, aws_secret_access_key):
-        self.aws_access_key_id = aws_access_key_id
-        self.aws_secret_access_key = aws_secret_access_key
-        self.layer = self.authenticate()
-
-    def authenticate(self):
-        return boto.swf.layer1.Layer1(
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key
-        )
+def set_aws_credentials(aws_access_key_id, aws_secret_access_key):
+    """Set default credentials."""
+    AWS_CREDENTIALS.update({
+        'aws_access_key_id': aws_access_key_id,
+        'aws_secret_access_key': aws_secret_access_key,
+    })
 
 
 class ConnectedSWFObject(object):
@@ -38,17 +22,18 @@ class ConnectedSWFObject(object):
     Once inherited, implements the AWS authentication
     into the child, adding a `connection` property.
     """
-    def __init__(self, connection=None, *args, **kwargs):
-        self._connection = connection
+    def __init__(self, *args, **kwargs):
+        for credkey in ('aws_access_key_id', 'aws_secret_access_key'):
+            if AWS_CREDENTIALS.get(credkey):
+                setattr(self, credkey, AWS_CREDENTIALS[credkey])
 
-    @property
-    def connection(self):
-        return self._connection
+        for kwarg in kwargs:
+            setattr(self, kwarg, kwargs[kwarg])
 
-    @connection.setter
-    def connection(self, conn):
-        if isinstance(conn, Connection):
-            self._connection = conn
+        self.connection = Layer1(
+            self.aws_access_key_id,
+            self.aws_secret_access_key
+        )
 
     def exists(self):
         """Checks if the connected swf object exists amazon-side"""

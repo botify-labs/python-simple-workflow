@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import boto.swf
-
 from swf.core import ConnectedSWFObject
 
 
 class BaseQuerySet(ConnectedSWFObject):
-    @staticmethod
-    def get(name):
+    def get(self, name):
         raise NotImplemented
 
-    @staticmethod
-    def all():
+    def all(self):
         raise NotImplemented
