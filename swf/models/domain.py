@@ -51,3 +51,11 @@ class Domain(ConnectedSWFObject):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)
+
+    @property
+    def workflows(self):
+        pass
+
+    @property
+    def executions(self):
+        pass
