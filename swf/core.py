@@ -2,8 +2,6 @@
 
 import boto.swf
 
-from .utils import requires_connection
-
 
 class Connection(object):
     """Holds an authenticated AWS Simple Workflow connexion
@@ -40,7 +38,7 @@ class ConnectedSWFObject(object):
     Once inherited, implements the AWS authentication
     into the child, adding a `connection` property.
     """
-    def __init__(self, connection=None):
+    def __init__(self, connection=None, *args, **kwargs):
         self._connection = connection
 
     @property

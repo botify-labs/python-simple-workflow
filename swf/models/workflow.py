@@ -2,7 +2,7 @@
 
 import boto.swf
 
-from .base import ConnectedSWFObject
+from swf.core import ConnectedSWFObject
 
 
 class WorkflowType(ConnectedSWFObject):

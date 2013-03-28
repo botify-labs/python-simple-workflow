@@ -28,4 +28,10 @@ setup(
     install_requires=[
         'boto==2.8.0',
     ],
+
+    packages=[
+        'swf',
+        'swf.models',
+        'swf.querysets',
+    ],
 )

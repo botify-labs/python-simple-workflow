@@ -2,8 +2,8 @@
 
 from boto.exception import SWFResponseError
 
-from swf.core import ConnectedSWFObject
-from swf.utils import requires_connection
+from .base import ConnectedSWFObject
+from .utils import requires_connection
 
 
 class Domain(ConnectedSWFObject):
@@ -26,11 +26,12 @@ class Domain(ConnectedSWFObject):
     REGISTERED = "REGISTERED"
     DEPRECATED = "DEPRECATED"
 
-    def __init__(self, name, retention_period,
-                 description=None, *args, **kwargs):
+    def __init__(self, name, status=REGISTRED, description=None,
+                 retention_period=30, *args, **kwargs):
         super(Domain, self).__init__(*args, **kwargs)
 
         self.name = name
+        self.status = status
         self.retention_period = retention_period
         self.description = description
 
