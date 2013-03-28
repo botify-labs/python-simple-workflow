@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from boto.exception import SWFResponseError
+
 from .base import ConnectedSWFObject
 from .utils import requires_connection
 
@@ -36,9 +38,18 @@ class Domain(ConnectedSWFObject):
     @requires_connection
     def exists(self):
         """Checks if the domain exists amazon-side"""
-        domains = self.connection.layer.list_domains(self.REGISTERED)['domainInfos']
+        try:
+            self.connection.layer.describe_domain(self.name)
+        except SWFResponseError as e:
+            # If resource does not exist, amazon throws 400 with
+            # UnknownResourceFault exception
+            if e.body['__type'] == 'com.amazonaws.swf.base.model#UnknownResourceFault':
+                return False
+            # Any other errors should raise
+            else:
+                raise e
 
-        return any(d['name'] == self.name for d in domains)
+        return True
 
     @requires_connection
     def save(self):
