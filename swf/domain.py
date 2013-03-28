@@ -26,7 +26,7 @@ class Domain(ConnectedSWFObject):
     REGISTERED = "REGISTERED"
     DEPRECATED = "DEPRECATED"
 
-    def __init__(self, name, status=REGISTRED, description=None,
+    def __init__(self, name, status=REGISTERED, description=None,
                  retention_period=30, *args, **kwargs):
         super(Domain, self).__init__(*args, **kwargs)
 
@@ -34,23 +34,6 @@ class Domain(ConnectedSWFObject):
         self.status = status
         self.retention_period = retention_period
         self.description = description
-
-    @property
-    @requires_connection
-    def exists(self):
-        """Checks if the domain exists amazon-side"""
-        try:
-            self.connection.layer.describe_domain(self.name)
-        except SWFResponseError as e:
-            # If resource does not exist, amazon throws 400 with
-            # UnknownResourceFault exception
-            if e.body['__type'] == 'com.amazonaws.swf.base.model#UnknownResourceFault':
-                return False
-            # Any other errors should raise
-            else:
-                raise e
-
-        return True
 
     @requires_connection
     def save(self):
