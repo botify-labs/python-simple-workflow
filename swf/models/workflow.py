@@ -7,9 +7,47 @@ from swf.exceptions import DoesNotExistError, AlreadyExistsError
 
 
 class WorkflowType(ConnectedSWFObject):
-    CHILD_POLICY_TERMINATE = "TERMINATE"
-    CHILD_POLICY_REQUEST_CANCEL = "REQUEST_CANCEL"
-    CHILD_POLICY_ABANDON = "ABANDON"
+    """Simple Workflow Type wrapper
+
+    Params
+    ------
+    * domain
+        * type: swf.models.Domain
+        * value: Domain the workflow type should be registered in
+    * name
+        * type: String
+        * value: name of the workflow type
+    * version
+        * type: Integer
+        * value: version of the workflow type
+    * status
+        * type: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
+        * value: workflow type status
+    * task_list
+        * type: String
+        * value: task list to use for scheduling decision tasks for executions
+                 of this workflow type
+    * child_policy
+        * type: swf.models.WorkflowType.{
+                    CHILD_POLICY_TERMINATE,
+                    CHILD_POLICY_REQUEST_CANCEL,
+                    CHILD_POLICY_ABANDON
+                }
+        * value: policy to use for the child workflow executions
+                 when a workflow execution of this type is terminated
+    * execution_timeout
+        * type: String
+        * value: maximum duration for executions of this workflow type
+    * decision_tasks_timeout
+        * type: String
+        * value: maximum duration of decision tasks for this workflow type
+    * description
+        * type: String
+        * value:  Textual description of the workflow type
+    """
+    CHILD_POLICY_TERMINATE = "TERMINATE"  # child executions will be terminated
+    CHILD_POLICY_REQUEST_CANCEL = "REQUEST_CANCEL"  #  a request to cancel will be attempted for each child execution
+    CHILD_POLICY_ABANDON = "ABANDON"  # no action will be taken
 
     def __init__(self, domain, name, version,
                  status=ConnectedSWFObject.REGISTERED,
@@ -52,6 +90,7 @@ class WorkflowType(ConnectedSWFObject):
             raise ValueError("Provided child policy value is invalid")
 
     def save(self):
+        """Creates the workflow type amazon side"""
         try:
             self.connection.register_workflow_type(
                 self.domain.name,
@@ -70,6 +109,7 @@ class WorkflowType(ConnectedSWFObject):
                 raise DoesNotExistError(e.body['message'])
 
     def delete(self):
+        """Deprecates the workflow type amazon-side"""
         try:
             self.connection.deprecate_workflow_type(self.domain.name, self.name, self.version)
         except SWFResponseError as e:
@@ -79,6 +119,7 @@ class WorkflowType(ConnectedSWFObject):
     def start(self):
         """Starts a Workflow execution"""
         pass
+
 
 class WorkflowExecution(ConnectedSWFObject):
     def __init__(self):

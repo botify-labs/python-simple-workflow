@@ -19,6 +19,10 @@ class Domain(ConnectedSWFObject):
         * type: Integer
         * value: Domain's workflow executions records retention in days
 
+    * status
+        * type: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
+        * value: the domain status
+
     * description
         * type: String
         * value: Textual description of the domain
