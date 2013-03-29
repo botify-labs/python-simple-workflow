@@ -9,7 +9,26 @@ from swf.exceptions import ResponseError, DoesNotExistError,\
 
 
 class DomainQuery(BaseQuerySet):
+    """Swf domain queryset object
+
+    Allows the user to interact with amazon's swf domains
+    through a django-queryset like interface
+    """
     def get(self, name):
+        """Fetches the Domain with `name`
+
+        A typical Amazon response looks like:
+        {
+            'configuration': {
+                'workflowExecutionRetentionPeriodInDays': '7',
+            },
+            'domainInfo': {
+                'status': 'REGISTERED',
+                'name': 'CrawlTest',
+                }
+            }
+        }
+        """
         try:
             response = self.connection.describe_domain(name)
         except SWFResponseError as e:
@@ -37,6 +56,19 @@ class DomainQuery(BaseQuerySet):
         )
 
     def all(self, registration_status=BaseQuerySet.REGISTERED_STATUS):
+        """Retrieves every domains
+
+        A typical Amazon response looks like:
+        {
+            'domainInfos': [
+                {
+                    'name': 'Crawl'
+                    'status': 'REGISTERED',
+                    'description': '',
+                },
+            ]
+        }
+        """
         domains = []
         next_page_token = None
 
