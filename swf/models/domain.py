@@ -23,10 +23,9 @@ class Domain(ConnectedSWFObject):
         * type: String
         * value: Textual description of the domain
     """
-    REGISTERED = "REGISTERED"
-    DEPRECATED = "DEPRECATED"
-
-    def __init__(self, name, status=REGISTERED, description=None,
+    def __init__(self, name,
+                 status=ConnectedSWFObject.REGISTERED,
+                 description=None,
                  retention_period=30, *args, **kwargs):
         super(Domain, self).__init__(*args, **kwargs)
 

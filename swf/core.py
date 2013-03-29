@@ -22,6 +22,9 @@ class ConnectedSWFObject(object):
     Once inherited, implements the AWS authentication
     into the child, adding a `connection` property.
     """
+    REGISTERED = "REGISTERED"
+    DEPRECATED = "DEPRECATED"
+
     def __init__(self, *args, **kwargs):
         for credkey in ('aws_access_key_id', 'aws_secret_access_key'):
             if AWS_CREDENTIALS.get(credkey):

@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import boto.swf
-from boto.swf.exceptions import SWFTypeAlreadyExistsError
+from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.core import ConnectedSWFObject
 from swf.exceptions import DoesNotExistError, AlreadyExistsError
@@ -13,7 +12,9 @@ class WorkflowType(ConnectedSWFObject):
     CHILD_POLICY_ABANDON = "ABANDON"
 
     def __init__(self, domain, name, version,
-                 task_list=None, child_policy=CHILD_POLICY_TERMINATE,
+                 status=ConnectedSWFObject.REGISTERED,
+                 task_list=None,
+                 child_policy=CHILD_POLICY_TERMINATE,
                  execution_timeout='300',
                  decision_tasks_timeout='300',
                  description=None, *args, **kwargs):
@@ -21,6 +22,7 @@ class WorkflowType(ConnectedSWFObject):
         self.domain = domain
         self.name = name
         self.version = version
+        self.status = status
 
         self._child_policy = None
         self.task_list = task_list
@@ -49,7 +51,6 @@ class WorkflowType(ConnectedSWFObject):
         else:
             raise ValueError("Provided child policy value is invalid")
 
-
     def save(self):
         try:
             self.connection.register_workflow_type(
@@ -68,12 +69,16 @@ class WorkflowType(ConnectedSWFObject):
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(e.body['message'])
 
-    # def delete(self):
-    #     try:
-    #         self.connection.deprecate_workflow_type(self.domain.name, self.name, self.version)
-    #     except SWFResponseError as e:
-    #         if e.error_code == 'UnknownResourceFault':
-    #             raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)
+    def delete(self):
+        try:
+            self.connection.deprecate_workflow_type(self.domain.name, self.name, self.version)
+        except SWFResponseError as e:
+            if e.error_code in ['UnknownResourceFault', 'TypeDeprecatedFault']:
+                raise DoesNotExistError(e.body['message'])
+
+    def start(self):
+        """Starts a Workflow execution"""
+        pass
 
 class WorkflowExecution(ConnectedSWFObject):
     def __init__(self):

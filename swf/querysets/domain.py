@@ -9,9 +9,6 @@ from swf.exceptions import ResponseError, DoesNotExistError,\
 
 
 class DomainQuery(BaseQuerySet):
-    REGISTERED_STATUS = "REGISTERED"
-    DEPRECATED_STATUS = "DEPRECATED"
-
     def get(self, name):
         try:
             response = self.connection.describe_domain(name)
@@ -39,7 +36,7 @@ class DomainQuery(BaseQuerySet):
             connection=self.connection
         )
 
-    def all(self, registration_status=REGISTERED_STATUS):
+    def all(self, registration_status=BaseQuerySet.REGISTERED_STATUS):
         domains = []
         next_page_token = None
 
