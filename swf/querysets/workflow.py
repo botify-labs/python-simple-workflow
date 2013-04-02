@@ -8,12 +8,11 @@ from swf.exceptions import ResponseError, DoesNotExistError
 
 
 class WorkflowTypeQuery(BaseQuerySet):
-    def __init__(self, domain_name, version, *args, **kwargs):
+    def __init__(self, domain_name, *args, **kwargs):
         super(WorkflowTypeQuery, self).__init__(*args, **kwargs)
         self.domain_name = domain_name
-        self.version = version
 
-    def get(self, name, version=None):
+    def get(self, name, version):
         """Fetches the Workflow Type with `name` and `version`
 
         A typical Amazon response looks like:
@@ -36,8 +35,6 @@ class WorkflowTypeQuery(BaseQuerySet):
             }
         }
         """
-        version = version or self.version
-
         try:
             response = self.connection.describe_workflow_type(self.domain_name, name, str(version))
         except SWFResponseError as e:
