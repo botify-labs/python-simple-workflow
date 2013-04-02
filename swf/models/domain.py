@@ -3,6 +3,7 @@
 from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 
 from swf.core import ConnectedSWFObject
+from swf.querysets.workflow import WorkflowTypeQuery
 from swf.exceptions import AlreadyExistsError, DoesNotExistError
 
 
@@ -55,9 +56,10 @@ class Domain(ConnectedSWFObject):
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)
 
-    @property
-    def workflows(self):
-        pass
+    def workflows(self, status=ConnectedSWFObject.REGISTERED):
+        """Lists the current domain's workflows"""
+        qs = WorkflowTypeQuery(self.name)
+        return qs.all(registration_status=status)
 
     @property
     def executions(self):
