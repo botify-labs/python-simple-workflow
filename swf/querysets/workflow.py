@@ -8,9 +8,9 @@ from swf.exceptions import ResponseError, DoesNotExistError
 
 
 class WorkflowTypeQuery(BaseQuerySet):
-    def __init__(self, domain, version, *args, **kwargs):
+    def __init__(self, domain_name, version, *args, **kwargs):
         super(WorkflowTypeQuery, self).__init__(*args, **kwargs)
-        self.domain = domain
+        self.domain_name = domain_name
         self.version = version
 
     def get(self, name, version=None):
@@ -39,7 +39,7 @@ class WorkflowTypeQuery(BaseQuerySet):
         version = version or self.version
 
         try:
-            response = self.connection.describe_workflow_type(self.domain.name, name, str(version))
+            response = self.connection.describe_workflow_type(self.domain_name, name, str(version))
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(e.body['message'])
@@ -50,7 +50,7 @@ class WorkflowTypeQuery(BaseQuerySet):
         wt_config = response['configuration']
 
         return WorkflowType(
-            self.domain.name,
+            self.domain_name,
             wt_info['workflowType']['name'],
             int(wt_info['workflowType']['version']),
             status=wt_info['status'],
@@ -59,6 +59,38 @@ class WorkflowTypeQuery(BaseQuerySet):
             execution_timeout=wt_config['defaultExecutionStartToCloseTimeout'],
             decision_task_timeout=wt_config['defaultTaskStartToCloseTimeout'],
         )
+
+    def filter(self, domain_name=None, registration_status=WorkflowType.REGISTERED, name=None):
+        """Filters workflows based of their status, and/or name"""
+        workflow_types = []
+        next_page_token = None
+
+        # As WorkflowTypeQuery has to be built against a specific domain
+        # name, domain filter is disposable, but not mandatory.
+        domain_name = domain_name or self.domain_name
+
+        while True:
+            response = self.connection.list_workflow_types(
+                domain_name,
+                registration_status,
+                name=name,
+                next_page_token=next_page_token
+            )
+
+            for workflow in response['typeInfos']:
+                workflow_types.append(WorkflowType(
+                    self.domain_name,
+                    workflow['workflowType']['name'],
+                    int(workflow['workflowType']['version']),
+                    status=workflow['status'],
+                ))
+
+            if not 'nextPageToken' in response:
+                break
+            else:
+                next_page_token = response['nextPageToken']
+
+        return workflow_types
 
     def all(self, registration_status=BaseQuerySet.REGISTERED_STATUS):
         """Retrieves every Workflow types
@@ -91,14 +123,14 @@ class WorkflowTypeQuery(BaseQuerySet):
 
         while True:
             response = self.connection.list_workflow_types(
-                self.domain.name,
+                self.domain_name,
                 registration_status,
                 next_page_token=next_page_token
             )
 
             for workflow in response['typeInfos']:
                 workflow_types.append(WorkflowType(
-                    self.domain.name,
+                    self.domain_name,
                     workflow['workflowType']['name'],
                     int(workflow['workflowType']['version']),
                     status=workflow['status'],

@@ -122,5 +122,6 @@ class WorkflowType(ConnectedSWFObject):
 
 
 class WorkflowExecution(ConnectedSWFObject):
-    def __init__(self):
+    def __init__(self, domain, workflow_id, run_id=None, *args, **kwargs):
         pass
+

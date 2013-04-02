@@ -1,0 +1,18 @@
+Amazon interface models implementation:
+ ✔ Domain @done (13-04-02 10:01)
+ ✔ Workflow Type @done (13-04-02 10:01)
+ ☐ Workflow Execution
+ ☐ Activity Type
+ ☐ Decider
+
+Amazon interface querysets implementation:
+ ✔ DomainQuery @done (13-04-02 10:02)
+ ✔ WorkflowTypeQuery @done (13-04-02 10:03)
+ ☐ Workflow Execution
+ ☐ Activity Type
+ ☐ Decider
+
+General:
+ ☐ Add sphinx doc
+ ☐ Document real world example
+ ☐ TESTS TESTS TESTS!
