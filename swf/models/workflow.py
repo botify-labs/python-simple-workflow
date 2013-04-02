@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 
+import time
+
 from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.core import ConnectedSWFObject
@@ -116,12 +118,31 @@ class WorkflowType(ConnectedSWFObject):
             if e.error_code in ['UnknownResourceFault', 'TypeDeprecatedFault']:
                 raise DoesNotExistError(e.body['message'])
 
-    def start(self):
+    def start_execution(self, workflow_id=None, task_list=None,
+                        child_policy=None, execution_timeout=None,
+                        input=None, tag_list=None, decision_tasks_timeout=None):
         """Starts a Workflow execution"""
-        pass
+        workflow_id = workflow_id or '%s-%s-%i' % (self.name, self.version, time.time())
+        task_list = task_list or self.task_list
+        child_policy = child_policy or self.child_policy
+
+        run_id = self.connection.start_workflow_execution(
+            self.domain.name,
+            workflow_id,
+            self.name,
+            str(self.version),
+            task_list=task_list,
+            child_policy=child_policy,
+            execution_start_to_close_timeout=execution_timeout,
+            input=input,
+            tag_list=tag_list,
+            task_start_to_close_timeout=decision_tasks_timeout,
+        )
+
+        return WorkflowExecution(self.domain, workflow_id, run_id)
 
 
 class WorkflowExecution(ConnectedSWFObject):
     def __init__(self, domain, workflow_id, run_id=None, *args, **kwargs):
-        pass
-
+        self.domain = domain
+        self.workflow_id = workflow_id
