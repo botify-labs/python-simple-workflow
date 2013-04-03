@@ -42,8 +42,7 @@ class DomainQuery(BaseQuerySet):
                     self.aws_secret_access_key
                 )
             # Any other errors should raise
-            else:
-                raise ResponseError(e.body['message'])
+            raise ResponseError(e.body['message'])
 
         domain_info = response['domainInfo']
         domain_config = response['configuration']
@@ -85,7 +84,7 @@ class DomainQuery(BaseQuerySet):
 
             if not 'nextPageToken' in response:
                 break
-            else:
-                next_page_token = response['nextPageToken']
+
+            next_page_token = response['nextPageToken']
 
         return domains

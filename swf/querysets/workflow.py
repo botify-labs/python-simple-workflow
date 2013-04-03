@@ -40,8 +40,8 @@ class WorkflowTypeQuery(BaseQuerySet):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(e.body['message'])
-            else:
-                raise ResponseError(e.body['message'])
+
+            raise ResponseError(e.body['message'])
 
         wt_info = response['typeInfo']
         wt_config = response['configuration']
@@ -84,8 +84,8 @@ class WorkflowTypeQuery(BaseQuerySet):
 
             if not 'nextPageToken' in response:
                 break
-            else:
-                next_page_token = response['nextPageToken']
+
+            next_page_token = response['nextPageToken']
 
         return workflow_types
 
@@ -135,7 +135,7 @@ class WorkflowTypeQuery(BaseQuerySet):
 
             if not 'nextPageToken' in response:
                 break
-            else:
-                next_page_token = response['nextPageToken']
+
+            next_page_token = response['nextPageToken']
 
         return workflow_types

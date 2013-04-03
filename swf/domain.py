@@ -36,9 +36,7 @@ class Domain(ConnectedSWFObject):
 
     @cached_property
     def exists(self):
-        if DomainQuery(self.connection).get(self.name):
-            return True
-        return False
+        return bool(DomainQuery(self.connection).get(self.name))
 
     def save(self):
         """Creates the domain amazon side"""
