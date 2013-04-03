@@ -2,6 +2,7 @@
 
 from boto.swf.exceptions import SWFResponseError
 
+from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
 from swf.models.domain import Domain
 from swf.exceptions import ResponseError, DoesNotExistError,\
@@ -54,7 +55,7 @@ class DomainQuery(BaseQuerySet):
             connection=self.connection
         )
 
-    def all(self, registration_status=BaseQuerySet.REGISTERED_STATUS):
+    def all(self, registration_status=REGISTERED):
         """Retrieves every domains
 
         A typical Amazon response looks like:
