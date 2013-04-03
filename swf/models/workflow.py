@@ -5,6 +5,7 @@ import time
 from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.core import ConnectedSWFObject
+from swf.models.event import History
 from swf.exceptions import DoesNotExistError, AlreadyExistsError
 
 
@@ -143,6 +144,23 @@ class WorkflowType(ConnectedSWFObject):
 
 
 class WorkflowExecution(ConnectedSWFObject):
+    CLOSE_STATUS_COMPLETED = "COMPLETED"
+    CLOSE_STATUS_FAILED = "FAILED"
+    CLOSE_STATUS_CANCELED = "CANCELED"
+    CLOSE_STATUS_TERMINATED = "TERMINATED"
+    CLOSE_STATUS_CONTINUED_AS_NEW = "CLOSE_STATUS_CONTINUED_AS_NEW"
+    CLOSE_TIMED_OUT = "TIMED_OUT"
+
     def __init__(self, domain, workflow_id, run_id=None, *args, **kwargs):
         self.domain = domain
         self.workflow_id = workflow_id
+
+    def history(self, *args, **kwargs):
+        event_list = self.connection.get_workflow_execution_history(
+            self.domain,
+            self.run_id,
+            self.workflow_id,
+            **kwargs
+        )['events']
+
+        return History.from_event_list(event_list)

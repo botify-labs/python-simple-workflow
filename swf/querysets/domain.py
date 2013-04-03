@@ -8,7 +8,7 @@ from swf.exceptions import ResponseError, DoesNotExistError,\
                            InvalidCredentialsError
 
 
-class DomainQuery(BaseQuerySet):
+class DomainQuerySet(BaseQuerySet):
     """Swf domain queryset object
 
     Allows the user to interact with amazon's swf domains
