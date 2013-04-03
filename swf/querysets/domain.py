@@ -69,23 +69,17 @@ class DomainQuerySet(BaseQuerySet):
             ]
         }
         """
-        domains = []
-        next_page_token = None
 
-        while True:
-            response = self.connection.list_domains(
-                registration_status,
-                next_page_token=next_page_token
-            )
+        def get_domains():
+            response = {'nextPageToken': None}
+            while 'nextPageToken' in response:
+                response = self.connection.list_domains(
+                    registration_status,
+                    next_page_token=response['nextPageToken']
+                )
 
-            domains.extend(
-                [Domain(d['name'], d['status'], d['description']) for d
-                 in response['domainInfos']]
-            )
+                for domain_info in response['domainInfos']:
+                    yield domain_info
 
-            if not 'nextPageToken' in response:
-                break
-
-            next_page_token = response['nextPageToken']
-
-        return domains
+        return [Domain(d['name'], d['status'], d.get('description')) for d
+                in get_domains()]
