@@ -13,41 +13,38 @@ from swf.exceptions import DoesNotExistError, AlreadyExistsError
 class WorkflowType(ConnectedSWFObject):
     """Simple Workflow Type wrapper
 
-    Params
-    ------
-    * domain
-        * type: swf.models.Domain
-        * value: Domain the workflow type should be registered in
-    * name
-        * type: String
-        * value: name of the workflow type
-    * version
-        * type: Integer
-        * value: version of the workflow type
-    * status
-        * type: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
-        * value: workflow type status
-    * task_list
-        * type: String
-        * value: task list to use for scheduling decision tasks for executions
-                 of this workflow type
-    * child_policy
-        * type: swf.models.WorkflowType.{
-                    CHILD_POLICY_TERMINATE,
-                    CHILD_POLICY_REQUEST_CANCEL,
-                    CHILD_POLICY_ABANDON
-                }
-        * value: policy to use for the child workflow executions
-                 when a workflow execution of this type is terminated
-    * execution_timeout
-        * type: String
-        * value: maximum duration for executions of this workflow type
-    * decision_tasks_timeout
-        * type: String
-        * value: maximum duration of decision tasks for this workflow type
-    * description
-        * type: String
-        * value:  Textual description of the workflow type
+    :param  domain: Domain the workflow type should be registered in
+    :type   domain: swf.models.Domain
+
+    :param  name: name of the workflow type
+    :type   name: String
+
+    :param  version: workflow type version
+    :type   version: Integer
+
+    :param  status: workflow type status
+    :type   status: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
+
+    :param  task_list: task list to use for scheduling decision tasks for executions
+                       of this workflow type
+    :type   task_list: String
+
+    :param  child_policy: policy to use for the child workflow executions
+                          when a workflow execution of this type is terminated
+    :type   child_policy: swf.models.WorkflowType.{
+                                CHILD_POLICY_TERMINATE,
+                                CHILD_POLICY_REQUEST_CANCEL,
+                                CHILD_POLICY_ABANDON
+                            }
+
+    :param  execution_timeout: maximum duration for executions of this workflow type
+    :type   execution_timeout: String
+
+    :param  decision_tasks_timeout: maximum duration of decision tasks for this workflow type
+    :type   decision_tasks_timeout: String
+
+    :param  description: Textual description of the workflow type
+    :type   description: String
     """
     CHILD_POLICY_TERMINATE = "TERMINATE"  # child executions will be terminated
     CHILD_POLICY_REQUEST_CANCEL = "REQUEST_CANCEL"  #  a request to cancel will be attempted for each child execution
@@ -123,7 +120,7 @@ class WorkflowType(ConnectedSWFObject):
     def start_execution(self, workflow_id=None, task_list=None,
                         child_policy=None, execution_timeout=None,
                         input=None, tag_list=None, decision_tasks_timeout=None):
-        """Starts a Workflow execution"""
+        """Starts a Workflow execution of current workflow type"""
         workflow_id = workflow_id or '%s-%s-%i' % (self.name, self.version, time.time())
         task_list = task_list or self.task_list
         child_policy = child_policy or self.child_policy
@@ -145,6 +142,11 @@ class WorkflowType(ConnectedSWFObject):
 
 
 class WorkflowExecution(ConnectedSWFObject):
+    """Simple Workflow execution wrapper
+
+    :param  domain: Domain the workflow execution should be registered in
+    :type   domain: swf.models.domain.Domain
+    """
     STATUS_OPEN = "OPEN"
     STATUS_CLOSED = "CLOSED"
 
@@ -155,8 +157,9 @@ class WorkflowExecution(ConnectedSWFObject):
     CLOSE_STATUS_CONTINUED_AS_NEW = "CLOSE_STATUS_CONTINUED_AS_NEW"
     CLOSE_TIMED_OUT = "TIMED_OUT"
 
-    def __init__(self, domain, workflow_id,
-                 run_id=None, status=STATUS_OPEN,
+    def __init__(self, domain, workflow_type,
+                 workflow_id, run_id=None,
+                 status=STATUS_OPEN,
                  *args, **kwargs):
         self.domain = domain
         self.workflow_id = workflow_id
@@ -165,7 +168,7 @@ class WorkflowExecution(ConnectedSWFObject):
 
     def history(self, *args, **kwargs):
         event_list = self.connection.get_workflow_execution_history(
-            self.domain,
+            self.domain.name,
             self.run_id,
             self.workflow_id,
             **kwargs
