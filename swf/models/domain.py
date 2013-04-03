@@ -4,7 +4,6 @@ from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
-from swf.querysets.workflow import WorkflowTypeQuerySet
 from swf.exceptions import AlreadyExistsError, DoesNotExistError
 
 
@@ -59,6 +58,7 @@ class Domain(ConnectedSWFObject):
 
     def workflows(self, status=REGISTERED):
         """Lists the current domain's workflows"""
+        from swf.querysets.workflow import WorkflowTypeQuerySet
         qs = WorkflowTypeQuerySet(self.name)
         return qs.all(registration_status=status)
 
