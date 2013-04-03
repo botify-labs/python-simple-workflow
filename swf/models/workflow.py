@@ -139,7 +139,7 @@ class WorkflowType(ConnectedSWFObject):
             input=input,
             tag_list=tag_list,
             task_start_to_close_timeout=decision_tasks_timeout,
-        )
+        )['runId']
 
         return WorkflowExecution(self.domain, workflow_id, run_id)
 
