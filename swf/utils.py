@@ -2,6 +2,9 @@
 
 from functools import wraps
 
+# De-capitalize a string (lower first character)
+decapitalize = lambda s: s[:1].lower() + s[1:] if s else ''
+
 
 class _CachedProperty(property):
     """A property cache mechanism.
