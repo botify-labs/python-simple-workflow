@@ -74,15 +74,21 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         wt_info = response['typeInfo']
         wt_config = response['configuration']
 
-        return WorkflowType(
-            self.domain.name,
-            wt_info['workflowType']['name'],
-            int(wt_info['workflowType']['version']),
-            status=wt_info['status'],
+        return self.to_WorkflowType(
+            wt_info,
             task_list=wt_config['defaultTaskList']['name'],
             child_policy=wt_config['defaultChildPolicy'],
             execution_timeout=wt_config['defaultExecutionStartToCloseTimeout'],
             decision_task_timeout=wt_config['defaultTaskStartToCloseTimeout'],
+        )
+
+    def to_WorkflowType(self, workflow_info, **kwargs):
+        return WorkflowType(
+            self.domain.name,
+            workflow_info['workflowType']['name'],
+            workflow_info['workflowType']['version'],
+            status=workflow_info['status'],
+            **kwargs
         )
 
     def filter(self, domain_name=None, registration_status=REGISTERED, name=None):
@@ -103,12 +109,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             )
 
             for workflow in response['typeInfos']:
-                workflow_types.append(WorkflowType(
-                    self.domain.name,
-                    workflow['workflowType']['name'],
-                    int(workflow['workflowType']['version']),
-                    status=workflow['status'],
-                ))
+                workflow_types.append(self.to_WorkflowType(workflow))
 
             if not 'nextPageToken' in response:
                 break
@@ -156,10 +157,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
                 for workflow in response['typeInfos']:
                     yield workflow
 
-        return [WorkflowType(self.domain.name,
-                             wf['workflowType']['name'],
-                             int(wf['workflowType']['version']),
-                             status=wf['status']) for wf in get_workflows()]
+        return [self.to_WorkflowType(wf) for wf in get_workflows()]
 
 
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
