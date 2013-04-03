@@ -166,6 +166,7 @@ class WorkflowExecution(ConnectedSWFObject):
     def __init__(self, domain, workflow_id,
                  run_id=None, status=STATUS_OPEN,
                  *args, **kwargs):
+        super(WorkflowExecution, self).__init__(*args, **kwargs)
         self.domain = domain
         self.workflow_id = workflow_id
         self.run_id = run_id or None
