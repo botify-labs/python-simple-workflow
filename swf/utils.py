@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
+from time import mktime
+
 from functools import wraps
 
 # De-capitalize a string (lower first character)
 decapitalize = lambda s: s[:1].lower() + s[1:] if s else ''
+
+past_day = lambda d: datetime.now() - timedelta(days=d)
+datetime_timestamp = lambda datetime: mktime(datetime.timetuple())
 
 
 class _CachedProperty(property):
