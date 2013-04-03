@@ -143,30 +143,23 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             ]
         }
         """
-        workflow_types = []
-        next_page_token = None
 
-        while True:
-            response = self.connection.list_workflow_types(
-                self.domain.name,
-                registration_status,
-                next_page_token=next_page_token
-            )
-
-            for workflow in response['typeInfos']:
-                workflow_types.append(WorkflowType(
+        def get_workflows():
+            response = {'nextPageToken': None}
+            while 'nextPageToken' in response:
+                response = self.connection.list_workflow_types(
                     self.domain.name,
-                    workflow['workflowType']['name'],
-                    int(workflow['workflowType']['version']),
-                    status=workflow['status'],
-                ))
+                    registration_status,
+                    next_page_token=response['nextPageToken']
+                )
 
-            if not 'nextPageToken' in response:
-                break
+                for workflow in response['typeInfos']:
+                    yield workflow
 
-            next_page_token = response['nextPageToken']
-
-        return workflow_types
+        return [WorkflowType(self.domain.name,
+                             wf['workflowType']['name'],
+                             int(wf['workflowType']['version']),
+                             status=wf['status']) for wf in get_workflows()]
 
 
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
