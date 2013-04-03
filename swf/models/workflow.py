@@ -144,6 +144,9 @@ class WorkflowType(ConnectedSWFObject):
 
 
 class WorkflowExecution(ConnectedSWFObject):
+    STATUS_OPEN = "OPEN"
+    STATUS_CLOSED = "CLOSED"
+
     CLOSE_STATUS_COMPLETED = "COMPLETED"
     CLOSE_STATUS_FAILED = "FAILED"
     CLOSE_STATUS_CANCELED = "CANCELED"
@@ -151,9 +154,13 @@ class WorkflowExecution(ConnectedSWFObject):
     CLOSE_STATUS_CONTINUED_AS_NEW = "CLOSE_STATUS_CONTINUED_AS_NEW"
     CLOSE_TIMED_OUT = "TIMED_OUT"
 
-    def __init__(self, domain, workflow_id, run_id=None, *args, **kwargs):
+    def __init__(self, domain, workflow_id,
+                 run_id=None, status=STATUS_OPEN,
+                 *args, **kwargs):
         self.domain = domain
         self.workflow_id = workflow_id
+        self.run_id = run_id or None
+        self.status = status
 
     def history(self, *args, **kwargs):
         event_list = self.connection.get_workflow_execution_history(
