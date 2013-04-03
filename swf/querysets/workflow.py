@@ -93,30 +93,25 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 
     def filter(self, domain_name=None, registration_status=REGISTERED, name=None):
         """Filters workflows based of their status, and/or name"""
-        workflow_types = []
-        next_page_token = None
+
+        def get_workflows():
+            response = {'nextPageToken': None}
+            while 'nextPageToken' in response:
+                response = self.connection.list_workflow_types(
+                    domain_name,
+                    registration_status,
+                    name=name,
+                    next_page_token=response['nextPageToken']
+                )
+
+                for workflow in response['typeInfos']:
+                    yield workflow
 
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
         domain_name = domain_name or self.domain.name
 
-        while True:
-            response = self.connection.list_workflow_types(
-                domain_name,
-                registration_status,
-                name=name,
-                next_page_token=next_page_token
-            )
-
-            for workflow in response['typeInfos']:
-                workflow_types.append(self.to_WorkflowType(workflow))
-
-            if not 'nextPageToken' in response:
-                break
-
-            next_page_token = response['nextPageToken']
-
-        return workflow_types
+        return [self.to_WorkflowType(wf) for wf in get_workflows()]
 
     def all(self, registration_status=REGISTERED):
         """Retrieves every Workflow types
@@ -144,20 +139,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             ]
         }
         """
-
-        def get_workflows():
-            response = {'nextPageToken': None}
-            while 'nextPageToken' in response:
-                response = self.connection.list_workflow_types(
-                    self.domain.name,
-                    registration_status,
-                    next_page_token=response['nextPageToken']
-                )
-
-                for workflow in response['typeInfos']:
-                    yield workflow
-
-        return [self.to_WorkflowType(wf) for wf in get_workflows()]
+        return self.filter(registration_status=registration_status)
 
 
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
