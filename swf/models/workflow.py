@@ -136,9 +136,17 @@ class WorkflowType(ConnectedSWFObject):
             input=input,
             tag_list=tag_list,
             task_start_to_close_timeout=decision_tasks_timeout,
-        )
+        )['runId']
 
         return WorkflowExecution(self.domain, workflow_id, run_id)
+
+    def __repr__(self):
+        return '<{} domain={} name={} version={} status={}>'.format(
+               self.__class__.__name__,
+               self.domain.name,
+               self.name,
+               self.version,
+               self.status)
 
 
 class WorkflowExecution(ConnectedSWFObject):
@@ -161,6 +169,7 @@ class WorkflowExecution(ConnectedSWFObject):
                  workflow_id, run_id=None,
                  status=STATUS_OPEN,
                  *args, **kwargs):
+        super(WorkflowExecution, self).__init__(*args, **kwargs)
         self.domain = domain
         self.workflow_id = workflow_id
         self.run_id = run_id or None

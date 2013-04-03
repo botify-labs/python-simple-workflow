@@ -65,3 +65,7 @@ class Domain(ConnectedSWFObject):
     @property
     def executions(self):
         pass
+
+    def __repr__(self):
+        return '<{} name={} status={}>'.format(
+               self.__class__.__name__, self.name, self.status)
