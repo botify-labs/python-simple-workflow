@@ -174,7 +174,7 @@ class WorkflowExecution(ConnectedSWFObject):
 
     def history(self, *args, **kwargs):
         event_list = self.connection.get_workflow_execution_history(
-            self.domain,
+            self.domain.name,
             self.run_id,
             self.workflow_id,
             **kwargs
