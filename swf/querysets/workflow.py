@@ -7,11 +7,13 @@ from swf.models.workflow import WorkflowType
 from swf.exceptions import ResponseError, DoesNotExistError
 
 
-class WorkflowTypeQuery(BaseQuerySet):
+class BaseWorkflowQuerySet(BaseQuerySet):
     def __init__(self, domain_name, *args, **kwargs):
-        super(WorkflowTypeQuery, self).__init__(*args, **kwargs)
+        super(BaseWorkflowQuerySet, self).__init__(*args, **kwargs)
         self.domain_name = domain_name
 
+
+class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
     def get(self, name, version):
         """Fetches the Workflow Type with `name` and `version`
 
@@ -139,3 +141,7 @@ class WorkflowTypeQuery(BaseQuerySet):
             next_page_token = response['nextPageToken']
 
         return workflow_types
+
+
+class WorkflowExecutionsQuerySet(BaseWorkflowQuerySet):
+    pass
