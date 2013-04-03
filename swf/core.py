@@ -3,8 +3,8 @@
 from boto.swf.layer1 import Layer1
 
 AWS_CREDENTIALS = {
-    'aws_access_key_id': None,
-    'aws_secret_access_key': None
+    #'aws_access_key_id': AWS_ACCESS_KEY_ID,
+    #'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
 }
 
 
@@ -22,20 +22,13 @@ class ConnectedSWFObject(object):
     Once inherited, implements the AWS authentication
     into the child, adding a `connection` property.
     """
-    REGISTERED = "REGISTERED"
-    DEPRECATED = "DEPRECATED"
-
     def __init__(self, *args, **kwargs):
-        for credkey in ('aws_access_key_id', 'aws_secret_access_key'):
-            if AWS_CREDENTIALS.get(credkey):
-                setattr(self, credkey, AWS_CREDENTIALS[credkey])
-
         for kwarg in kwargs:
             setattr(self, kwarg, kwargs[kwarg])
 
         self.connection = Layer1(
-            self.aws_access_key_id,
-            self.aws_secret_access_key
+            AWS_CREDENTIALS['aws_access_key_id'],
+            AWS_CREDENTIALS['aws_secret_access_key'],
         )
 
     def exists(self):

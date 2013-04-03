@@ -2,6 +2,7 @@
 
 from boto.swf.exceptions import SWFResponseError
 
+from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
 from swf.models.workflow import WorkflowType, WorkflowExecution
 from swf.exceptions import ResponseError, DoesNotExistError
@@ -66,7 +67,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             decision_task_timeout=wt_config['defaultTaskStartToCloseTimeout'],
         )
 
-    def filter(self, domain_name=None, registration_status=WorkflowType.REGISTERED, name=None):
+    def filter(self, domain_name=None, registration_status=REGISTERED, name=None):
         """Filters workflows based of their status, and/or name"""
         workflow_types = []
         next_page_token = None
@@ -98,7 +99,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 
         return workflow_types
 
-    def all(self, registration_status=BaseQuerySet.REGISTERED_STATUS):
+    def all(self, registration_status=REGISTERED):
         """Retrieves every Workflow types
 
         A typical Amazon response looks like:

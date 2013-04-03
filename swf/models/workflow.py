@@ -4,6 +4,7 @@ import time
 
 from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
+from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
 from swf.models.event import History
 from swf.exceptions import DoesNotExistError, AlreadyExistsError
@@ -53,7 +54,7 @@ class WorkflowType(ConnectedSWFObject):
     CHILD_POLICY_ABANDON = "ABANDON"  # no action will be taken
 
     def __init__(self, domain, name, version,
-                 status=ConnectedSWFObject.REGISTERED,
+                 status=REGISTERED,
                  task_list=None,
                  child_policy=CHILD_POLICY_TERMINATE,
                  execution_timeout='300',
