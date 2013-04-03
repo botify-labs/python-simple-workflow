@@ -143,6 +143,14 @@ class WorkflowType(ConnectedSWFObject):
 
         return WorkflowExecution(self.domain, workflow_id, run_id)
 
+    def __repr__(self):
+        return '<{} domain={} name={} version={} status={}>'.format(
+               self.__class__.__name__,
+               self.domain.name,
+               self.name,
+               self.version,
+               self.status)
+
 
 class WorkflowExecution(ConnectedSWFObject):
     STATUS_OPEN = "OPEN"
