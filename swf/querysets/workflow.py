@@ -91,10 +91,12 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         )
 
     def to_WorkflowType(self, workflow_info, **kwargs):
+        # Not using get_subkey in order for it to explictly
+        # raise when workflowType name doesn't exist for example
         return WorkflowType(
             self.domain.name,
             workflow_info['workflowType']['name'],
-            float(workflow_info['workflowType']['version']),
+            workflow_info['workflowType']['version'],
             status=workflow_info['status'],
             **kwargs
         )
