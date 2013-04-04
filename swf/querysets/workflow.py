@@ -5,8 +5,9 @@ from boto.swf.exceptions import SWFResponseError
 from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
 from swf.models.workflow import WorkflowType, WorkflowExecution
-from swf.exceptions import ResponseError, DoesNotExistError
 from swf.utils import datetime_timestamp, past_day, get_subkey
+from swf.exceptions import ResponseError, DoesNotExistError,\
+                           InvalidKeywordArgumentError
 
 
 class BaseWorkflowQuerySet(BaseQuerySet):
@@ -155,6 +156,28 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
     """Fetches Workflow executions"""
 
+    def _valid_list_operations_kwargs(self, status, kwargs):
+        invalid_kwargs = []
+        if status == WorkflowExecution.STATUS_OPEN:
+            invalid_kwargs = [
+                'start_latest_date',
+                'start_oldest_date',
+                'close_latest_date',
+                'close_oldest_date',
+                'close_status'
+            ]
+        else:
+            invalid_kwargs = [
+                'oldest_date',
+                'latest_date'
+            ]
+
+        for kwarg in invalid_kwargs:
+            if kwarg in kwargs:
+                return False, kwarg
+
+        return True, None
+
     def list_workflow_executions(self, status, *args, **kwargs):
         statuses = {
             WorkflowExecution.STATUS_OPEN: 'open',
@@ -217,6 +240,103 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             execution_timeout=execution_config.get('executionStartToCloseTimeout'),
             decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
         )
+
+    def filter(self, domain_name=None,
+               status=WorkflowExecution.STATUS_OPEN, tag=None,
+               workflow_id=None, workflow_type_name=None,
+               workflow_type_version=None,
+               *args, **kwargs):
+        """Filters workflow executions based on kwargs provided criteras
+
+        :param  domain_name: workflow executions attached to domain with
+                             provided domain_name will be kept
+        :type   domain_name: String
+
+        :param  status: workflow executions with provided status will be kept
+        :type   status: swf.models.WorkflowExecution.{STATUS_OPEN, STATUS_CLOSED}
+
+        :param  tag: workflow executions containing the tag will be kept
+        :type   tag: String
+
+        :param  workflow_id: workflow executions attached to the id will be kept
+        :type   workflow_id: String
+
+        :param  workflow_type_name: workflow executions attached to the workflow type
+                                    with provided name will be kept
+        :type   workflow_type_name: String
+
+        :param  workflow_type_version: workflow executions attached to the workflow type
+                                       of the provided version will be kept
+        :type   workflow_type_version: String
+
+        **Be aware that** querying over status allows the usage of statuses specific
+        kwargs
+
+        * STATUS_OPEN
+
+            :param start_latest_date: latest start or close date and time to return (in days)
+            :type  start_latest_date: int
+
+        * STATUS_CLOSED
+
+            :param  start_latest_date: workflow executions that meet the start time criteria
+                                       of the filter are kept (in days)
+            :type   start_latest_date: int
+
+            :param  start_oldest_date: workflow executions that meet the start time criteria
+                                       of the filter are kept (in days)
+            :type   start_oldest_date: int
+
+            :param  close_latest_date: workflow executions that meet the close time criteria
+                                       of the filter are kept (in days)
+            :type   close_latest_date: int
+
+            :param  close_oldest_date: workflow executions that meet the close time criteria
+                                       of the filter are kept (in days)
+            :type   close_oldest_date: int
+
+            :param  close_status: must match the close status of an execution for it
+                                  to meet the criteria of this filter
+            :type   close_status: swf.models.WorkflowExecution.{
+                                      CLOSE_STATUS_COMPLETED,
+                                      CLOSE_STATUS_FAILED,
+                                      CLOSE_STATUS_CANCELED,
+                                      CLOSE_STATUS_TERMINATED,
+                                      CLOSE_STATUS_CONTINUED_AS_NEW,
+                                      CLOSE_TIMED_OUT,
+                                  }
+        """
+
+        def get_workflows(status, domain_name, **kwargs):
+            response = {'nextPageToken': None}
+            while 'nextPageToken' in response:
+                response = self.list_workflow_executions(
+                    status,
+                    domain_name,
+                    start_oldest_date=kwargs.pop('start_oldest_date'),
+                    next_page_token=response['nextPageToken'],
+                    **kwargs
+                )
+
+                for workflow in response['executionInfos']:
+                    yield workflow
+
+        valid_kwargs, invalid_kwarg = self._valid_list_operations_kwargs(status, kwargs)
+        start_oldest_date = datetime_timestamp(past_day(kwargs.get('oldest_date', 30)))
+
+        if not valid_kwargs:
+            err_msg = "Invalid keyword argument supplied: {}".format(invalid_kwarg)
+            raise InvalidKeywordArgumentError(err_msg)
+
+        # As WorkflowTypeQuery has to be built against a specific domain
+        # name, domain filter is disposable, but not mandatory.
+        domain_name = domain_name or self.domain.name
+
+        return [self.to_WorkflowExecution(wf) for wf
+                in get_workflows(
+                    status,
+                    domain_name,
+                    start_oldest_date=start_oldest_date)]
 
     def all(self, status=WorkflowExecution.STATUS_OPEN,
             start_oldest_date=30):

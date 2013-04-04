@@ -22,3 +22,6 @@ class DoesNotExistError(Exception):
 
 class AlreadyExistsError(Exception):
     pass
+
+class InvalidKeywordArgumentError(Exception):
+    pass
