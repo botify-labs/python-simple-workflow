@@ -82,12 +82,17 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         wt_info = response['typeInfo']
         wt_config = response['configuration']
 
+        # Handle case when defaultTaskList is not present
+        # in config.
+        default_task_list = wt_config.get('defaultTaskList')
+        wt_task_list = default_task_list['name'] if default_task_list else None
+
         return self.to_WorkflowType(
             wt_info,
-            task_list=wt_config['defaultTaskList']['name'],
-            child_policy=wt_config['defaultChildPolicy'],
-            execution_timeout=wt_config['defaultExecutionStartToCloseTimeout'],
-            decision_task_timeout=wt_config['defaultTaskStartToCloseTimeout'],
+            task_list=wt_task_list,  # Avoid non-existing task-list
+            child_policy=wt_config.get('defaultChildPolicy'),
+            execution_timeout=wt_config.get('defaultExecutionStartToCloseTimeout'),
+            decision_task_timeout=wt_config.get('defaultTaskStartToCloseTimeout'),
         )
 
     def to_WorkflowType(self, workflow_info, **kwargs):
@@ -230,7 +235,6 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             )
 
             for workflow in response['executionInfos']:
-                print workflow['workflowType']
                 workflow_type_qs = WorkflowTypeQuerySet(self.domain)
                 workflow_type = workflow_type_qs.get(
                     workflow['workflowType']['name'],
