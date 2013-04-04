@@ -210,13 +210,22 @@ class WorkflowExecution(ConnectedSWFObject):
 
     def __init__(self, domain, workflow_type,
                  workflow_id, run_id=None,
-                 status=STATUS_OPEN,
-                 *args, **kwargs):
+                 status=STATUS_OPEN, task_list=None,
+                 child_policy=None, execution_timeout=None,
+                 input=None, tag_list=None,
+                 decision_tasks_timeout=None, *args, **kwargs):
         super(WorkflowExecution, self).__init__(*args, **kwargs)
+
         self.domain = domain
         self.workflow_id = workflow_id
-        self.run_id = run_id or None
+        self.run_id = run_id
         self.status = status
+        self.task_list = task_list
+        self.child_policy = child_policy
+        self.execution_timeout = execution_timeout
+        self.input = input
+        self.tag_list = tag_list
+        self.decision_tasks_timeout = decision_tasks_timeout
 
     def history(self, *args, **kwargs):
         """Returns workflow execution history report

@@ -8,8 +8,43 @@ from functools import wraps
 # De-capitalize a string (lower first character)
 decapitalize = lambda s: s[:1].lower() + s[1:] if s else ''
 
+# Get a past day datetime
 past_day = lambda d: datetime.now() - timedelta(days=d)
+
+# Get a datetime timestamp
 datetime_timestamp = lambda datetime: mktime(datetime.timetuple())
+
+
+def get_subkey(d, key_path):
+    """Gets a sub-dict key, and return None if whether
+    the parent or child dict key does not exist
+
+    Example:
+    >>> d = {
+      'a': {
+        '1': 2,
+        '2': 3,
+      }
+    }
+    >>> subkey(d, ['a'])
+    {'1': 2, '2': 3}
+    >>> subkey(d, ['a', '1'])
+    2
+    >>> subkey(d, ['a', '3'])
+    None
+
+    :param  d: dict to operate over
+    :type   d: dict of dicts
+
+    :param  key_path: dict keys path list representation
+    :type   key_path: list
+    """
+    if len(key_path) > 1:
+        if d.get(key_path[0]) is None:
+            return None
+        return get_subkey(d[key_path[0]], key_path[1:])
+    else:
+        return d.get(key_path[0])
 
 
 class _CachedProperty(property):

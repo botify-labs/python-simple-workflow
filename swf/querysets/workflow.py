@@ -6,7 +6,7 @@ from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
 from swf.models.workflow import WorkflowType, WorkflowExecution
 from swf.exceptions import ResponseError, DoesNotExistError
-from swf.utils import datetime_timestamp, past_day
+from swf.utils import datetime_timestamp, past_day, get_subkey
 
 
 class BaseWorkflowQuerySet(BaseQuerySet):
@@ -82,14 +82,9 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         wt_info = response['typeInfo']
         wt_config = response['configuration']
 
-        # Handle case when defaultTaskList is not present
-        # in config.
-        default_task_list = wt_config.get('defaultTaskList')
-        wt_task_list = default_task_list['name'] if default_task_list else None
-
         return self.to_WorkflowType(
             wt_info,
-            task_list=wt_task_list,  # Avoid non-existing task-list
+            task_list=get_subkey(wt_config, ['defaultTaskList', 'name']),  # Avoid non-existing task-list
             child_policy=wt_config.get('defaultChildPolicy'),
             execution_timeout=wt_config.get('defaultExecutionStartToCloseTimeout'),
             decision_task_timeout=wt_config.get('defaultTaskStartToCloseTimeout'),
@@ -177,6 +172,50 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         except KeyError:
             raise ValueError("Unknown status provided: %s" % status)
 
+    def get_workflow_type(self, execution_info):
+        workflow_type = execution_info.pop('workflowType')
+        workflow_type_qs = WorkflowTypeQuerySet(self.domain)
+
+        return workflow_type_qs.get(
+            workflow_type['name'],
+            workflow_type['version'],
+        )
+
+    def to_WorkflowExecution(self, execution_info, **kwargs):
+        return WorkflowExecution(
+            self.domain.name,
+            self.get_workflow_type(execution_info),  # workflow_type
+            get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
+            run_id=get_subkey(execution_info, ['execution', 'runId']),
+            status=execution_info.get('executionStatus'),
+            tag_list=execution_info.get('tagList'),
+            **kwargs
+        )
+
+    def get(self, workflow_id, run_id):
+        """ """
+        try:
+            response = self.connection.describe_workflow_execution(
+                self.domain.name,
+                run_id,
+                workflow_id)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError(e.body['message'])
+
+            raise ResponseError(e.body['message'])
+
+        execution_info = response['executionInfo']
+        execution_config = response['executionConfiguration']
+
+        return self.to_WorkflowExecution(
+            execution_info,
+            task_list=get_subkey(execution_config, ['defaultTaskList', 'name']),
+            child_policy=execution_config.get('childPolicy'),
+            execution_timeout=execution_config.get('executionStartToCloseTimeout'),
+            decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
+        )
+
     def all(self, status=WorkflowExecution.STATUS_OPEN,
             start_oldest_date=30):
         """Fetch every workflow executions during the last `start_oldest_date`
@@ -234,20 +273,8 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                 next_page_token=next_page_token
             )
 
-            for workflow in response['executionInfos']:
-                workflow_type_qs = WorkflowTypeQuerySet(self.domain)
-                workflow_type = workflow_type_qs.get(
-                    workflow['workflowType']['name'],
-                    workflow['workflowType']['version'],
-                )
-
-                workflow_executions.append(WorkflowExecution(
-                    self.domain,
-                    workflow_type,
-                    workflow['execution']['workflowId'],
-                    run_id=workflow['execution']['runId'],
-                    status=workflow['executionStatus'],
-                ))
+            for execution_info in response['executionInfos']:
+                workflow_executions.append(self.to_WorkflowExecution(execution_info))
 
             if not 'nextPageToken' in response:
                 break
