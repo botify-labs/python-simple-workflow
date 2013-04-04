@@ -43,6 +43,14 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
     def get(self, name, version):
         """Fetches the Workflow Type with `name` and `version`
 
+        :param  name: name of the workflow type
+        :type   name: String
+
+        :param  version: workflow type version
+        :type   version: String
+
+        :returns: A swf.model.workflow.WorkflowType instance
+
         A typical Amazon response looks like:
         {
             'configuration': {
@@ -64,7 +72,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         }
         """
         try:
-            response = self.connection.describe_workflow_type(self.domain.name, name, str(version))
+            response = self.connection.describe_workflow_type(self.domain.name, name, version)
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(e.body['message'])
@@ -86,7 +94,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         return WorkflowType(
             self.domain.name,
             workflow_info['workflowType']['name'],
-            workflow_info['workflowType']['version'],
+            float(workflow_info['workflowType']['version']),
             status=workflow_info['status'],
             **kwargs
         )
@@ -226,7 +234,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                 workflow_type_qs = WorkflowTypeQuerySet(self.domain)
                 workflow_type = workflow_type_qs.get(
                     workflow['workflowType']['name'],
-                    int(workflow['workflowType']['version']),
+                    workflow['workflowType']['version'],
                 )
 
                 workflow_executions.append(WorkflowExecution(

@@ -20,7 +20,7 @@ class WorkflowType(ConnectedSWFObject):
     :type   name: String
 
     :param  version: workflow type version
-    :type   version: Integer
+    :type   version: String
 
     :param  status: workflow type status
     :type   status: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
@@ -96,7 +96,7 @@ class WorkflowType(ConnectedSWFObject):
             self.connection.register_workflow_type(
                 self.domain.name,
                 self.name,
-                str(self.version),
+                self.version,
                 task_list=str(self.task_list),
                 default_child_policy=str(self.child_policy),
                 default_execution_start_to_close_timeout=str(self.execution_timeout),
@@ -129,7 +129,7 @@ class WorkflowType(ConnectedSWFObject):
             self.domain.name,
             workflow_id,
             self.name,
-            str(self.version),
+            self.version,
             task_list=task_list,
             child_policy=child_policy,
             execution_start_to_close_timeout=execution_timeout,
