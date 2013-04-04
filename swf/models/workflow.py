@@ -120,7 +120,36 @@ class WorkflowType(ConnectedSWFObject):
     def start_execution(self, workflow_id=None, task_list=None,
                         child_policy=None, execution_timeout=None,
                         input=None, tag_list=None, decision_tasks_timeout=None):
-        """Starts a Workflow execution of current workflow type"""
+        """Starts a Workflow execution of current workflow type
+
+        :param  workflow_id: The user defined identifier associated with the workflow execution
+        :type   workflow_id: String
+
+        :param  task_list: task list to use for scheduling decision tasks for execution
+                        of this workflow
+        :type   task_list: String
+
+        :param  child_policy: policy to use for the child workflow executions
+                              of this workflow execution.
+        :type   child_policy: swf.models.WorkflowType.{
+                                CHILD_POLICY_TERMINATE,
+                                CHILD_POLICY_REQUEST_CANCEL,
+                                CHILD_POLICY_ABANDON
+                            }
+
+        :param  execution_timeout: maximum duration for the workflow execution
+        :type   execution_timeout: String
+
+        :param  input: Input of the workflow execution
+        :type   input: String
+
+        :param  tag_list: Tags associated with the workflow execution
+        :type   tag_list: String
+
+        :param  decision_tasks_timeout: maximum duration of decision tasks
+                                        for this workflow execution
+        :type   decision_tasks_timeout: String
+        """
         workflow_id = workflow_id or '%s-%s-%i' % (self.name, self.version, time.time())
         task_list = task_list or self.task_list
         child_policy = child_policy or self.child_policy
@@ -154,6 +183,20 @@ class WorkflowExecution(ConnectedSWFObject):
 
     :param  domain: Domain the workflow execution should be registered in
     :type   domain: swf.models.domain.Domain
+
+    :param  workflow_type: The WorkflowType associated with the workflow execution
+                           is associated with
+    :type   workflow_type: String
+
+    :param  workflow_id: The user defined identifier associated with the workflow execution
+    :type   workflow_id: String
+
+    :param  run_id: The Amazon defined identifier associated with the workflow execution
+    :type   run_id: String
+
+    :param  status: Whether the WorkflowExecution instance represents an opened or
+                    closed execution
+    :type   status: String constant
     """
     STATUS_OPEN = "OPEN"
     STATUS_CLOSED = "CLOSED"
@@ -176,6 +219,11 @@ class WorkflowExecution(ConnectedSWFObject):
         self.status = status
 
     def history(self, *args, **kwargs):
+        """Returns workflow execution history report
+
+        :returns: The workflow execution complete events history
+        :rtype: swf.models.event.History
+        """
         event_list = self.connection.get_workflow_execution_history(
             self.domain.name,
             self.run_id,
