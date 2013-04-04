@@ -41,6 +41,17 @@ class BaseWorkflowQuerySet(BaseQuerySet):
 
 
 class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
+    def to_WorkflowType(self, domain, workflow_info, **kwargs):
+        # Not using get_subkey in order for it to explictly
+        # raise when workflowType name doesn't exist for example
+        return WorkflowType(
+            domain,
+            workflow_info['workflowType']['name'],
+            workflow_info['workflowType']['version'],
+            status=workflow_info['status'],
+            **kwargs
+        )
+
     def get(self, name, version):
         """Fetches the Workflow Type with `name` and `version`
 
@@ -84,6 +95,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         wt_config = response['configuration']
 
         return self.to_WorkflowType(
+            self.domain,
             wt_info,
             task_list=get_subkey(wt_config, ['defaultTaskList', 'name']),  # Avoid non-existing task-list
             child_policy=wt_config.get('defaultChildPolicy'),
@@ -91,25 +103,17 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             decision_task_timeout=wt_config.get('defaultTaskStartToCloseTimeout'),
         )
 
-    def to_WorkflowType(self, workflow_info, **kwargs):
-        # Not using get_subkey in order for it to explictly
-        # raise when workflowType name doesn't exist for example
-        return WorkflowType(
-            self.domain.name,
-            workflow_info['workflowType']['name'],
-            workflow_info['workflowType']['version'],
-            status=workflow_info['status'],
-            **kwargs
-        )
-
-    def filter(self, domain_name=None, registration_status=REGISTERED, name=None):
+    def filter(self, domain=None, registration_status=REGISTERED, name=None):
         """Filters workflows based of their status, and/or name"""
+        # As WorkflowTypeQuery has to be built against a specific domain
+        # name, domain filter is disposable, but not mandatory.
+        domain = domain or self.domain
 
         def get_workflows():
             response = {'nextPageToken': None}
             while 'nextPageToken' in response:
                 response = self.connection.list_workflow_types(
-                    domain_name,
+                    domain.name,
                     registration_status,
                     name=name,
                     next_page_token=response['nextPageToken']
@@ -118,11 +122,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
                 for workflow in response['typeInfos']:
                     yield workflow
 
-        # As WorkflowTypeQuery has to be built against a specific domain
-        # name, domain filter is disposable, but not mandatory.
-        domain_name = domain_name or self.domain.name
-
-        return [self.to_WorkflowType(wf) for wf in get_workflows()]
+        return [self.to_WorkflowType(domain, wf) for wf in get_workflows()]
 
     def all(self, registration_status=REGISTERED):
         """Retrieves every Workflow types
@@ -206,9 +206,9 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             workflow_type['version'],
         )
 
-    def to_WorkflowExecution(self, execution_info, **kwargs):
+    def to_WorkflowExecution(self, domain, execution_info, **kwargs):
         return WorkflowExecution(
-            self.domain.name,
+            domain,
             self.get_workflow_type(execution_info),  # workflow_type
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
@@ -234,6 +234,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         execution_config = response['executionConfiguration']
 
         return self.to_WorkflowExecution(
+            self.domain,
             execution_info,
             task_list=get_subkey(execution_config, ['defaultTaskList', 'name']),
             child_policy=execution_config.get('childPolicy'),
@@ -241,7 +242,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
         )
 
-    def filter(self, domain_name=None,
+    def filter(self, domain=None,
                status=WorkflowExecution.STATUS_OPEN, tag=None,
                workflow_id=None, workflow_type_name=None,
                workflow_type_version=None,
@@ -306,13 +307,16 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                                       CLOSE_TIMED_OUT,
                                   }
         """
+        # As WorkflowTypeQuery has to be built against a specific domain
+        # name, domain filter is disposable, but not mandatory.
+        domain = domain or self.domain.name
 
-        def get_workflows(status, domain_name, **kwargs):
+        def get_workflows(status, domain, **kwargs):
             response = {'nextPageToken': None}
             while 'nextPageToken' in response:
                 response = self.list_workflow_executions(
                     status,
-                    domain_name,
+                    domain.name,
                     start_oldest_date=kwargs.pop('start_oldest_date'),
                     next_page_token=response['nextPageToken'],
                     **kwargs
@@ -328,14 +332,10 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             err_msg = "Invalid keyword argument supplied: {}".format(invalid_kwarg)
             raise InvalidKeywordArgumentError(err_msg)
 
-        # As WorkflowTypeQuery has to be built against a specific domain
-        # name, domain filter is disposable, but not mandatory.
-        domain_name = domain_name or self.domain.name
-
-        return [self.to_WorkflowExecution(wf) for wf
+        return [self.to_WorkflowExecution(domain, wf) for wf
                 in get_workflows(
                     status,
-                    domain_name,
+                    domain,
                     start_oldest_date=start_oldest_date)]
 
     def all(self, status=WorkflowExecution.STATUS_OPEN,
