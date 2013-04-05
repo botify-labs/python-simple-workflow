@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import time
+import collections
 
 from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
@@ -8,6 +9,16 @@ from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
 from swf.models.event import History
 from swf.exceptions import DoesNotExistError, AlreadyExistsError
+
+
+_POLICIES = ('TERMINATE',       # child executions will be terminated
+             'REQUEST_CANCEL',  # a request to cancel will be attempted for
+                                # each child execution
+             'ABANDON',         # no action will be taken
+)
+
+CHILD_POLICIES = collections.namedtuple('CHILD_POLICY',
+                                        ' '.join(_POLICIES))(*_POLICIES)
 
 
 class WorkflowType(ConnectedSWFObject):
@@ -31,11 +42,9 @@ class WorkflowType(ConnectedSWFObject):
 
     :param  child_policy: policy to use for the child workflow executions
                           when a workflow execution of this type is terminated
-    :type   child_policy: swf.models.WorkflowType.{
-                                CHILD_POLICY_TERMINATE,
-                                CHILD_POLICY_REQUEST_CANCEL,
-                                CHILD_POLICY_ABANDON
-                            }
+    :type   child_policy: CHILD_POLICIES.{TERMINATE |
+                                          REQUEST_CANCEL |
+                                          ABANDON}
 
     :param  execution_timeout: maximum duration for executions of this workflow type
     :type   execution_timeout: String
@@ -46,14 +55,10 @@ class WorkflowType(ConnectedSWFObject):
     :param  description: Textual description of the workflow type
     :type   description: String
     """
-    CHILD_POLICY_TERMINATE = "TERMINATE"  # child executions will be terminated
-    CHILD_POLICY_REQUEST_CANCEL = "REQUEST_CANCEL"  #  a request to cancel will be attempted for each child execution
-    CHILD_POLICY_ABANDON = "ABANDON"  # no action will be taken
-
     def __init__(self, domain, name, version,
                  status=REGISTERED,
                  task_list=None,
-                 child_policy=CHILD_POLICY_TERMINATE,
+                 child_policy=CHILD_POLICIES.TERMINATE,
                  execution_timeout='300',
                  decision_tasks_timeout='300',
                  description=None, *args, **kwargs):
@@ -78,17 +83,11 @@ class WorkflowType(ConnectedSWFObject):
         return self._child_policy
 
     @child_policy.setter
-    def child_policy(self, value):
-        valid_policies = [
-            self.CHILD_POLICY_ABANDON,
-            self.CHILD_POLICY_TERMINATE,
-            self.CHILD_POLICY_REQUEST_CANCEL
-        ]
-
-        if value in valid_policies:
-            self._child_policy = value
+    def child_policy(self, policy):
+        if policy in CHILD_POLICIES:
+            self._child_policy = policy
         else:
-            raise ValueError("Provided child policy value is invalid")
+            raise ValueError("invalid child policy value: {}".format(policy))
 
     def save(self):
         """Creates the workflow type amazon side"""
@@ -131,11 +130,9 @@ class WorkflowType(ConnectedSWFObject):
 
         :param  child_policy: policy to use for the child workflow executions
                               of this workflow execution.
-        :type   child_policy: swf.models.WorkflowType.{
-                                CHILD_POLICY_TERMINATE,
-                                CHILD_POLICY_REQUEST_CANCEL,
-                                CHILD_POLICY_ABANDON
-                            }
+        :type   child_policy: CHILD_POLICIES.{TERMINATE |
+                                              REQUEST_CANCEL |
+                                              ABANDON}
 
         :param  execution_timeout: maximum duration for the workflow execution
         :type   execution_timeout: String
