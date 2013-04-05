@@ -161,27 +161,27 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
     """Fetches Workflow executions"""
 
-    def _valid_list_operations_kwargs(self, status, kwargs):
-        invalid_kwargs = []
-        if status == WorkflowExecution.STATUS_OPEN:
-            invalid_kwargs = [
+    _infos = 'executionInfos'
+
+    def _is_valid_status_param(self, status, param):
+        statuses = {
+            WorkflowExecution.STATUS_OPEN: set([
+                'oldest_date',
+                'latest_date'],
+            ),
+            WorkflowExecution.STATUS_CLOSED: set([
                 'start_latest_date',
                 'start_oldest_date',
                 'close_latest_date',
                 'close_oldest_date',
                 'close_status'
-            ]
-        else:
-            invalid_kwargs = [
-                'oldest_date',
-                'latest_date'
-            ]
+            ]),
+        }
+        return param in statuses.get(status, set())
 
-        for kwarg in invalid_kwargs:
-            if kwarg in kwargs:
-                return False, kwarg
-
-        return True, None
+    def _validate_status_parameters(self, status, params):
+        return [param for param in params if
+                not self._is_valid_status_param(status, param)]
 
     def list_workflow_executions(self, status, *args, **kwargs):
         statuses = {
@@ -315,33 +315,21 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
         domain = domain or self.domain.name
+        invalid_kwargs = self._validate_status_parameters(status, kwargs)
 
-        def get_workflows(status, domain, **kwargs):
-            response = {'nextPageToken': None}
-            while 'nextPageToken' in response:
-                response = self.list_workflow_executions(
-                    status,
-                    domain.name,
-                    start_oldest_date=kwargs.pop('start_oldest_date'),
-                    next_page_token=response['nextPageToken'],
-                    **kwargs
-                )
-
-                for workflow in response['executionInfos']:
-                    yield workflow
-
-        valid_kwargs, invalid_kwarg = self._valid_list_operations_kwargs(status, kwargs)
-        start_oldest_date = datetime_timestamp(past_day(kwargs.get('oldest_date', 30)))
-
-        if not valid_kwargs:
-            err_msg = "Invalid keyword argument supplied: {}".format(invalid_kwarg)
+        if invalid_kwargs:
+            err_msg = 'Invalid keyword arguments supplied: {}'.format(
+                      ', '.join(invalid_kwargs))
             raise InvalidKeywordArgumentError(err_msg)
 
-        return [self.to_WorkflowExecution(domain, wf) for wf
-                in get_workflows(
-                    status,
-                    domain,
-                    start_oldest_date=start_oldest_date)]
+        start_oldest_date = datetime_timestamp(past_day(kwargs.get('oldest_date', 30)))
+        return [self.to_WorkflowExecution(domain, wfe) for wfe in
+                self._list_items(status,
+                                 domain,
+                                 start_oldest_date=int(start_oldest_date))]
+
+    def _list(self, *args, **kwargs):
+        return self.list_workflow_executions(*args, **kwargs)
 
     def all(self, status=WorkflowExecution.STATUS_OPEN,
             start_oldest_date=30):
@@ -388,24 +376,9 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
 
         :returns: swf.model.WorkflowExcution objects list
         """
-        workflow_executions = []
-        next_page_token = None
         start_oldest_date = datetime_timestamp(past_day(start_oldest_date))
 
-        while True:
-            response = self.list_workflow_executions(
-                status,
-                self.domain.name,
-                start_oldest_date=int(start_oldest_date),
-                next_page_token=next_page_token
-            )
-
-            for execution_info in response['executionInfos']:
-                workflow_executions.append(self.to_WorkflowExecution(execution_info))
-
-            if not 'nextPageToken' in response:
-                break
-
-            next_page_token = response['nextPageToken']
-
-        return workflow_executions
+        return [self.to_WorkflowExecution(wfe) for wfe in
+                self._list_items(status,
+                                self.domain.name,
+                                start_oldest_date=int(start_oldest_date))]
