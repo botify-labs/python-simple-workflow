@@ -16,7 +16,11 @@ class BaseWorkflowQuerySet(BaseQuerySet):
     Amazon workflows types and executions are always bounded
     to a specific domain: so any queryset which means to deal
     with workflows has to be built against a `domain`
+
     """
+
+    _infos = 'typeInfos'
+
     def __init__(self, domain, *args, **kwargs):
         super(BaseWorkflowQuerySet, self).__init__(*args, **kwargs)
         self.domain = domain
@@ -38,6 +42,17 @@ class BaseWorkflowQuerySet(BaseQuerySet):
                   % type(value)
             raise TypeError(err)
         self._domain = value
+
+    def _list_items(self, *args, **kwargs):
+        response = {'nextPageToken': None}
+        while 'nextPageToken' in response:
+            response = self._list(*args,
+                                  next_page_token=response['nextPageToken'],
+                                  **kwargs
+            )
+
+            for item in response[self._infos]:
+                yield item
 
 
 class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
@@ -103,26 +118,16 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             decision_task_timeout=wt_config.get('defaultTaskStartToCloseTimeout'),
         )
 
+    def _list(self, *args, **kwargs):
+        return self.connection.list_workflow_types(*args, **kwargs)
+
     def filter(self, domain=None, registration_status=REGISTERED, name=None):
         """Filters workflows based of their status, and/or name"""
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
         domain = domain or self.domain
-
-        def get_workflows():
-            response = {'nextPageToken': None}
-            while 'nextPageToken' in response:
-                response = self.connection.list_workflow_types(
-                    domain.name,
-                    registration_status,
-                    name=name,
-                    next_page_token=response['nextPageToken']
-                )
-
-                for workflow in response['typeInfos']:
-                    yield workflow
-
-        return [self.to_WorkflowType(domain, wf) for wf in get_workflows()]
+        return [self.to_WorkflowType(domain, wf) for wf in
+                self._list_items(domain.name, registration_status, name=name)]
 
     def all(self, registration_status=REGISTERED):
         """Retrieves every Workflow types
