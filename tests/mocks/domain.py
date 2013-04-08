@@ -3,9 +3,8 @@
 from swf.constants import REGISTERED
 
 
-def mock_list_domains(override_data={}, raises=None):
-    if raises:
-        raise raises(400, "Mocking exception raised")
+def mock_list_domains(*args, **kwargs):
+    override_data = kwargs.pop('override_data', {})
 
     response = {
         "domainInfos": [{
@@ -21,9 +20,8 @@ def mock_list_domains(override_data={}, raises=None):
     return response
 
 
-def mock_describe_domain(override_data={}, raises=None):
-    if raises:
-        raise raises(400, "Mocking exception raised")
+def mock_describe_domain(*args, **kwargs):
+    override_data = kwargs.pop('override_data', {})
 
     response = {
         "configuration": {

@@ -11,7 +11,7 @@ from swf.core import set_aws_credentials
 from swf.models.domain import Domain
 from swf.querysets.domain import DomainQuerySet
 
-from .mock_domain import mock_list_domains, mock_describe_domain
+from ..mocks.domain import mock_list_domains, mock_describe_domain
 
 set_aws_credentials('fakeaccesskey', 'fakesecretkey')
 
@@ -26,7 +26,7 @@ class TestDomainQuerySet(unittest2.TestCase):
 
     def test_get_existent_domain(self):
         with patch.object(
-            DomainQuerySet.connection,
+            self.qs.connection,
             'describe_domain',
             mock_describe_domain
         ):
