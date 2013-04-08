@@ -13,7 +13,7 @@ def mock_list_domains(override_data={}, raises=None):
             "name": "test-domain",
             "status": REGISTERED,
         }],
-        "nextPageToken": "string"
+        "nextPageToken": None
     }
 
     response.update(override_data)
@@ -30,9 +30,9 @@ def mock_describe_domain(override_data={}, raises=None):
             "workflowExecutionRetentionPeriodInDays": "string"
         },
         "domainInfo": {
-            "description": "string",
-            "name": "string",
-            "status": "string"
+            "description": "mocked test domain",
+            "name": "test-domain",
+            "status": REGISTERED
         }
     }
 
