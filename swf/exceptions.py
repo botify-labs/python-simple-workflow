@@ -2,14 +2,7 @@
 
 
 class InvalidCredentialsError(Exception):
-    def __init__(self, aws_access_key_id, aws_secret_access_key):
-        self.msg = "The credentials provided with this request are invalid. "\
-                   "aws_access_key_id: %s, "\
-                   "aws_secret_access_key: %s"\
-                   % (aws_access_key_id, aws_secret_access_key)
-
-    def __str__(self):
-        return repr(self.msg)
+    pass
 
 
 class ResponseError(Exception):
@@ -22,6 +15,7 @@ class DoesNotExistError(Exception):
 
 class AlreadyExistsError(Exception):
     pass
+
 
 class InvalidKeywordArgumentError(Exception):
     pass

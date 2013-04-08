@@ -38,10 +38,7 @@ class DomainQuerySet(BaseQuerySet):
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("No such domain: %s" % name)
             elif e.error_code == 'UnrecognizedClientException':
-                raise InvalidCredentialsError(
-                    self.aws_access_key_id,
-                    self.aws_secret_access_key
-                )
+                raise InvalidCredentialsError("Invalid aws credentials supplied")
             # Any other errors should raise
             raise ResponseError(e.body['message'])
 
