@@ -12,7 +12,6 @@ def mock_list_domains(*args, **kwargs):
             "name": "test-domain",
             "status": REGISTERED,
         }],
-        "nextPageToken": None
     }
 
     response.update(override_data)
