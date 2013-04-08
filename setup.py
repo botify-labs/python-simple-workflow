@@ -27,6 +27,8 @@ setup(
     zip_safe=True,
     install_requires=[
         'boto==2.8.0',
+        'mock==1.0.1',
+        'unittest2==0.5.1',
     ],
 
     packages=[
