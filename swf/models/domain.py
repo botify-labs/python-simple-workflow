@@ -59,7 +59,7 @@ class Domain(ConnectedSWFObject):
     def workflows(self, status=REGISTERED):
         """Lists the current domain's workflows"""
         from swf.querysets.workflow import WorkflowTypeQuerySet
-        qs = WorkflowTypeQuerySet(self.name)
+        qs = WorkflowTypeQuerySet(self)
         return qs.all(registration_status=status)
 
     @property
