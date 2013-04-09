@@ -1,22 +1,12 @@
-.. python-simple-workflow documentation master file, created by
-   sphinx-quickstart on Tue Apr  9 08:44:16 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+:orphan:
 
-Welcome to python-simple-workflow's documentation!
-==================================================
+Welcome to Python Simple Workflow
+=================================
 
-Contents:
+Under heavy development, and not yet usable
 
-.. toctree::
-   :maxdepth: 2
+python-simple-workflow is a wrapper for `Amazon Simple Workflow <http://aws.amazon.com/swf>`_ service. It aims to provide some abstractions over `Boto <http://boto.readthedocs.org>`_ library SWF API implementation, like querysets and objects over commonly used concepts: ``Domains``, ``Workflows``, ``Activities``, and so on.
 
+It is under MIT license, and any ideas, features requests, patches, pull requests to improve it are of course welcome.
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+.. include:: contents.rst.inc

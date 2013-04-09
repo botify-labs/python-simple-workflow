@@ -19,16 +19,19 @@ class DomainQuerySet(BaseQuerySet):
         """Fetches the Domain with `name`
 
         A typical Amazon response looks like:
-        {
-            'configuration': {
-                'workflowExecutionRetentionPeriodInDays': '7',
-            },
-            'domainInfo': {
-                'status': 'REGISTERED',
-                'name': 'CrawlTest',
+
+        .. code-block:: json
+
+            {
+                'configuration': {
+                    'workflowExecutionRetentionPeriodInDays': '7',
+                },
+                'domainInfo': {
+                    'status': 'REGISTERED',
+                    'name': 'CrawlTest',
+                    }
                 }
             }
-        }
         """
         try:
             response = self.connection.describe_domain(name)
@@ -56,15 +59,18 @@ class DomainQuerySet(BaseQuerySet):
         """Retrieves every domains
 
         A typical Amazon response looks like:
-        {
-            'domainInfos': [
-                {
-                    'name': 'Crawl'
-                    'status': 'REGISTERED',
-                    'description': '',
-                },
-            ]
-        }
+
+        .. code-block:: json
+
+            {
+                'domainInfos': [
+                    {
+                        'name': 'Crawl'
+                        'status': 'REGISTERED',
+                        'description': '',
+                    },
+                ]
+            }
         """
 
         def get_domains():

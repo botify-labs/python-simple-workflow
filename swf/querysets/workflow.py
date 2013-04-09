@@ -90,24 +90,27 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         :returns: A swf.model.workflow.WorkflowType instance
 
         A typical Amazon response looks like:
-        {
-            'configuration': {
-                'defaultExecutionStartToCloseTimeout': '300',
-                'defaultTaskStartToCloseTimeout': '300',
-                'defaultTaskList': {
-                    'name': 'None'
+
+        .. code-block:: json
+
+            {
+                'configuration': {
+                    'defaultExecutionStartToCloseTimeout': '300',
+                    'defaultTaskStartToCloseTimeout': '300',
+                    'defaultTaskList': {
+                        'name': 'None'
+                    },
+                    'defaultChildPolicy': 'TERMINATE'
                 },
-                'defaultChildPolicy': 'TERMINATE'
-            },
-            'typeInfo': {
-                'status': 'REGISTERED',
-                'creationDate': 1364492094.968,
-                'workflowType': {
-                    'version': '1',
-                    'name': 'testW'
+                'typeInfo': {
+                    'status': 'REGISTERED',
+                    'creationDate': 1364492094.968,
+                    'workflowType': {
+                        'version': '1',
+                        'name': 'testW'
+                    }
                 }
             }
-        }
         """
         try:
             response = self.connection.describe_workflow_type(self.domain.name, name, version)
@@ -144,27 +147,30 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         """Retrieves every Workflow types
 
         A typical Amazon response looks like:
-        {
-            'typeInfos': [
-                {
-                    'status': 'REGISTERED',
-                    'creationDate': 1364293450.67,
-                    'description': '',
-                    'workflowType': {
-                        'version': '1',
-                        'name': 'Crawl'
+
+        .. code-block:: json
+
+            {
+                'typeInfos': [
+                    {
+                        'status': 'REGISTERED',
+                        'creationDate': 1364293450.67,
+                        'description': '',
+                        'workflowType': {
+                            'version': '1',
+                            'name': 'Crawl'
+                        }
+                    },
+                    {
+                        'status': 'REGISTERED',
+                        'creationDate': 1364492094.968,
+                        'workflowType': {
+                            'version': '1',
+                            'name': 'testW'
+                        }
                     }
-                },
-                {
-                    'status': 'REGISTERED',
-                    'creationDate': 1364492094.968,
-                    'workflowType': {
-                        'version': '1',
-                        'name': 'testW'
-                    }
-                }
-            ]
-        }
+                ]
+            }
         """
         return self.filter(registration_status=registration_status)
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from swf.constants import REGISTERED, DEPRECATED
 from swf.core import ConnectedSWFObject
 
 

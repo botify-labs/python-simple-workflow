@@ -10,23 +10,17 @@ from swf.exceptions import AlreadyExistsError, DoesNotExistError
 class Domain(ConnectedSWFObject):
     """Simple Workflow Domain wrapper
 
-    Params
-    ------
-    * name:
-        * type: String
-        * value: Name of the domain to register (unique)
+    :param      name: Name of the domain to register (unique)
+    :type       name: String
 
-    * retention_period
-        * type: Integer
-        * value: Domain's workflow executions records retention in days
+    :param      retention_period: Domain's workflow executions records retention in days
+    :type       retention_period: Integer
 
-    * status
-        * type: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
-        * value: the domain status
+    :param      status: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
+    :type       status: the domain status
 
-    * description
-        * type: String
-        * value: Textual description of the domain
+    :param      description: Textual description of the domain
+    :type       description: String
     """
     def __init__(self, name,
                  status=REGISTERED,

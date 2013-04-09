@@ -101,39 +101,41 @@ class History(object):
 
     Typical amazon response looks like:
 
-    {
-        "events": [
-            {
-                'eventId': 1,
-                'eventType': 'WorkflowExecutionStarted',
-                'workflowExecutionStartedEventAttributes': {
-                    'taskList': {
-                        'name': 'test'
+    .. code-block:: json
+
+        {
+            "events": [
+                {
+                    'eventId': 1,
+                    'eventType': 'WorkflowExecutionStarted',
+                    'workflowExecutionStartedEventAttributes': {
+                        'taskList': {
+                            'name': 'test'
+                        },
+                        'parentInitiatedEventId': 0,
+                        'taskStartToCloseTimeout': '300',
+                        'childPolicy': 'TERMINATE',
+                        'executionStartToCloseTimeout': '6000',
+                        'workflowType': {
+                            'version': '0.1',
+                            'name': 'test-1'
+                        },
                     },
-                    'parentInitiatedEventId': 0,
-                    'taskStartToCloseTimeout': '300',
-                    'childPolicy': 'TERMINATE',
-                    'executionStartToCloseTimeout': '6000',
-                    'workflowType': {
-                        'version': '0.1',
-                        'name': 'test-1'
+                    'eventTimestamp': 1365177769.585,
+                },
+                {
+                    'eventId': 2,
+                    'eventType': 'DecisionTaskScheduled',
+                    'decisionTaskScheduledEventAttributes': {
+                        'startToCloseTimeout': '300',
+                        'taskList': {
+                            'name': 'test'
+                        }
                     },
-                },
-                'eventTimestamp': 1365177769.585,
-            },
-            {
-                'eventId': 2,
-                'eventType': 'DecisionTaskScheduled',
-                'decisionTaskScheduledEventAttributes': {
-                    'startToCloseTimeout': '300',
-                    'taskList': {
-                        'name': 'test'
-                    }
-                },
-                'eventTimestamp': 1365177769.585
-            }
-        ]
-    }
+                    'eventTimestamp': 1365177769.585
+                }
+            ]
+        }
     """
     def __init__(self, *args, **kwargs):
         self.container = kwargs.pop('events', [])
