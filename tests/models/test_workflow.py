@@ -11,7 +11,7 @@ from swf.models.event import History
 from swf.models.domain import Domain
 from swf.models.workflow import WorkflowType, WorkflowExecution
 
-from ..mocks.workflow import mock_get_workflow_execution_history
+from ..mocks.event import mock_get_workflow_execution_history
 
 
 class TestWorkflowType(unittest2.TestCase):
