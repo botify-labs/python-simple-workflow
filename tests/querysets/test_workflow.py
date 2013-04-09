@@ -3,18 +3,23 @@
 import unittest2
 
 from mock import patch
+from boto.swf.layer1 import Layer1
 from boto.exception import SWFResponseError
 
 from swf.constants import REGISTERED
 from swf.models.domain import Domain
-from swf.models.workflow import WorkflowType
+from swf.models.workflow import WorkflowType, WorkflowExecution
 from swf.querysets.workflow import BaseWorkflowQuerySet,\
                                    WorkflowTypeQuerySet,\
                                    WorkflowExecutionQuerySet
 from swf.exceptions import DoesNotExistError, ResponseError
+from swf.utils import datetime_timestamp, past_day
 
 from ..mocks.workflow import mock_describe_workflow_type,\
-                             mock_list_workflow_types
+                             mock_list_workflow_types,\
+                             mock_list_open_workflow_executions,\
+                             mock_list_closed_workflow_executions,\
+                             mock_describe_workflow_execution
 
 
 class TestBaseWorkflowTypeQuerySet(unittest2.TestCase):
@@ -121,3 +126,168 @@ class TestWorkflowTypeQuerySet(unittest2.TestCase):
             for wt in types:
                 self.assertIsInstance(wt, WorkflowType)
                 self.assertEqual(wt.status, REGISTERED)
+
+
+class TestWorkflowExecutionQuerySet(unittest2.TestCase):
+
+    def setUp(self):
+        self.domain = Domain("TestDomain")
+        self.wt = WorkflowType(self.domain, "TestType", "0.1")
+        self.weq = WorkflowExecutionQuerySet(self.domain)
+
+    def tearDown(self):
+        pass
+
+    def test__is_valid_open_status_param(self):
+        status = WorkflowExecution.STATUS_OPEN
+
+        self.assertTrue(
+            self.weq._is_valid_status_param(status, 'oldest_date'),
+        )
+
+    def test__is_invalid_open_status_param(self):
+        status = WorkflowExecution.STATUS_OPEN
+
+        self.assertFalse(
+            self.weq._is_valid_status_param(status, 'start_oldest_date'),
+        )
+
+    def test__is_valid_closed_status_param(self):
+        status = WorkflowExecution.STATUS_CLOSED
+
+        self.assertTrue(
+            self.weq._is_valid_status_param(status, 'start_oldest_date'),
+        )
+
+    def test__is_invalid_closed_status_param(self):
+        status = WorkflowExecution.STATUS_CLOSED
+
+        self.assertFalse(
+            self.weq._is_valid_status_param(status, 'oldest_date'),
+        )
+
+    def test_validate_valid_open_status_parameters(self):
+        params = ['oldest_date', 'latest_date']
+        status = WorkflowExecution.STATUS_OPEN
+
+        self.assertEqual(
+            self.weq._validate_status_parameters(status, params),
+            []
+        )
+
+    def test_validate_invalid_open_status_parameters(self):
+        params = ['oldest_date', 'start_latest_date']
+        status = WorkflowExecution.STATUS_OPEN
+
+        self.assertEqual(
+            self.weq._validate_status_parameters(status, params),
+            ['start_latest_date']
+        )
+
+    def test_validate_valid_closed_status_parameters(self):
+        params = ['start_oldest_date', 'start_latest_date']
+        status = WorkflowExecution.STATUS_CLOSED
+
+        self.assertEqual(
+            self.weq._validate_status_parameters(status, params),
+            []
+        )
+
+    def test_validate_invalid_closed_status_parameters(self):
+        params = ['oldest_date', 'start_latest_date']
+        status = WorkflowExecution.STATUS_CLOSED
+
+        self.assertEqual(
+            self.weq._validate_status_parameters(status, params),
+            ['oldest_date']
+        )
+
+    def test_list_open_workflows_executions_with_start_oldest_date(self):
+        with patch.object(
+            self.weq.connection,
+            'list_open_workflow_executions',
+            mock_list_open_workflow_executions
+        ):
+            we = self.weq.list_workflow_executions(
+                WorkflowExecution.STATUS_OPEN,
+                self.domain.name,
+                start_oldest_date=int(datetime_timestamp(past_day(3)))
+            )
+            self.assertIsNotNone(we)
+            self.assertIsInstance(we, dict)
+
+            self.assertTrue(we['executionInfos'][0]['executionStatus'] == WorkflowExecution.STATUS_OPEN)
+
+    def test_list_closed_workflows_executions(self):
+        with patch.object(
+            self.weq.connection,
+            'list_closed_workflow_executions',
+            mock_list_closed_workflow_executions
+        ):
+            we = self.weq.list_workflow_executions(
+                WorkflowExecution.STATUS_CLOSED,
+                self.domain.name,
+                start_oldest_date=int(datetime_timestamp(past_day(3)))
+            )
+            self.assertIsNotNone(we)
+            self.assertIsInstance(we, dict)
+
+            self.assertTrue(we['executionInfos'][0]['executionStatus'] == WorkflowExecution.STATUS_CLOSED)
+
+    def test_list_invalid_status_workflow_executions(self):
+        with self.assertRaises(ValueError):
+            self.weq.list_workflow_executions(
+                "INVALID_STATUS",
+                self.domain.name,
+                start_oldest_date=int(datetime_timestamp(past_day(3)))
+            )
+
+    def test_get_workflow_type(self):
+        execution_info = mock_list_open_workflow_executions()['executionInfos'][0]
+
+        with patch.object(
+            Layer1,
+            'describe_workflow_type',
+            mock_describe_workflow_type
+        ):
+            wt = self.weq.get_workflow_type(execution_info)
+            self.assertIsNotNone(wt)
+            self.assertIsInstance(wt, WorkflowType)
+            self.assertTrue(wt.name == execution_info['workflowType']['name'])
+
+    def test_get_valid_workflow_execution(self):
+        pass
+        # with patch.object(
+        #     self.weq.connection,
+        #     'describe_workflow_execution',
+        #     mock_describe_workflow_execution
+        # ):
+        #     we = self.weq.get("mocked-workflow-id", "mocked-run-id")
+        #     self.assertIsNotNone(we)
+        #     self.assertIsInstance(we, WorkflowExecution)
+
+    def test_get_non_existent_workflow_execution(self):
+        with patch.object(self.weq.connection, 'describe_workflow_execution') as mock:
+            with self.assertRaises(DoesNotExistError):
+                mock.side_effect = SWFResponseError(
+                    400,
+                    "mocked exception",
+                    {
+                        "__type": "UnknownResourceFault",
+                        "message": "Whatever",
+                    }
+                )
+                self.weq.get("mocked-workflow-id", "mocked-run-id")
+
+    def test_get_invalid_workflow_execution(self):
+        with patch.object(self.weq.connection, 'describe_workflow_execution') as mock:
+            with self.assertRaises(ResponseError):
+                mock.side_effect = SWFResponseError(
+                    400,
+                    "mocked exception",
+                    {
+                        "__type": "WhateverFault",
+                        "message": "Whatever",
+                    }
+                )
+                self.weq.get("mocked-workflow-id", "mocked-run-id")

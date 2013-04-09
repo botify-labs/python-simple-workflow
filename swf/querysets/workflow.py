@@ -208,14 +208,14 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             oldest_date = kwargs.pop('start_oldest_date')
             args = args + (oldest_date,)
 
-        method = 'list_{}_workflow_executions'.format(statuses[status])
         try:
+            method = 'list_{}_workflow_executions'.format(statuses[status])
             return getattr(self.connection, method)(*args, **kwargs)
         except KeyError:
             raise ValueError("Unknown status provided: %s" % status)
 
     def get_workflow_type(self, execution_info):
-        workflow_type = execution_info.pop('workflowType')
+        workflow_type = execution_info['workflowType']
         workflow_type_qs = WorkflowTypeQuerySet(self.domain)
 
         return workflow_type_qs.get(
