@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import datetime
+from datetime import datetime
 
 from swf.constants import REGISTERED
 from swf.utils import datetime_timestamp

@@ -18,8 +18,10 @@ class BaseWorkflowQuerySet(BaseQuerySet):
     with workflows has to be built against a `domain`
 
     """
-
-    _infos = 'typeInfos'
+    # Amazon response section corresponding
+    # to current queryset informations
+    _infos = 'typeInfo'
+    _infos_plural = 'typeInfos'
 
     def __init__(self, domain, *args, **kwargs):
         super(BaseWorkflowQuerySet, self).__init__(*args, **kwargs)
@@ -43,19 +45,28 @@ class BaseWorkflowQuerySet(BaseQuerySet):
             raise TypeError(err)
         self._domain = value
 
+    def _list(self, *args, **kwargs):
+        raise NotImplementedError
+
     def _list_items(self, *args, **kwargs):
         response = {'nextPageToken': None}
         while 'nextPageToken' in response:
-            response = self._list(*args,
-                                  next_page_token=response['nextPageToken'],
-                                  **kwargs
+            response = self._list(
+                *args,
+                next_page_token=response['nextPageToken'],
+                **kwargs
             )
 
-            for item in response[self._infos]:
+            for item in response[self._infos_plural]:
                 yield item
 
 
 class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
+
+    # Explicit is better than implicit, keep zen
+    _infos = 'typeInfo'
+    _infos_plural = 'typeInfos'
+
     def to_WorkflowType(self, domain, workflow_info, **kwargs):
         # Not using get_subkey in order for it to explictly
         # raise when workflowType name doesn't exist for example
@@ -106,7 +117,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 
             raise ResponseError(e.body['message'])
 
-        wt_info = response['typeInfo']
+        wt_info = response[self._infos]
         wt_config = response['configuration']
 
         return self.to_WorkflowType(
@@ -161,7 +172,8 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
     """Fetches Workflow executions"""
 
-    _infos = 'executionInfos'
+    _infos = 'executionInfo'
+    _infos_plural = 'executionInfos'
 
     def _is_valid_status_param(self, status, param):
         statuses = {
@@ -235,7 +247,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
 
             raise ResponseError(e.body['message'])
 
-        execution_info = response['executionInfo']
+        execution_info = response[self._infos]
         execution_config = response['executionConfiguration']
 
         return self.to_WorkflowExecution(
