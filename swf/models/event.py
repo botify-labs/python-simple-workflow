@@ -61,9 +61,11 @@ class Event(object):
     def __init__(self, event_type,
                  event_id=-1, event_timestamp='',
                  *args, **kwargs):
-        self.type = event_type
+        self._type = None
+
         self.id = event_id
         self.timestamp = event_timestamp
+        self.type = event_type
 
         for attr, value in kwargs.iteritems():
             setattr(self, attr, value)
@@ -77,8 +79,9 @@ class Event(object):
 
     @type.setter
     def type(self, value):
-        if value in Event.TYPES:
-            self._type = value
+        if value not in Event.TYPES:
+            raise ValueError("Invalid type supplied: %s" % self.type)
+        self._type = value
 
     @classmethod
     def from_dict(cls, event_type,
@@ -139,7 +142,7 @@ class History(object):
         if isinstance(val, int):
             return self.container[val]
         elif isinstance(val, slice):
-            return self.container[val]
+            return History(events=self.container[val])
         else:
             raise TypeError("Unknown slice format: %s" % type(val))
 

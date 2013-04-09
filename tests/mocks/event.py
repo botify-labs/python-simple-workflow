@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 
-def mock_get_workflow_execution_history(self, *args, **kwargs):
+def mock_get_workflow_execution_history(*args, **kwargs):
     override_data = kwargs.pop('override_data', {})
 
     response = {
