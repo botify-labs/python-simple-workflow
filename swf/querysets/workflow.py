@@ -378,7 +378,8 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         """
         start_oldest_date = datetime_timestamp(past_day(start_oldest_date))
 
-        return [self.to_WorkflowExecution(wfe) for wfe in
-                self._list_items(status,
-                                self.domain.name,
-                                start_oldest_date=int(start_oldest_date))]
+        return [self.to_WorkflowExecution(self.domain, wfe) for wfe
+                in self._list_items(
+                    status,
+                    self.domain.name,
+                    start_oldest_date=int(start_oldest_date))]
