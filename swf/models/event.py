@@ -50,6 +50,11 @@ EVENT_TYPES = [
 
 
 class Event(object):
+    """Simple workflow execution event wrapper
+
+    :param      event_type: type of event represented
+    :type       event_type: String
+    """
     TYPES = EVENT_TYPES
     EVENT_ATTR_SUFFIX = 'EventAttributes'
 
@@ -85,6 +90,48 @@ class Event(object):
 
 
 class History(object):
+    """Simple workflow execution events history
+
+    History object is an Event objects list container
+    which can be built directly against an amazon json response
+    using it's from_event_list method.
+
+    Typical amazon response looks like:
+
+    {
+        "events": [
+            {
+                'eventId': 1,
+                'eventType': 'WorkflowExecutionStarted',
+                'workflowExecutionStartedEventAttributes': {
+                    'taskList': {
+                        'name': 'test'
+                    },
+                    'parentInitiatedEventId': 0,
+                    'taskStartToCloseTimeout': '300',
+                    'childPolicy': 'TERMINATE',
+                    'executionStartToCloseTimeout': '6000',
+                    'workflowType': {
+                        'version': '0.1',
+                        'name': 'test-1'
+                    },
+                },
+                'eventTimestamp': 1365177769.585,
+            },
+            {
+                'eventId': 2,
+                'eventType': 'DecisionTaskScheduled',
+                'decisionTaskScheduledEventAttributes': {
+                    'startToCloseTimeout': '300',
+                    'taskList': {
+                        'name': 'test'
+                    }
+                },
+                'eventTimestamp': 1365177769.585
+            }
+        ]
+    }
+    """
     def __init__(self, *args, **kwargs):
         self.container = kwargs.pop('events', [])
 
