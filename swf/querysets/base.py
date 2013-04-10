@@ -7,8 +7,11 @@ class BaseQuerySet(ConnectedSWFObject):
     def __init__(self, *args, **kwargs):
         super(BaseQuerySet, self).__init__(*args, **kwargs)
 
-    def get(self, name):
-        raise NotImplemented
+    def get(self, *args, **kwargs):
+        raise NotImplementedError
 
-    def all(self):
-        raise NotImplemented
+    def filter(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def all(self, *args, **kwargs):
+        raise NotImplementedError
