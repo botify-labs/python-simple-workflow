@@ -33,12 +33,12 @@ class ConnectedSWFObject(object):
 
     def exists(self):
         """Checks if the connected swf object exists amazon-side"""
-        raise NotImplemented
+        raise NotImplementedError
 
     def save(self):
         """Creates the connected swf object amazon side"""
-        raise NotImplemented
+        raise NotImplementedError
 
     def deprecate(self):
         """Deprecates the connected swf object amazon side"""
-        raise NotImplemented
+        raise NotImplementedError
