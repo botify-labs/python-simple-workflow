@@ -19,6 +19,12 @@ class TestEvent(unittest2.TestCase):
         with self.assertRaises(ValueError):
             Event("WrongType")
 
+    def test_repr_with_missing_attr(self):
+        with self.assertRaises(AttributeError):
+            ev = Event('WorkflowExecutionStarted')
+            delattr(ev, 'id')
+            ev.__repr__()
+
 
 class TestHistory(unittest2.TestCase):
 
