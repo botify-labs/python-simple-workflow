@@ -52,14 +52,21 @@ EVENT_TYPES = [
 class Event(object):
     """Simple workflow execution event wrapper
 
-    :param      event_type: type of event represented
-    :type       event_type: String
+    :param      event_type: type of event represented.
+                            Valid values are members of: swf.models.event.EVENT_TYPES
+    :type       event_type: string
+
+    :param      event_id: specifies a unique id for the event
+    :type       event_id: int
+
+    :param      event_timestamp: timestamp of the event trigger
+    :type       event_timestamp: float
     """
     TYPES = EVENT_TYPES
     EVENT_ATTR_SUFFIX = 'EventAttributes'
 
     def __init__(self, event_type,
-                 event_id=-1, event_timestamp='',
+                 event_id=-1, event_timestamp=0.0,
                  *args, **kwargs):
         self._type = None
 
@@ -89,6 +96,24 @@ class Event(object):
                   event_timestamp,
                   data,
                   *args, **kwargs):
+        """Instantiates a new Event object from dictionary
+
+        :param      event_type: type of event represented.
+                                Valid values are members of: swf.models.event.EVENT_TYPES
+        :type       event_type: string
+
+        :param      event_id: specifies a unique id for the event
+        :type       event_id: int
+
+        :param      event_timestamp: timestamp of the event trigger
+        :type       event_timestamp: float
+
+        :param  data: event attributes data description
+        :type   data: dict
+
+        :returns: Event model instance built upon data
+        :rtype  : swf.model.event.Event
+        """
         return cls(event_type, event_id, event_timestamp, **data)
 
 
@@ -98,6 +123,9 @@ class History(object):
     History object is an Event objects list container
     which can be built directly against an amazon json response
     using it's from_event_list method.
+
+    :param  events: Events list to build History upon
+    :type   events: list
 
     Typical amazon response looks like:
 
@@ -150,6 +178,14 @@ class History(object):
 
     @classmethod
     def from_event_list(cls, data):
+        """Instantiates a new Event object from dictionary
+
+        :param  data: event history description (typically, an amazon response)
+        :type   data: dict
+
+        :returns: History model instance built upon data description
+        :rtype  : swf.model.event.History
+        """
         events_history = []
 
         for d in data:

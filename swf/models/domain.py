@@ -11,16 +11,19 @@ class Domain(ConnectedSWFObject):
     """Simple Workflow Domain wrapper
 
     :param      name: Name of the domain to register (unique)
-    :type       name: String
+    :type       name: string
 
     :param      retention_period: Domain's workflow executions records retention in days
     :type       retention_period: Integer
 
-    :param      status: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
-    :type       status: the domain status
+    :param      status: Specifies the registration status of the
+                        workflow types to list. Valid values are:
+                            * swf.constants.REGISTERED
+                            * swf.constants.DEPRECATED
+    :type       status: string
 
     :param      description: Textual description of the domain
-    :type       description: String
+    :type       description: string
     """
     def __init__(self, name,
                  status=REGISTERED,
@@ -51,7 +54,14 @@ class Domain(ConnectedSWFObject):
                 raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)
 
     def workflows(self, status=REGISTERED):
-        """Lists the current domain's workflows"""
+        """Lists the current domain's workflow types
+
+        :param      status: Specifies the registration status of the
+                            workflow types to list. Valid values are:
+                            * swf.constants.REGISTERED
+                            * swf.constants.DEPRECATED
+        :type       status: string
+        """
         from swf.querysets.workflow import WorkflowTypeQuerySet
         qs = WorkflowTypeQuerySet(self)
         return qs.all(registration_status=status)

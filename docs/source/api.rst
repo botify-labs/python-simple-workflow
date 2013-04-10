@@ -11,7 +11,7 @@ Domain
 ------
 
 .. automodule:: swf.models.domain
-   :members:   
+   :members:
 
 Workflow Type
 -------------
@@ -32,6 +32,7 @@ Event
 	:members:
 
 Execution History
+-----------------
 
 .. autoclass:: swf.models.event.History
 

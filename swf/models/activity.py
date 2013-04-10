@@ -25,11 +25,11 @@ class ActivityType(ConnectedSWFObject):
     :param  description: ActivityType description
     :type   description: str | None
 
-   :param   creation_date: creation date of the current ActivityType
-   :type    creation_date: int (timestamp)
+    :param   creation_date: creation date of the current ActivityType
+    :type    creation_date: int (timestamp)
 
-   :param   deprecation_date: deprecation date of ActivityType
-   :type    deprecation_date: int (timestamp)
+    :param   deprecation_date: deprecation date of ActivityType
+    :type    deprecation_date: int (timestamp)
 
     :param  task_list: specifies the default task list to use for scheduling
                        tasks of this activity type.
