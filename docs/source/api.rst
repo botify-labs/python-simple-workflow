@@ -66,3 +66,8 @@ WorkflowExecutionQuerySet
 .. autoclass:: swf.querysets.workflow.WorkflowExecutionQuerySet
 	:members:
 
+ActivityTypeQuerySet
+--------------------
+
+.. autoclass:: swf.querysets.activity.ActivityTypeQuerySet
+    :members:

@@ -19,18 +19,20 @@ class DomainQuerySet(BaseQuerySet):
     def get(self, name):
         """Fetches the Domain with `name`
 
+        :param      name:  name of the domain to fetch
+        :type       name: string
+
         A typical Amazon response looks like:
 
         .. code-block:: json
 
             {
-                'configuration': {
-                    'workflowExecutionRetentionPeriodInDays': '7',
+                "configuration": {
+                    "workflowExecutionRetentionPeriodInDays": "7",
                 },
-                'domainInfo': {
-                    'status': 'REGISTERED',
-                    'name': 'CrawlTest',
-                    }
+                "domainInfo": {
+                    "status": "REGISTERED",
+                    "name": "CrawlTest",
                 }
             }
         """
@@ -59,16 +61,22 @@ class DomainQuerySet(BaseQuerySet):
     def all(self, registration_status=REGISTERED):
         """Retrieves every domains
 
+        :param      registration_status: domain registration status to match,
+                                         Valid values are:
+                                        * ``swf.constants.REGISTERED``
+                                        * ``swf.constants.DEPRECATED``
+        :type       registration_status: string
+
         A typical Amazon response looks like:
 
         .. code-block:: json
 
             {
-                'domainInfos': [
+                "domainInfos": [
                     {
-                        'name': 'Crawl'
-                        'status': 'REGISTERED',
-                        'description': '',
+                        "name": "Crawl"
+                        "status": "REGISTERED",
+                        "description": "",
                     },
                 ]
             }

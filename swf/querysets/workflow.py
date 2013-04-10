@@ -17,6 +17,8 @@ class BaseWorkflowQuerySet(BaseQuerySet):
     to a specific domain: so any queryset which means to deal
     with workflows has to be built against a `domain`
 
+    :param      domain: domain the inheriting queryset belongs to
+    :type       domain: swf.model.domain.Domain
     """
     # Amazon response section corresponding
     # to current queryset informations
@@ -87,27 +89,28 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         :param  version: workflow type version
         :type   version: String
 
-        :returns: A swf.model.workflow.WorkflowType instance
+        :returns: matched workflow type instance
+        :rtype: swf.core.model.workflow.WorkflowType
 
         A typical Amazon response looks like:
 
         .. code-block:: json
 
             {
-                'configuration': {
-                    'defaultExecutionStartToCloseTimeout': '300',
-                    'defaultTaskStartToCloseTimeout': '300',
-                    'defaultTaskList': {
-                        'name': 'None'
+                "configuration": {
+                    "defaultExecutionStartToCloseTimeout": "300",
+                    "defaultTaskStartToCloseTimeout": "300",
+                    "defaultTaskList": {
+                        "name": "None"
                     },
-                    'defaultChildPolicy': 'TERMINATE'
+                    "defaultChildPolicy": "TERMINATE"
                 },
-                'typeInfo': {
-                    'status': 'REGISTERED',
-                    'creationDate': 1364492094.968,
-                    'workflowType': {
-                        'version': '1',
-                        'name': 'testW'
+                "typeInfo": {
+                    "status": "REGISTERED",
+                    "creationDate": 1364492094.968,
+                    "workflowType": {
+                        "version": "1",
+                        "name": "testW"
                     }
                 }
             }
@@ -138,6 +141,21 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
     def filter(self, domain=None, registration_status=REGISTERED, name=None):
         """Filters workflows based on the ``domain`` they belong to,
         their ``status`, and/or their ``name
+
+        :param      domain: domain the workflow type belongs to
+        :type       domain: swf.models.domain.Domain
+
+        :param      registration_status: workflow type registration status to match,
+                                         Valid values are:
+                                        * ``swf.constants.REGISTERED``
+                                        * ``swf.constants.DEPRECATED``
+        :type       registration_status: string
+
+        :param      name: workflow type name to match
+        :type       name: string
+
+        :returns: list of matched WorkflowType models objects
+        :rtype: list
         """
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
@@ -148,27 +166,33 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
     def all(self, registration_status=REGISTERED):
         """Retrieves every Workflow types
 
+        :param      registration_status: workflow type registration status to match,
+                                 Valid values are:
+                                * ``swf.constants.REGISTERED``
+                                * ``swf.constants.DEPRECATED``
+        :type       registration_status: string
+
         A typical Amazon response looks like:
 
         .. code-block:: json
 
             {
-                'typeInfos': [
+                "typeInfos": [
                     {
-                        'status': 'REGISTERED',
-                        'creationDate': 1364293450.67,
-                        'description': '',
-                        'workflowType': {
-                            'version': '1',
-                            'name': 'Crawl'
+                        "status": "REGISTERED",
+                        "creationDate": 1364293450.67,
+                        "description": "",
+                        "workflowType": {
+                            "version": "1",
+                            "name": "Crawl"
                         }
                     },
                     {
-                        'status': 'REGISTERED',
-                        'creationDate': 1364492094.968,
-                        'workflowType': {
-                            'version': '1',
-                            'name': 'testW'
+                        "status": "REGISTERED",
+                        "creationDate": 1364492094.968,
+                        "workflowType": {
+                            "version": "1",
+                            "name": "testW"
                         }
                     }
                 ]
@@ -278,8 +302,11 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                              provided domain_name will be kept
         :type   domain_name: String
 
-        :param  status: workflow executions with provided status will be kept
-        :type   status: swf.models.WorkflowExecution.{STATUS_OPEN, STATUS_CLOSED}
+        :param  status: workflow executions with provided status will be kept.
+                        Valid values are:
+                        * ``swf.models.WorkflowExecution.STATUS_OPEN``
+                        * ``swf.models.WorkflowExecution.STATUS_CLOSED``
+        :type   status: string
 
         :param  tag: workflow executions containing the tag will be kept
         :type   tag: String
@@ -322,15 +349,18 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             :type   close_oldest_date: int
 
             :param  close_status: must match the close status of an execution for it
-                                  to meet the criteria of this filter
-            :type   close_status: swf.models.WorkflowExecution.{
-                                      CLOSE_STATUS_COMPLETED,
-                                      CLOSE_STATUS_FAILED,
-                                      CLOSE_STATUS_CANCELED,
-                                      CLOSE_STATUS_TERMINATED,
-                                      CLOSE_STATUS_CONTINUED_AS_NEW,
-                                      CLOSE_TIMED_OUT,
-                                  }
+                                  to meet the criteria of this filter.
+                                  Valid values are:
+                                  * ``CLOSE_STATUS_COMPLETED``
+                                  * ``CLOSE_STATUS_FAILED``
+                                  * ``CLOSE_STATUS_CANCELED``
+                                  * ``CLOSE_STATUS_TERMINATED``
+                                  * ``CLOSE_STATUS_CONTINUED_AS_NEW``
+                                  * ``CLOSE_TIMED_OUT``
+            :type   close_status: string
+
+            :returns: workflow executions objects list
+            :rtype: list
         """
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
@@ -355,6 +385,15 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             start_oldest_date=30):
         """Fetch every workflow executions during the last `start_oldest_date`
         days, with `status`
+
+        :param  status: Workflow executions status filter
+        :type   status: swf.models.WorkflowExecution.{STATUS_OPEN, STATUS_CLOSED}
+
+        :param  start_oldest_date: Specifies the oldest start/close date to return.
+        :type   start_oldest_date: integer (days)
+
+        :returns: workflow executions objects list
+        :rtype: list
 
         A typical amazon response looks like:
 
@@ -387,14 +426,6 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                 ],
                 "nextPageToken": "string"
             }
-
-        :param  status: Workflow executions status filter
-        :type   status: swf.models.WorkflowExecution.{STATUS_OPEN, STATUS_CLOSED}
-
-        :param  start_oldest_date: Specifies the oldest start/close date to return.
-        :type   start_oldest_date: integer (days)
-
-        :returns: swf.model.WorkflowExcution objects list
         """
         start_oldest_date = datetime_timestamp(past_day(start_oldest_date))
 

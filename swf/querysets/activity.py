@@ -16,6 +16,9 @@ class ActivityTypeQuerySet(BaseQuerySet):
 
     Allows the user to interact with amazon's swf
     activity types through a django-queryset-like interface
+
+    :param      domain: domain the activity type belongs to
+    :type       domain: swf.models.domain.Domain
     """
 
     # Explicit is better than implicit, keep zen
@@ -60,8 +63,16 @@ class ActivityTypeQuerySet(BaseQuerySet):
         return self.connection.list_workflow_types(*args, **kwargs)
 
     def get(self, name, version):
-        """
-        Fetches the activity type with provided ``name`` and ``version``
+        """Fetches the activity type with provided ``name`` and ``version``
+
+        :param      name: activity type name to fetch
+        :type       name: String
+
+        :param      version: activity version to fetch
+        :type       version: String
+
+        :returns: Matched activity type instance
+        :rtype: swf.models.activity.ActivityType
 
         A typical Amazon response looks like:
 
@@ -112,7 +123,23 @@ class ActivityTypeQuerySet(BaseQuerySet):
 
 
     def filter(self, domain=None, registration_status=REGISTERED, name=None):
-        """Filters activity types based on their status, and/or name"""
+        """Filters activity types based on their status, and/or name
+
+        :param      domain: domain the activity type belongs to
+        :type       domain: swf.models.domain.Domain
+
+        :param      registration_status: activity type registration status to match,
+                                         Valid values are:
+                                        * ``swf.constants.REGISTERED``
+                                        * ``swf.constants.DEPRECATED``
+        :type       registration_status: string
+
+        :param      name: activity type name to match
+        :type       name: string
+
+        :returns: list of matched ActivityType models objects
+        :rtype: list
+        """
         # name, domain filter is disposable, but not mandatory.
         domain = domain or self.domain
         return [self.to_ActivityType(domain, activity_type) for activity_type in
@@ -120,6 +147,15 @@ class ActivityTypeQuerySet(BaseQuerySet):
 
     def all(self, registration_status=REGISTERED):
         """Retrieves every activity types
+
+        :param      registration_status: activity type registration status to match,
+                                         Valid values are:
+                                        * ``swf.constants.REGISTERED``
+                                        * ``swf.constants.DEPRECATED``
+        :type       registration_status: string
+
+        :returns: list of matched ActivityType models objects
+        :rtype: list
 
         A typical Amazon response looks like:
 
