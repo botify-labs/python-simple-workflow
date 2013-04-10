@@ -25,6 +25,12 @@ class ActivityType(ConnectedSWFObject):
     :param  description: ActivityType description
     :type   description: str | None
 
+   :param   creation_date: creation date of the current ActivityType
+   :type    creation_date: int (timestamp)
+
+   :param   deprecation_date: deprecation date of ActivityType
+   :type    deprecation_date: int (timestamp)
+
     :param  task_list: specifies the default task list to use for scheduling
                        tasks of this activity type.
     :type   task_list: str
@@ -47,11 +53,12 @@ class ActivityType(ConnectedSWFObject):
                                           worker can take to process tasks of
                                           this activity type.
     :type    task_start_to_close_timeout: int
-
     """
     def __init__(self, domain, name, version,
                  status=REGISTERED,
                  description=None,
+                 creation_date=None,
+                 deprecation_date=None,
                  task_list=None,
                  task_heartbeat_timeout=0,
                  task_schedule_to_close_timeout=0,
@@ -73,6 +80,7 @@ class ActivityType(ConnectedSWFObject):
         self.task_start_to_close_timeout = task_start_to_close_timeout
 
     def save(self):
+        """Creates the activity type amazon side"""
         try:
             self.connection.register_activity_type(
                 self.domain.name,
@@ -92,6 +100,7 @@ class ActivityType(ConnectedSWFObject):
             raise
 
     def delete(self):
+        """Deprecates the domain amazon side"""
         try:
             self.connection.deprecate_activity_type(self.domain.name,
                                                  self.name,

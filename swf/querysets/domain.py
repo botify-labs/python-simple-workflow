@@ -15,6 +15,7 @@ class DomainQuerySet(BaseQuerySet):
     Allows the user to interact with amazon's swf domains
     through a django-queryset like interface
     """
+
     def get(self, name):
         """Fetches the Domain with `name`
 

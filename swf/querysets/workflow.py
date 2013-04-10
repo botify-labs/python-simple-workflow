@@ -136,7 +136,9 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         return self.connection.list_workflow_types(*args, **kwargs)
 
     def filter(self, domain=None, registration_status=REGISTERED, name=None):
-        """Filters workflows based of their status, and/or name"""
+        """Filters workflows based on the ``domain`` they belong to,
+        their ``status`, and/or their ``name
+        """
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
         domain = domain or self.domain
