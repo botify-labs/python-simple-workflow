@@ -26,8 +26,8 @@ class Domain(BaseModel):
 
     :param      status: Specifies the registration status of the
                         workflow types to list. Valid values are:
-                            * swf.constants.REGISTERED
-                            * swf.constants.DEPRECATED
+                        * swf.constants.REGISTERED
+                        * swf.constants.DEPRECATED
     :type       status: string
 
     :param      description: Textual description of the domain

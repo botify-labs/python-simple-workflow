@@ -11,36 +11,43 @@ Domain
 ------
 
 .. automodule:: swf.models.domain
-   :members:
+    :members:
+    :inherited-members:
 
 Workflow Type
 -------------
 
 .. autoclass:: swf.models.workflow.WorkflowType
-	:members:
+    :members:
+    :inherited-members:
 
 Workflow Execution
 ------------------
 
 .. autoclass:: swf.models.workflow.WorkflowExecution
-	:members:
+    :members:
+    :inherited-members:
 
 Event
 -----
 
 .. autoclass:: swf.models.event.Event
-	:members:
+    :members:
+    :inherited-members:
 
 Execution History
 -----------------
 
 .. autoclass:: swf.models.event.History
+    :members:
+    :inherited-members:
 
 Activity Type
 -------------
 
 .. autoclass:: swf.models.activity.ActivityType
-	:members:
+    :members:
+    :inherited-members:
 
 
 
@@ -52,19 +59,19 @@ DomainQuerySet
 --------------
 
 .. autoclass:: swf.querysets.domain.DomainQuerySet
-	:members:
+  :members:
 
 WorkflowTypeQuerySet
 --------------------
 
 .. autoclass:: swf.querysets.workflow.WorkflowTypeQuerySet
-	:members:
+  :members:
 
 WorkflowExecutionQuerySet
 -------------------------
 
 .. autoclass:: swf.querysets.workflow.WorkflowExecutionQuerySet
-	:members:
+  :members:
 
 ActivityTypeQuerySet
 --------------------
