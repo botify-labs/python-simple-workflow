@@ -9,8 +9,10 @@ from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.models import BaseModel
+from swf.models.base import Diff
 from swf.core import ConnectedSWFObject
-from swf.exceptions import AlreadyExistsError, DoesNotExistError
+from swf.exceptions import AlreadyExistsError, DoesNotExistError,\
+                           ResponseError
 
 
 class Domain(BaseModel):
@@ -39,8 +41,79 @@ class Domain(BaseModel):
 
         self.name = name
         self.status = status
-        self.retention_period = retention_period
         self.description = description
+        self.retention_period = retention_period
+
+    def _diff(self):
+        """Checks for differences between Domain instance
+        and upstream version
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        try:
+            description = self.connection.describe_domain(self.name)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote Domain does not exist")
+            else:
+                raise ResponseError(e.body['message'])
+
+        domain_info = description['domainInfo']
+        domain_config = description['configuration']
+
+        attributes_comparison = [
+            Diff('name', self.name, domain_info['name']),
+            Diff('status', self.status, domain_info['status']),
+            Diff('description', self.description, domain_info['description']),
+            Diff('retention_period', self.retention_period, domain_config['workflowExecutionRetentionPeriodInDays']),
+        ]
+
+        return filter(
+            lambda data: data[1] != data[2],
+            attributes_comparison
+        )
+
+
+    @property
+    def exists(self):
+        """Checks if the Domain exists amazon-side
+
+        :rtype: bool
+        """
+        try:
+            description = self.connection.describe_domain(self.name)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                return False
+            else:
+                raise ResponseError(e.body['message'])
+
+        return True
+
+    @property
+    def is_synced(self):
+        """Checks if Domain instance has changes, comparing
+        with remote object representation
+
+        :rtype: bool
+        """
+        try:
+            return bool(self._diff == [])
+        except DoesNotExistError:
+            return False
+
+    @property
+    def changes(self):
+        """Returns changes between Domain instance, and
+        remote object representation
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        return self._diff()
 
     def save(self):
         """Creates the domain amazon side"""

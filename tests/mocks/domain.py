@@ -24,7 +24,7 @@ def mock_describe_domain(*args, **kwargs):
 
     response = {
         "configuration": {
-            "workflowExecutionRetentionPeriodInDays": "string"
+            "workflowExecutionRetentionPeriodInDays": "40"
         },
         "domainInfo": {
             "description": "mocked test domain",

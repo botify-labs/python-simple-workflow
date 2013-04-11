@@ -1,6 +1,16 @@
 # -*- coding:utf-8 -*-
 
+# Copyright (c) 2013, Theo Crevon
+# Copyright (c) 2013, Greg Leclercq
+#
+# See the file LICENSE for copying permission.
+
+from collections import namedtuple
+
 from swf.core import ConnectedSWFObject
+
+
+Diff = namedtuple('Diff', ['attribute', 'local_value', 'remote_value'])
 
 
 class BaseModel(ConnectedSWFObject):
