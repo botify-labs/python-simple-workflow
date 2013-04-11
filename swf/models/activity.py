@@ -9,8 +9,9 @@ from boto.swf.exceptions import SWFTypeAlreadyExistsError, SWFResponseError
 
 from swf.constants import REGISTERED, DEPRECATED
 from swf.models import BaseModel
+from swf.models.base import Diff
 from swf.core import ConnectedSWFObject
-from swf.exceptions import AlreadyExistsError, DoesNotExistError
+from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
 
 
 class ActivityType(BaseModel):
@@ -79,11 +80,97 @@ class ActivityType(BaseModel):
         self.status = status
         self.description = description
 
+        self.creation_date = creation_date
+        self.deprecation_date = deprecation_date
+
         self.task_list = task_list
         self.task_heartbeat_timeout = task_heartbeat_timeout
         self.task_schedule_to_close_timeout = task_schedule_to_close_timeout
         self.task_schedule_to_start_timeout = task_schedule_to_start_timeout
         self.task_start_to_close_timeout = task_start_to_close_timeout
+
+    def _diff(self):
+        """Checks for differences between ActivityType instance
+        and upstream version
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        try:
+            description = self.connection.describe_activity_type(
+                self.name,
+                self.name,
+                self.version
+            )
+        except SWFResponseError as err:
+            if err.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote ActivityType does not exist")
+            else:
+                raise ResponseError(err.body['message'])
+
+        info = description['typeInfo']
+        config = description['configuration']
+
+        attributes_comparison = [
+            Diff('name', self.name, info['activityType']['name']),
+            Diff('version', self.version, info['activityType']['version']),
+            Diff('status', self.status, info['status']),
+            Diff('description', self.description, info['description']),
+            Diff('creation_date', self.creation_date, info['creationDate']),
+            Diff('deprecation_date', self.deprecation_date, info['deprecationDate']),
+            Diff('task_list', self.task_list, config['defaultTaskList']['name']),
+            Diff('task_heartbeat_timeout', self.task_heartbeat_timeout, config['defaultTaskHeartbeatTimeout']),
+            Diff('task_schedule_to_close_timeout', self.task_schedule_to_close_timeout, config['defaultTaskScheduleToCloseTimeout']),
+            Diff('task_schedule_to_start_timeout', self.task_schedule_to_start_timeout, config['defaultTaskScheduleToStartTimeout']),
+            Diff('task_start_to_close_timeout', self.task_start_to_close_timeout, config['defaultTaskStartToCloseTimeout']),
+        ]
+
+        return filter(
+            lambda data: data.local_value != data.remote_value,
+            attributes_comparison
+        )
+
+
+    @property
+    def exists(self):
+        """Checks if the ActivityType exists amazon-side
+
+        :rtype: bool
+        """
+        try:
+            description = self.connection.describe_activity_type(
+                self.domain.name,
+                self.name,
+                self.version
+            )
+        except SWFResponseError as err:
+            if err.error_code == 'UnknownResourceFault':
+                return False
+            else:
+                raise ResponseError(err.body['message'])
+
+        return True
+
+    @property
+    def is_synced(self):
+        """Checks if ActivityType instance has changes, comparing
+        with remote object representation
+
+        :rtype: bool
+        """
+        return super(ActivityType, self).is_synced
+
+    @property
+    def changes(self):
+        """Returns changes between Domain instance, and
+        remote object representation
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        return super(ActivityType, self).changes
 
     def save(self):
         """Creates the activity type amazon side"""

@@ -99,10 +99,7 @@ class Domain(BaseModel):
 
         :rtype: bool
         """
-        try:
-            return bool(self._diff == [])
-        except DoesNotExistError:
-            return False
+        return super(Domain, self).is_synced
 
     @property
     def changes(self):
@@ -113,7 +110,7 @@ class Domain(BaseModel):
                   differences
         :rtype: list
         """
-        return self._diff()
+        return super(Domain, self).changes
 
     def save(self):
         """Creates the domain amazon side"""
