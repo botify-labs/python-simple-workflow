@@ -12,6 +12,7 @@ from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
+from swf.models import BaseModel
 from swf.models.event import History
 from swf.exceptions import DoesNotExistError, AlreadyExistsError
 
@@ -26,7 +27,7 @@ CHILD_POLICIES = collections.namedtuple('CHILD_POLICY',
                                         ' '.join(_POLICIES))(*_POLICIES)
 
 
-class WorkflowType(ConnectedSWFObject):
+class WorkflowType(BaseModel):
     """Simple Workflow Type wrapper
 
     :param  domain: Domain the workflow type should be registered in
@@ -180,7 +181,7 @@ class WorkflowType(ConnectedSWFObject):
                self.status)
 
 
-class WorkflowExecution(ConnectedSWFObject):
+class WorkflowExecution(BaseModel):
     """Simple Workflow execution wrapper
 
     :param  domain: Domain the workflow execution should be registered in

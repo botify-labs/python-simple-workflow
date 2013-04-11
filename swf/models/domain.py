@@ -8,11 +8,12 @@
 from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 
 from swf.constants import REGISTERED
+from swf.models import BaseModel
 from swf.core import ConnectedSWFObject
 from swf.exceptions import AlreadyExistsError, DoesNotExistError
 
 
-class Domain(ConnectedSWFObject):
+class Domain(BaseModel):
     """Simple Workflow Domain wrapper
 
     :param      name: Name of the domain to register (unique)

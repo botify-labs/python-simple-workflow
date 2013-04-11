@@ -36,14 +36,3 @@ class ConnectedSWFObject(object):
             AWS_CREDENTIALS['aws_secret_access_key'],
         )
 
-    def exists(self):
-        """Checks if the connected swf object exists amazon-side"""
-        raise NotImplementedError
-
-    def save(self):
-        """Creates the connected swf object amazon side"""
-        raise NotImplementedError
-
-    def deprecate(self):
-        """Deprecates the connected swf object amazon side"""
-        raise NotImplementedError

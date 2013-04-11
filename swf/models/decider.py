@@ -7,7 +7,9 @@
 
 import boto
 
+from swf.models import BaseModel
 
-class Decider(object):
+
+class Decider(BaseModel):
     def __init__(self):
         pass

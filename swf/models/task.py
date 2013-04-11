@@ -7,12 +7,13 @@
 
 import boto
 
+from swf.models import BaseModel
 
-class Task(object):
+class Task(BaseModel):
     def __init__(self):
         pass
 
 
-class TaskList(object):
+class TaskList(BaseModel):
     def __init__(self):
         pass

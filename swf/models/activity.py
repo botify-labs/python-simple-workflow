@@ -8,11 +8,12 @@
 from boto.swf.exceptions import SWFTypeAlreadyExistsError, SWFResponseError
 
 from swf.constants import REGISTERED, DEPRECATED
+from swf.models import BaseModel
 from swf.core import ConnectedSWFObject
 from swf.exceptions import AlreadyExistsError, DoesNotExistError
 
 
-class ActivityType(ConnectedSWFObject):
+class ActivityType(BaseModel):
     """ActivityType wrapper
 
     :param  domain: Domain the workflow type should be registered in
