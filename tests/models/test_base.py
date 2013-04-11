@@ -21,15 +21,6 @@ class TestBaseModel(unittest2.TestCase):
         with self.assertRaises(NotImplementedError):
             self.obj._diff()
 
-    def test_is_synced_not_implemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.obj.is_synced
-
-    def test_changes_not_implemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.obj.changes
-
-
     def test_exists_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             self.obj.exists

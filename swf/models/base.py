@@ -25,17 +25,29 @@ class BaseModel(ConnectedSWFObject):
         """Checks if the connected swf object exists amazon-side"""
         raise NotImplementedError
 
+
     @property
     def is_synced(self):
         """Checks if current Model instance has changes, comparing
-        with remote object representation"""
-        raise NotImplementedError
+        with remote object representation
+
+        :rtype: bool
+        """
+        try:
+            return bool(self._diff == [])
+        except DoesNotExistError:
+            return False
 
     @property
     def changes(self):
         """Returns changes between current model instance, and
-        remote object representation"""
-        raise NotImplementedError
+        remote object representation
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        return self._diff()
 
     def save(self):
         """Creates the connected swf object amazon side"""
