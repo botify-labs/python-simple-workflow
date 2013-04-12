@@ -31,8 +31,11 @@ class ConnectedSWFObject(object):
         for kwarg in kwargs:
             setattr(self, kwarg, kwargs[kwarg])
 
+        self.region = kwargs.pop('region', None)
+
         self.connection = Layer1(
             AWS_CREDENTIALS['aws_access_key_id'],
             AWS_CREDENTIALS['aws_secret_access_key'],
+            region=self.region
         )
 
