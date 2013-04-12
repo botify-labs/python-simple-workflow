@@ -324,7 +324,7 @@ class WorkflowExecution(BaseModel):
         self.decision_tasks_timeout = decision_tasks_timeout
 
     def _diff(self):
-        """Checks for differences between WorkflowType instance
+        """Checks for differences between WorkflowExecution instance
         and upstream version
 
         :returns: A list of swf.models.base.Diff namedtuple describing
@@ -364,7 +364,7 @@ class WorkflowExecution(BaseModel):
 
     @property
     def exists(self):
-        """Checks if the WorkflowType exists amazon-side
+        """Checks if the WorkflowExecution exists amazon-side
 
         :rtype: bool
         """
@@ -384,7 +384,7 @@ class WorkflowExecution(BaseModel):
 
     @property
     def is_synced(self):
-        """Checks if WorkflowType instance has changes, comparing
+        """Checks if WorkflowExecution instance has changes, comparing
         with remote object representation
 
         :rtype: bool
@@ -393,7 +393,7 @@ class WorkflowExecution(BaseModel):
 
     @property
     def changes(self):
-        """Returns changes between WorkflowType instance, and
+        """Returns changes between WorkflowExecution instance, and
         remote object representation
 
         :returns: A list of swf.models.base.Diff namedtuple describing
