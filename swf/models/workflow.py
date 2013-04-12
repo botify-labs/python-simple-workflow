@@ -15,7 +15,8 @@ from swf.core import ConnectedSWFObject
 from swf.models import BaseModel
 from swf.models.base import Diff
 from swf.models.event import History
-from swf.exceptions import DoesNotExistError, AlreadyExistsError
+from swf.exceptions import DoesNotExistError, AlreadyExistsError,\
+                           ResponseError
 
 
 _POLICIES = ('TERMINATE',       # child executions will be terminated
@@ -319,8 +320,87 @@ class WorkflowExecution(BaseModel):
         self.child_policy = child_policy
         self.execution_timeout = execution_timeout
         self.input = input
-        self.tag_list = tag_list
+        self.tag_list = tag_list or []
         self.decision_tasks_timeout = decision_tasks_timeout
+
+    def _diff(self):
+        """Checks for differences between WorkflowType instance
+        and upstream version
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        try:
+            description = self.connection.describe_workflow_execution(
+                self.domain.name,
+                self.run_id,
+                self.workflow_id
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote Domain does not exist")
+            else:
+                raise ResponseError(e.body['message'])
+
+        execution_info = description['executionInfo']
+        execution_config = description['executionConfiguration']
+
+        attributes_comparison = [
+            Diff('workflow_id', self.workflow_id, execution_info['execution']['workflowId']),
+            Diff('run_id', self.run_id, execution_info['execution']['runId']),
+            Diff('status',  self.status, execution_info['executionStatus']),
+            Diff('task_list', self.task_list, execution_config['taskList']['name']),
+            Diff('child_policy',  self.child_policy, execution_config['childPolicy']),
+            Diff('execution_timeout', self.execution_timeout, execution_config['executionStartToCloseTimeout']),
+            Diff('tag_list', self.tag_list, execution_info['tagList']),
+            Diff('decision_tasks_timeout', self.decision_tasks_timeout, execution_config['taskStartToCloseTimeout']),
+        ]
+
+        return filter(
+            lambda data: data[1] != data[2],
+            attributes_comparison
+        )
+
+    @property
+    def exists(self):
+        """Checks if the WorkflowType exists amazon-side
+
+        :rtype: bool
+        """
+        try:
+            description = self.connection.describe_workflow_execution(
+                self.domain.name,
+                self.run_id,
+                self.workflow_id
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                return False
+            else:
+                raise ResponseError(e.body['message'])
+
+        return True
+
+    @property
+    def is_synced(self):
+        """Checks if WorkflowType instance has changes, comparing
+        with remote object representation
+
+        :rtype: bool
+        """
+        return super(WorkflowExecution, self).is_synced
+
+    @property
+    def changes(self):
+        """Returns changes between WorkflowType instance, and
+        remote object representation
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        return super(WorkflowExecution, self).changes
 
     def history(self, *args, **kwargs):
         """Returns workflow execution history report

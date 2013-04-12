@@ -12,7 +12,8 @@ from swf.models.event import History
 from swf.models.domain import Domain
 from swf.models.workflow import WorkflowType, WorkflowExecution
 
-from ..mocks.workflow import mock_describe_workflow_type
+from ..mocks.workflow import mock_describe_workflow_type,\
+                             mock_describe_workflow_execution
 from ..mocks.event import mock_get_workflow_execution_history
 
 
@@ -240,6 +241,139 @@ class TestWorkflowExecution(unittest2.TestCase):
             WorkflowExecution.STATUS_OPEN,
             WorkflowExecution.STATUS_CLOSED
         ])
+
+    def test___diff_with_different_workflow_execution(self):
+        with patch.object(
+            Layer1,
+            'describe_workflow_execution',
+            mock_describe_workflow_execution,
+        ):
+            workflow_execution = WorkflowExecution(
+                self.domain,
+                WorkflowType(self.domain, "NonExistentTestType", "1.0"),
+                "non-existent-id"
+            )
+            diffs = workflow_execution._diff()
+
+            self.assertIsNotNone(diffs)
+            self.assertEqual(len(diffs), 7)
+
+            self.assertTrue(hasattr(diffs[0], 'attribute'))
+            self.assertTrue(hasattr(diffs[0], 'local_value'))
+            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+
+    def test_workflow_execution__diff_with_identical_workflow_execution(self):
+        with patch.object(
+            Layer1,
+            'describe_workflow_execution',
+            mock_describe_workflow_execution,
+        ):
+            mocked = mock_describe_workflow_execution()
+            workflow_execution = WorkflowExecution(
+                self.domain,
+                self.wt,
+                mocked['executionInfo']['execution']['workflowId'],
+                run_id=mocked['executionInfo']['execution']['runId'],
+                status=mocked['executionInfo']['executionStatus'],
+                task_list=mocked['executionConfiguration']['taskList']['name'],
+                child_policy=mocked['executionConfiguration']['childPolicy'],
+                execution_timeout=mocked['executionConfiguration']['executionStartToCloseTimeout'],
+                tag_list=mocked['executionInfo']['tagList'],
+                decision_tasks_timeout=mocked['executionConfiguration']['taskStartToCloseTimeout'],
+            )
+
+            diffs = workflow_execution._diff()
+
+            self.assertEqual(diffs, [])
+
+    def test_exists_with_existing_workflow_execution(self):
+        with patch.object(Layer1, 'describe_workflow_execution'):
+            self.assertTrue(self.we.exists)
+
+    def test_exists_with_non_existent_workflow_execution(self):
+        with patch.object(self.we.connection, 'describe_workflow_execution') as mock:
+            mock.side_effect = SWFResponseError(
+                    400,
+                    "mocking exception",
+                    {'__type': 'UnknownResourceFault'}
+            )
+            self.assertFalse(self.we.exists)
+
+    def test_workflow_execution_exists_with_whatever_error(self):
+        with patch.object(self.we.connection, 'describe_workflow_execution') as mock:
+            with self.assertRaises(ResponseError):
+                mock.side_effect = SWFResponseError(
+                        400,
+                        "mocking exception",
+                        {
+                            '__type': 'WhateverError',
+                            'message': 'Whatever'
+                        }
+                )
+                self.domain.exists
+
+    def test_is_synced_with_unsynced_workflow_execution(self):
+        pass
+
+    def test_is_synced_with_synced_workflow_execution(self):
+        pass
+
+    def test_is_synced_over_non_existent_workflow_execution(self):
+        with patch.object(
+            Layer1,
+            'describe_workflow_execution',
+            mock_describe_workflow_execution
+        ):
+            workflow_execution = WorkflowExecution(
+                self.domain,
+                WorkflowType(self.domain, "NonExistentTestType", "1.0"),
+                "non-existent-id"
+            )
+            self.assertFalse(workflow_execution.is_synced)
+
+    def test_changes_with_different_workflow_execution(self):
+        with patch.object(
+            Layer1,
+            'describe_workflow_execution',
+            mock_describe_workflow_execution,
+        ):
+            workflow_execution = WorkflowExecution(
+                self.domain,
+                WorkflowType(self.domain, "NonExistentTestType", "1.0"),
+                "non-existent-id"
+            )
+            diffs = workflow_execution.changes
+
+            self.assertIsNotNone(diffs)
+            self.assertEqual(len(diffs), 7)
+
+            self.assertTrue(hasattr(diffs[0], 'attribute'))
+            self.assertTrue(hasattr(diffs[0], 'local_value'))
+            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+
+    def test_workflow_execution_changes_with_identical_workflow_execution(self):
+        with patch.object(
+            Layer1,
+            'describe_workflow_execution',
+            mock_describe_workflow_execution,
+        ):
+            mocked = mock_describe_workflow_execution()
+            workflow_execution = WorkflowExecution(
+                self.domain,
+                self.wt,
+                mocked['executionInfo']['execution']['workflowId'],
+                run_id=mocked['executionInfo']['execution']['runId'],
+                status=mocked['executionInfo']['executionStatus'],
+                task_list=mocked['executionConfiguration']['taskList']['name'],
+                child_policy=mocked['executionConfiguration']['childPolicy'],
+                execution_timeout=mocked['executionConfiguration']['executionStartToCloseTimeout'],
+                tag_list=mocked['executionInfo']['tagList'],
+                decision_tasks_timeout=mocked['executionConfiguration']['taskStartToCloseTimeout'],
+            )
+
+            diffs = workflow_execution.changes
+
+            self.assertEqual(diffs, [])
 
     def test_history(self):
         with patch.object(
