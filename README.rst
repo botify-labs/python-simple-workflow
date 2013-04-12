@@ -107,10 +107,14 @@ they're behaving like django managers.
     # Queryset objects cannot act as classmethods proxy and have to be instantiated;
     # most of the time against a Domain model instance
     >>> from swf.querysets import DomainQuerySet, WorkflowTypeQuerySet
-    >>> domain_qs = DomainQuerySet()  # Domain querysets can be instantiated directly
+
+    # Domain querysets can be instantiated directly
+    >>> domain_qs = DomainQuerySet()
     >>> workflow_domain = domain_qs.get("MyTestDomain")  # and specific model retieved via .get method
     >>> workflow_qs = WorkflowTypeQuerySet(workflow_domain)  # queryset built against model instance example
+
     >>> workflow_qs.all()
     [WorkflowType("TestType1"), WorkflowType("TestType2"),]
+
     >>> workflow_qs.filter(status=DEPRECATED)
     [WorkflowType("DeprecatedType1"),]
