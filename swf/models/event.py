@@ -87,6 +87,8 @@ class Event(object):
 
     @property
     def type(self):
+        if not hasattr(self, '_type'):
+            self._type = None
         return self._type
 
     @type.setter

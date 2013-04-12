@@ -86,7 +86,6 @@ class WorkflowType(BaseModel):
         self.creation_date = creation_date
         self.deprecation_date = deprecation_date
 
-        self._child_policy = None
         self.task_list = task_list
         self.execution_timeout = execution_timeout
         self.decision_tasks_timeout = decision_tasks_timeout
@@ -98,6 +97,8 @@ class WorkflowType(BaseModel):
 
     @property
     def child_policy(self):
+        if not hasattr(self, '_child_policy'):
+            self._child_policy = None
         return self._child_policy
 
     @child_policy.setter
