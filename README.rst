@@ -2,7 +2,7 @@
 Python Simple Workflow
 ======================
 
-*Under heavy development, and not yet usable*
+*Still under heavy development*
 
 python-simple-workflow is a wrapper for `Amazon Simple Workflow <http://aws.amazon.com/en/swf/>`_ service. It aims to provide
 some abstractions over `Boto <https://boto.readthedocs.org/en/latest/ref/swf.html>`_ library SWF API implementation, like querysets and objects over
