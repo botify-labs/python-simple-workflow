@@ -99,14 +99,15 @@ class WorkflowType(BaseModel):
     def child_policy(self):
         if not hasattr(self, '_child_policy'):
             self._child_policy = None
+
         return self._child_policy
 
     @child_policy.setter
     def child_policy(self, policy):
-        if policy in CHILD_POLICIES:
-            self._child_policy = policy
-        else:
+        if not policy in CHILD_POLICIES:
             raise ValueError("invalid child policy value: {}".format(policy))
+
+        self._child_policy = policy
 
     def _diff(self):
         """Checks for differences between WorkflowType instance
@@ -125,8 +126,8 @@ class WorkflowType(BaseModel):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Remote Domain does not exist")
-            else:
-                raise ResponseError(e.body['message'])
+
+            raise ResponseError(e.body['message'])
 
         workflow_info = description['typeInfo']
         workflow_config = description['configuration']
@@ -162,10 +163,10 @@ class WorkflowType(BaseModel):
                 self.version
             )
         except SWFResponseError as e:
-            if e.error_code == 'UnknownResourceFault':
-                return False
-            else:
+            if e.error_code != 'UnknownResourceFault':
                 raise ResponseError(e.body['message'])
+
+            return False
 
         return True
 
@@ -341,8 +342,8 @@ class WorkflowExecution(BaseModel):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Remote Domain does not exist")
-            else:
-                raise ResponseError(e.body['message'])
+
+            raise ResponseError(e.body['message'])
 
         execution_info = description['executionInfo']
         execution_config = description['executionConfiguration']
@@ -376,10 +377,10 @@ class WorkflowExecution(BaseModel):
                 self.workflow_id
             )
         except SWFResponseError as e:
-            if e.error_code == 'UnknownResourceFault':
-                return False
-            else:
+            if e.error_code != 'UnknownResourceFault':
                 raise ResponseError(e.body['message'])
+
+            return False
 
         return True
 

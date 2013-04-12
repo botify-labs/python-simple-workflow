@@ -93,7 +93,7 @@ class Event(object):
 
     @type.setter
     def type(self, value):
-        if value not in Event.TYPES:
+        if not value in Event.TYPES:
             raise ValueError("Invalid type supplied: %s" % self.type)
         self._type = value
 
@@ -180,8 +180,8 @@ class History(object):
             return self.container[val]
         elif isinstance(val, slice):
             return History(events=self.container[val])
-        else:
-            raise TypeError("Unknown slice format: %s" % type(val))
+
+        raise TypeError("Unknown slice format: %s" % type(val))
 
     @classmethod
     def from_event_list(cls, data):

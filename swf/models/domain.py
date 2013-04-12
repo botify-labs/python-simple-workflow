@@ -11,8 +11,8 @@ from swf.constants import REGISTERED
 from swf.models import BaseModel
 from swf.models.base import Diff
 from swf.core import ConnectedSWFObject
-from swf.exceptions import AlreadyExistsError, DoesNotExistError,\
-                           ResponseError
+from swf.exceptions import (AlreadyExistsError, DoesNotExistError,
+                            ResponseError)
 
 
 class Domain(BaseModel):
@@ -57,8 +57,8 @@ class Domain(BaseModel):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Remote Domain does not exist")
-            else:
-                raise ResponseError(e.body['message'])
+
+            raise ResponseError(e.body['message'])
 
         domain_info = description['domainInfo']
         domain_config = description['configuration']

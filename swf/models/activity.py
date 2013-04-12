@@ -106,8 +106,8 @@ class ActivityType(BaseModel):
         except SWFResponseError as err:
             if err.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Remote ActivityType does not exist")
-            else:
-                raise ResponseError(err.body['message'])
+
+            raise ResponseError(err.body['message'])
 
         info = description['typeInfo']
         config = description['configuration']
@@ -145,10 +145,10 @@ class ActivityType(BaseModel):
                 self.version
             )
         except SWFResponseError as err:
-            if err.error_code == 'UnknownResourceFault':
-                return False
-            else:
+            if err.error_code != 'UnknownResourceFault':
                 raise ResponseError(err.body['message'])
+
+            return False
 
         return True
 
