@@ -33,10 +33,10 @@ class ActivityType(BaseModel):
     :type   description: str | None
 
     :param   creation_date: creation date of the current ActivityType
-    :type    creation_date: int (timestamp)
+    :type    creation_date: float (timestamp)
 
     :param   deprecation_date: deprecation date of ActivityType
-    :type    deprecation_date: int (timestamp)
+    :type    deprecation_date: float (timestamp)
 
     :param  task_list: specifies the default task list to use for scheduling
                        tasks of this activity type.
@@ -64,8 +64,8 @@ class ActivityType(BaseModel):
     def __init__(self, domain, name, version,
                  status=REGISTERED,
                  description=None,
-                 creation_date=None,
-                 deprecation_date=None,
+                 creation_date=0.0,
+                 deprecation_date=0.0,
                  task_list=None,
                  task_heartbeat_timeout=0,
                  task_schedule_to_close_timeout=0,

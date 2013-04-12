@@ -13,6 +13,7 @@ from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
 from swf.models import BaseModel
+from swf.models.base import Diff
 from swf.models.event import History
 from swf.exceptions import DoesNotExistError, AlreadyExistsError
 
@@ -42,6 +43,12 @@ class WorkflowType(BaseModel):
     :param  status: workflow type status
     :type   status: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
 
+    :param   creation_date: creation date of the current WorkflowType
+    :type    creation_date: float (timestamp)
+
+    :param   deprecation_date: deprecation date of WorkflowType
+    :type    deprecation_date: float (timestamp)
+
     :param  task_list: task list to use for scheduling decision tasks for executions
                        of this workflow type
     :type   task_list: String
@@ -63,6 +70,8 @@ class WorkflowType(BaseModel):
     """
     def __init__(self, domain, name, version,
                  status=REGISTERED,
+                 creation_date=0.0,
+                 deprecation_date=0.0,
                  task_list=None,
                  child_policy=CHILD_POLICIES.TERMINATE,
                  execution_timeout='300',
@@ -73,6 +82,8 @@ class WorkflowType(BaseModel):
         self.name = name
         self.version = version
         self.status = status
+        self.creation_date = creation_date
+        self.deprecation_date = deprecation_date
 
         self._child_policy = None
         self.task_list = task_list
@@ -94,6 +105,87 @@ class WorkflowType(BaseModel):
             self._child_policy = policy
         else:
             raise ValueError("invalid child policy value: {}".format(policy))
+
+    def _diff(self):
+        """Checks for differences between WorkflowType instance
+        and upstream version
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        try:
+            description = self.connection.describe_workflow_type(
+                self.domain.name,
+                self.name,
+                self.version
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote Domain does not exist")
+            else:
+                raise ResponseError(e.body['message'])
+
+        workflow_info = description['typeInfo']
+        workflow_config = description['configuration']
+
+        attributes_comparison = [
+            Diff('name', self.name, workflow_info['workflowType']['name']),
+            Diff('version', self.version, workflow_info['workflowType']['version']),
+            Diff('status', self.status, workflow_info['status']),
+            Diff('creation_date', self.creation_date, workflow_info['creationDate']),
+            Diff('deprecation_date', self.deprecation_date, workflow_info['deprecationDate']),
+            Diff('task_list', self.task_list, workflow_config['defaultTaskList']['name']),
+            Diff('child_policy', self.child_policy, workflow_config['defaultChildPolicy']),
+            Diff('execution_timeout', self.execution_timeout, workflow_config['defaultExecutionStartToCloseTimeout']),
+            Diff('decision_tasks_timout', self.decision_tasks_timeout, workflow_config['defaultTaskStartToCloseTimeout']),
+            Diff('description', self.description, workflow_info['description']),
+        ]
+
+        return filter(
+            lambda data: data[1] != data[2],
+            attributes_comparison
+        )
+
+    @property
+    def exists(self):
+        """Checks if the WorkflowType exists amazon-side
+
+        :rtype: bool
+        """
+        try:
+            description = self.connection.describe_workflow_type(
+                self.domain.name,
+                self.name,
+                self.version
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                return False
+            else:
+                raise ResponseError(e.body['message'])
+
+        return True
+
+    @property
+    def is_synced(self):
+        """Checks if WorkflowType instance has changes, comparing
+        with remote object representation
+
+        :rtype: bool
+        """
+        return super(WorkflowType, self).is_synced
+
+    @property
+    def changes(self):
+        """Returns changes between WorkflowType instance, and
+        remote object representation
+
+        :returns: A list of swf.models.base.Diff namedtuple describing
+                  differences
+        :rtype: list
+        """
+        return super(WorkflowType, self).changes
 
     def save(self):
         """Creates the workflow type amazon side"""
