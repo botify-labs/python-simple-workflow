@@ -25,17 +25,31 @@ Usage
 Before you ask
 --------------
 
-To be usable, the python simple workflow package modules have to be aware of your AWS credentials.To do so, python-simple-workflow provides a ``set_aws_credentials`` helper function.
+To be able to communicate with Amazon, the python simple workflow package modules have to be aware of your AWS credentials. Three credentials providing methods are available and evaluated by the module in the following order:
 
-.. code-block:: python
+1. credential file: a ``.swf`` is seeked in the user's home directory, it's content has to match the following pattern:
 
-	>>> from swf.core import set_aws_credentials
-	>>> set_aws_credentials('MYAWSACCESSKEYID', 'MYAWSSECRETACCESSKEY')
+.. code-block:: ini
 
-	# And then you're good to go...
-	>>> queryset = DomainQuery()
-	>>> queryset.all()
-	[Domain('test1'), Domain('test2')]
+    [credentials]
+    aws_access_key_id=<aws_access_key_id>
+    aws_secret_access_key=<aws_secret_access_key>
+
+
+2. environment variables: python-simple-workflow will check for ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` environment variables to be set to relevant values
+
+3. Helper function: if neither previous methods were used,
+you'll still be able to set the global module aws credentials using the ``swf.credentials.set_aws_credentials`` method.
+
+.. code-block:: shell
+
+    >>> from swf.credentials import set_aws_credentials
+    >>> set_aws_credentials('MYAWSACCESSKEYID', 'MYAWSSECRETACCESSKEY')
+
+    # And then you're good to go...
+    >>> queryset = DomainQuery()
+    >>> queryset.all()
+    [Domain('test1'), Domain('test2')]
 
 
 Models
