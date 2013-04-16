@@ -6,7 +6,7 @@ from mock import patch
 
 from boto.exception import SWFResponseError
 
-from swf.core import set_aws_credentials
+from swf.credentials import set_aws_credentials
 from swf.exceptions import (ResponseError, DoesNotExistError,
                             InvalidCredentialsError)
 from swf.models.domain import Domain

@@ -7,18 +7,9 @@
 
 from boto.swf.layer1 import Layer1
 
-AWS_CREDENTIALS = {
-    #'aws_access_key_id': AWS_ACCESS_KEY_ID,
-    #'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
-}
+from swf.credentials import extract_aws_credentials
 
-
-def set_aws_credentials(aws_access_key_id, aws_secret_access_key):
-    """Set default credentials."""
-    AWS_CREDENTIALS.update({
-        'aws_access_key_id': aws_access_key_id,
-        'aws_secret_access_key': aws_secret_access_key,
-    })
+AWS_CREDENTIALS = extract_aws_credentials()
 
 
 class ConnectedSWFObject(object):
@@ -38,4 +29,3 @@ class ConnectedSWFObject(object):
             AWS_CREDENTIALS['aws_secret_access_key'],
             region=self.region
         )
-
