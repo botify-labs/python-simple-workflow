@@ -109,3 +109,14 @@ class TestActivityTypeQuerySet(unittest2.TestCase):
                     {'__type': 'UnknownResourceFault'}
                 )
                 self.atq.get('mocked-non-existent-activity-type-name', 'na')
+
+    def test_create(self):
+        with patch.object(Layer1, 'register_activity_type'):
+            new_activity_type = ActivityType(
+                self.domain,
+                "TestActivityType",
+                "0.test"
+            )
+
+            self.assertIsNotNone(new_activity_type)
+            self.assertIsInstance(new_activity_type, ActivityType)

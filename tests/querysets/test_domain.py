@@ -5,6 +5,7 @@ import unittest2
 from mock import patch
 
 from boto.exception import SWFResponseError
+from boto.swf.layer1 import Layer1
 
 from swf.credentials import set_aws_credentials
 from swf.exceptions import (ResponseError, DoesNotExistError,
@@ -74,3 +75,10 @@ class TestDomainQuerySet(unittest2.TestCase):
             domains = self.qs.all()
             self.assertEqual(len(domains), 1)
             self.assertIsInstance(domains[0], Domain)
+
+    def test_create_domain(self):
+        with patch.object(Layer1, 'register_domain'):
+            new_domain = self.qs.create("TestDomain")
+            
+            self.assertIsNotNone(new_domain)
+            self.assertIsInstance(new_domain, Domain)

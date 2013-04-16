@@ -75,7 +75,6 @@ class Domain(BaseModel):
             attributes_comparison
         )
 
-
     @property
     def exists(self):
         """Checks if the Domain exists amazon-side

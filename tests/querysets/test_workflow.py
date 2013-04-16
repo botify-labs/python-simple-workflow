@@ -127,6 +127,17 @@ class TestWorkflowTypeQuerySet(unittest2.TestCase):
                 self.assertIsInstance(wt, WorkflowType)
                 self.assertEqual(wt.status, REGISTERED)
 
+    def test_create_workflow_type(self):
+        with patch.object(Layer1, 'register_workflow_type'):
+            new_wt = self.wtq.create(
+                self.domain,
+                "TestWorkflowType",
+                "0.test",
+            )
+
+            self.assertIsNotNone(new_wt)
+            self.assertIsInstance(new_wt, WorkflowType)
+
 
 class TestWorkflowExecutionQuerySet(unittest2.TestCase):
 

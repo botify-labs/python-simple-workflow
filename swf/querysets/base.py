@@ -20,3 +20,6 @@ class BaseQuerySet(ConnectedSWFObject):
 
     def all(self, *args, **kwargs):
         raise NotImplementedError
+
+    def create(self, *args, **kwargs):
+        raise NotImplementedError

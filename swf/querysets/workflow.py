@@ -9,7 +9,8 @@ from boto.swf.exceptions import SWFResponseError
 
 from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
-from swf.models.workflow import WorkflowType, WorkflowExecution
+from swf.models.workflow import WorkflowType, WorkflowExecution,\
+                                CHILD_POLICIES
 from swf.utils import datetime_timestamp, past_day, get_subkey
 from swf.exceptions import ResponseError, DoesNotExistError,\
                            InvalidKeywordArgumentError
@@ -204,6 +205,72 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             }
         """
         return self.filter(registration_status=registration_status)
+
+    def create(self, domain, name, version,
+               status=REGISTERED,
+               creation_date=0.0,
+               deprecation_date=0.0,
+               task_list=None,
+               child_policy=CHILD_POLICIES.TERMINATE,
+               execution_timeout='300',
+               decision_tasks_timeout='300',
+               description=None, *args, **kwargs):
+        """Creates a new remote workflow type and returns the 
+        created WorkflowType model instance.
+
+        :param  domain: Domain the workflow type should be registered in
+        :type   domain: swf.models.Domain
+
+        :param  name: name of the workflow type
+        :type   name: String
+
+        :param  version: workflow type version
+        :type   version: String
+
+        :param  status: workflow type status
+        :type   status: swf.core.ConnectedSWFObject.{REGISTERED, DEPRECATED}
+
+        :param   creation_date: creation date of the current WorkflowType
+        :type    creation_date: float (timestamp)
+
+        :param   deprecation_date: deprecation date of WorkflowType
+        :type    deprecation_date: float (timestamp)
+
+        :param  task_list: task list to use for scheduling decision tasks for executions
+                           of this workflow type
+        :type   task_list: String
+
+        :param  child_policy: policy to use for the child workflow executions
+                              when a workflow execution of this type is terminated
+        :type   child_policy: CHILD_POLICIES.{TERMINATE |
+                                              REQUEST_CANCEL |
+                                              ABANDON}
+
+        :param  execution_timeout: maximum duration for executions of this workflow type
+        :type   execution_timeout: String
+
+        :param  decision_tasks_timeout: maximum duration of decision tasks for this workflow type
+        :type   decision_tasks_timeout: String
+
+        :param  description: Textual description of the workflow type
+        :type   description: String
+        """
+        workflow_type = WorkflowType(
+            domain,
+            name,
+            version,
+            status=status,
+            creation_date=creation_date,
+            deprecation_date=deprecation_date,
+            task_list=task_list,
+            child_policy=child_policy,
+            execution_timeout=execution_timeout,
+            decision_tasks_timeout=decision_tasks_timeout,
+            description=description
+        )
+        workflow_type.save()
+
+        return workflow_type
 
 
 class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):

@@ -100,3 +100,35 @@ class DomainQuerySet(BaseQuerySet):
 
         return [Domain(d['name'], d['status'], d.get('description')) for d
                 in get_domains()]
+
+    def create(self, name,
+               status=REGISTERED,
+               description=None,
+               retention_period=30, *args, **kwargs):
+        """Creates a new remote domain and returns the Domain model instance
+
+        :param      name: Name of the domain to register (unique)
+        :type       name: string
+
+        :param      retention_period: Domain's workflow executions records retention in days
+        :type       retention_period: Integer
+
+        :param      status: Specifies the registration status of the
+                            workflow types to list. Valid values are:
+                            * ``swf.constants.REGISTERED``
+                            * ``swf.constants.DEPRECATED``
+        :type       status: string
+
+        :param      description: Textual description of the domain
+        :type       description: string
+        """
+
+        domain = Domain(
+            name,
+            status=status,
+            description=description,
+            retention_period=retention_period
+        )
+        domain.save()
+
+        return domain

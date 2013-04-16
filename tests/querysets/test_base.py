@@ -24,3 +24,7 @@ class TestBaseQuerySet(unittest2.TestCase):
     def test_all_method_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             self.base_qs.all()
+
+    def test_create_method_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            self.base_qs.create()
