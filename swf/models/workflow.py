@@ -267,6 +267,7 @@ class WorkflowType(BaseModel):
                self.status)
 
 
+@immutable
 class WorkflowExecution(BaseModel):
     """Simple Workflow execution wrapper
 
@@ -297,13 +298,26 @@ class WorkflowExecution(BaseModel):
     CLOSE_STATUS_CONTINUED_AS_NEW = "CLOSE_STATUS_CONTINUED_AS_NEW"
     CLOSE_TIMED_OUT = "TIMED_OUT"
 
+    __slots__ = [
+        'domain',
+        'workflow_type',
+        'workflow_id',
+        'run_id',
+        'status',
+        'task_list',
+        'child_policy',
+        'execution_timeout',
+        'input',
+        'tag_list',
+        'decision_tasks_timeout',
+    ]
+
     def __init__(self, domain, workflow_type,
                  workflow_id, run_id=None,
                  status=STATUS_OPEN, task_list=None,
                  child_policy=None, execution_timeout=None,
                  input=None, tag_list=None,
                  decision_tasks_timeout=None, *args, **kwargs):
-        super(WorkflowExecution, self).__init__(*args, **kwargs)
 
         self.domain = domain
         self.workflow_id = workflow_id
@@ -315,6 +329,10 @@ class WorkflowExecution(BaseModel):
         self.input = input
         self.tag_list = tag_list or []
         self.decision_tasks_timeout = decision_tasks_timeout
+        
+        # immutable decorator rebinds class name,
+        # so have to use generice self.__class__
+        super(self.__class__, self).__init__(*args, **kwargs)
 
     def _diff(self):
         """Checks for differences between WorkflowExecution instance
@@ -374,26 +392,6 @@ class WorkflowExecution(BaseModel):
             return False
 
         return True
-
-    @property
-    def is_synced(self):
-        """Checks if WorkflowExecution instance has changes, comparing
-        with remote object representation
-
-        :rtype: bool
-        """
-        return super(WorkflowExecution, self).is_synced
-
-    @property
-    def changes(self):
-        """Returns changes between WorkflowExecution instance, and
-        remote object representation
-
-        :returns: A list of swf.models.base.Diff namedtuple describing
-                  differences
-        :rtype: list
-        """
-        return super(WorkflowExecution, self).changes
 
     def history(self, *args, **kwargs):
         """Returns workflow execution history report
