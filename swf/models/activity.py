@@ -8,12 +8,14 @@
 from boto.swf.exceptions import SWFTypeAlreadyExistsError, SWFResponseError
 
 from swf.constants import REGISTERED, DEPRECATED
+from swf.utils import immutable
 from swf.models import BaseModel
 from swf.models.base import Diff
 from swf.core import ConnectedSWFObject
 from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
 
 
+@immutable
 class ActivityType(BaseModel):
     """ActivityType wrapper
 
@@ -61,6 +63,21 @@ class ActivityType(BaseModel):
                                           this activity type.
     :type    task_start_to_close_timeout: int
     """
+    __slots__ = [
+    'domain',
+    'name',
+    'version',
+    'status',
+    'description',
+    'creation_date',
+    'deprecation_date',
+    'task_list',
+    'task_heartbeat_timeout',
+    'task_schedule_to_close_timeout',
+    'task_schedule_to_start_timeout',
+    'task_start_to_close_timeout',
+    ]
+
     def __init__(self, domain, name, version,
                  status=REGISTERED,
                  description=None,
@@ -72,7 +89,6 @@ class ActivityType(BaseModel):
                  task_schedule_to_start_timeout=0,
                  task_start_to_close_timeout=0,
                  *args, **kwargs):
-        super(ActivityType, self).__init__(*args, **kwargs)
 
         self.domain = domain
         self.name = name
@@ -88,6 +104,10 @@ class ActivityType(BaseModel):
         self.task_schedule_to_close_timeout = task_schedule_to_close_timeout
         self.task_schedule_to_start_timeout = task_schedule_to_start_timeout
         self.task_start_to_close_timeout = task_start_to_close_timeout
+        
+        # immutable decorator rebinds class name,
+        # so have to use generice self.__class__
+        super(self.__class__, self).__init__(*args, **kwargs)
 
     def _diff(self):
         """Checks for differences between ActivityType instance
@@ -131,7 +151,6 @@ class ActivityType(BaseModel):
             attributes_comparison
         )
 
-
     @property
     def exists(self):
         """Checks if the ActivityType exists amazon-side
@@ -151,26 +170,6 @@ class ActivityType(BaseModel):
             return False
 
         return True
-
-    @property
-    def is_synced(self):
-        """Checks if ActivityType instance has changes, comparing
-        with remote object representation
-
-        :rtype: bool
-        """
-        return super(ActivityType, self).is_synced
-
-    @property
-    def changes(self):
-        """Returns changes between Domain instance, and
-        remote object representation
-
-        :returns: A list of swf.models.base.Diff namedtuple describing
-                  differences
-        :rtype: list
-        """
-        return super(ActivityType, self).changes
 
     def save(self):
         """Creates the activity type amazon side"""
