@@ -8,12 +8,18 @@
 from collections import namedtuple
 
 from swf.core import ConnectedSWFObject
+from swf.utils import immutable
 
 
 Diff = namedtuple('Diff', ['attribute', 'local_value', 'remote_value'])
 
 
 class BaseModel(ConnectedSWFObject):
+    __slots__ = [
+        'exists',
+        'is_synced',
+        'changes',
+    ]
 
     def _diff(self):
         """Checks for differences between current model instance

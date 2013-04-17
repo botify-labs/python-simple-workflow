@@ -11,10 +11,12 @@ from swf.constants import REGISTERED
 from swf.models import BaseModel
 from swf.models.base import Diff
 from swf.core import ConnectedSWFObject
+from swf.utils import immutable
 from swf.exceptions import (AlreadyExistsError, DoesNotExistError,
                             ResponseError)
 
 
+@immutable
 class Domain(BaseModel):
     """Simple Workflow Domain wrapper
 
@@ -33,16 +35,25 @@ class Domain(BaseModel):
     :param      description: Textual description of the domain
     :type       description: string
     """
+    __slots__ = [
+        'name',
+        'status',
+        'description',
+        'retention_period',
+    ]
+
     def __init__(self, name,
                  status=REGISTERED,
                  description=None,
                  retention_period=30, *args, **kwargs):
-        super(Domain, self).__init__(*args, **kwargs)
-
         self.name = name
         self.status = status
         self.description = description
         self.retention_period = retention_period
+
+        # immutable decorator rebinds class name,
+        # so have to use generice self.__class__
+        super(self.__class__, self).__init__(*args, **kwargs)
 
     def _diff(self):
         """Checks for differences between Domain instance
@@ -90,26 +101,6 @@ class Domain(BaseModel):
                 raise ResponseError(e.body['message'])
 
         return True
-
-    @property
-    def is_synced(self):
-        """Checks if Domain instance has changes, comparing
-        with remote object representation
-
-        :rtype: bool
-        """
-        return super(Domain, self).is_synced
-
-    @property
-    def changes(self):
-        """Returns changes between Domain instance, and
-        remote object representation
-
-        :returns: A list of swf.models.base.Diff namedtuple describing
-                  differences
-        :rtype: list
-        """
-        return super(Domain, self).changes
 
     def save(self):
         """Creates the domain amazon side"""

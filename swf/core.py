@@ -8,6 +8,7 @@
 from boto.swf.layer1 import Layer1
 
 from swf.credentials import extract_aws_credentials
+from swf.utils import immutable
 
 AWS_CREDENTIALS = extract_aws_credentials()
 
@@ -18,10 +19,12 @@ class ConnectedSWFObject(object):
     Once inherited, implements the AWS authentication
     into the child, adding a `connection` property.
     """
-    def __init__(self, *args, **kwargs):
-        for kwarg in kwargs:
-            setattr(self, kwarg, kwargs[kwarg])
+    __slots__ = [
+        'region',
+        'connection'
+    ]
 
+    def __init__(self, *args, **kwargs):
         self.region = kwargs.pop('region', None)
 
         self.connection = Layer1(
