@@ -12,6 +12,7 @@ from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
+from swf.utils import immutable
 from swf.models import BaseModel
 from swf.models.base import Diff
 from swf.models.event import History
@@ -29,6 +30,7 @@ CHILD_POLICIES = collections.namedtuple('CHILD_POLICY',
                                         ' '.join(_POLICIES))(*_POLICIES)
 
 
+@immutable
 class WorkflowType(BaseModel):
     """Simple Workflow Type wrapper
 
@@ -69,6 +71,20 @@ class WorkflowType(BaseModel):
     :param  description: Textual description of the workflow type
     :type   description: String
     """
+    __slots__ = [
+        'domain',
+        'name',
+        'version',
+        'status',
+        'creation_date',
+        'deprecation_date',
+        'task_list',
+        'child_policy',
+        'execution_timeout',
+        'decision_tasks_timeout',
+        'description',
+    ]
+
     def __init__(self, domain, name, version,
                  status=REGISTERED,
                  creation_date=0.0,
@@ -78,7 +94,6 @@ class WorkflowType(BaseModel):
                  execution_timeout='300',
                  decision_tasks_timeout='300',
                  description=None, *args, **kwargs):
-        super(WorkflowType, self).__init__(*args, **kwargs)
         self.domain = domain
         self.name = name
         self.version = version
@@ -93,21 +108,17 @@ class WorkflowType(BaseModel):
 
         # Explicitly call child_policy setter
         # to validate input value
-        self.child_policy = child_policy
+        self.set_child_policy(child_policy)
 
-    @property
-    def child_policy(self):
-        if not hasattr(self, '_child_policy'):
-            self._child_policy = None
+        # immutable decorator rebinds class name,
+        # so have to use generice self.__class__
+        super(self.__class__, self).__init__(*args, **kwargs)
 
-        return self._child_policy
-
-    @child_policy.setter
-    def child_policy(self, policy):
+    def set_child_policy(self, policy):
         if not policy in CHILD_POLICIES:
             raise ValueError("invalid child policy value: {}".format(policy))
 
-        self._child_policy = policy
+        self.child_policy = policy
 
     def _diff(self):
         """Checks for differences between WorkflowType instance
@@ -169,26 +180,6 @@ class WorkflowType(BaseModel):
             return False
 
         return True
-
-    @property
-    def is_synced(self):
-        """Checks if WorkflowType instance has changes, comparing
-        with remote object representation
-
-        :rtype: bool
-        """
-        return super(WorkflowType, self).is_synced
-
-    @property
-    def changes(self):
-        """Returns changes between WorkflowType instance, and
-        remote object representation
-
-        :returns: A list of swf.models.base.Diff namedtuple describing
-                  differences
-        :rtype: list
-        """
-        return super(WorkflowType, self).changes
 
     def save(self):
         """Creates the workflow type amazon side"""
