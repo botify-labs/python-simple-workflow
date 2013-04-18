@@ -31,6 +31,9 @@ setup(
         'unittest2==0.5.1',
     ],
 
+    package_dir={'': '.'},
+    include_package_data=False,
+
     packages=[
         'swf',
         'swf.models',
