@@ -5,8 +5,8 @@ Python Simple Workflow
 *Still under heavy development*
 
 python-simple-workflow is a wrapper for `Amazon Simple Workflow <http://aws.amazon.com/en/swf/>`_ service. It aims to provide
-some abstractions over `Boto <https://boto.readthedocs.org/en/latest/ref/swf.html>`_ library SWF API implementation, like querysets and objects over
-commonly used concepts: Domains, Workflows, Activities, and so on.
+some abstractions over `Boto <https://boto.readthedocs.org/en/latest/ref/swf.html>`_ library SWF API implementation.
+It provides querysets and model objects over commonly used concepts: domains, workflow types, activity types, and so on.
 
 It is under MIT license, and any ideas, features requests, patches, pull requests to improve it are of course welcome.
 
@@ -25,38 +25,43 @@ Usage
 Before you ask
 --------------
 
-To be able to communicate with Amazon, the python simple workflow package modules have to be aware of your AWS credentials. Three credentials providing methods are available and evaluated by the module in the following order
+To be able to communicate with Amazon service, the python simple workflow package modules have to be aware of your AWS credentials. Three credentials providing methods are available and evaluated by the module in the following order
 
-1. credential file: a ``.swf`` is seeked in the user's home directory, it's content has to match the following pattern
+Credential file
+    a ``.swf`` is seeked in the user's home directory, it's content has to match the following pattern
 
-.. code-block:: ini
+    .. code-block:: ini
 
-    [credentials]
-    aws_access_key_id=<aws_access_key_id>
-    aws_secret_access_key=<aws_secret_access_key>
+        [credentials]
+        aws_access_key_id=<aws_access_key_id>
+        aws_secret_access_key=<aws_secret_access_key>
 
-2. environment variables: python-simple-workflow will check for ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` environment variables to be set to relevant values.
+Environment variables
+    python-simple-workflow will check for ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` environment variables to be set to relevant values.
 
-3. Helper function: if neither previous methods were used,
-you'll still be able to set the global module aws credentials using the ``swf.credentials.set_aws_credentials`` method.
+Helper function
+    if neither previous methods were used, you'll still be able to set the global module aws credentials using the ``swf.credentials.set_aws_credentials`` method.
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    >>> from swf.credentials import set_aws_credentials
-    >>> set_aws_credentials('MYAWSACCESSKEYID', 'MYAWSSECRETACCESSKEY')
+        >>> from swf.credentials import set_aws_credentials
+        >>> set_aws_credentials('MYAWSACCESSKEYID', 'MYAWSSECRETACCESSKEY')
 
-    # And then you're good to go...
-    >>> queryset = DomainQuery()
-    >>> queryset.all()
-    [Domain('test1'), Domain('test2')]
+        # And then you're good to go...
+        >>> queryset = DomainQuery()
+        >>> queryset.all()
+        [Domain('test1'), Domain('test2')]
 
 
 Models
 ------
 
-Simple Workflow concepts are to be manipulated through python-simple-workflow using models. They look
-quite the same django's model, and are there to help representing amazon simple workflow concepts as
+Simple Workflow concepts are to be manipulated through python-simple-workflow using ``models``. They look
+quite the same as django's models, and are there to help representing amazon simple workflow concepts as
 objects.
+
+Models are an ``swf`` immutable object modelisation. They provide an immutable interface to objects attributes.
+Provides local/remote synchronization, and changes diff watch between local and remote objects.
 
 A good walkthrough example worths it all. For more details about models, see `python-simple-workflow api documentation <https://python-simple-workflow.readthedocs.org/en/latest/api.html>`_ .
 
