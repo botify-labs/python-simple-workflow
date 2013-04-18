@@ -13,7 +13,7 @@ with open(os.path.join(root, 'README.rst')) as f:
     README = f.read()
 
 setup(
-    name='python-simple-workflow',
+    name='simple-workflow',
     version=version,
     license='MIT',
 
@@ -21,8 +21,8 @@ setup(
     long_description=README + '\n\n',
 
     author='Oleiade',
-    author_email='theo@botify.com',
-    url='http://github.com/sem-io/python-simple-workflow',
+    author_email='tcrevon@gmail.com',
+    url='http://github.com/botify-labs/python-simple-workflow',
     keywords='amazon simple wokflow swf python',
     zip_safe=True,
     install_requires=[
