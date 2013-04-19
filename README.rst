@@ -15,7 +15,7 @@ Installation
 
 .. code-block:: shell
 
-    python setup.py install
+    pip install simple-workflow
 
 
 Usage
