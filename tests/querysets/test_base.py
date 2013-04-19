@@ -17,6 +17,10 @@ class TestBaseQuerySet(unittest2.TestCase):
         with self.assertRaises(NotImplementedError):
             self.base_qs.get()
 
+    def test_get_or_create_not_implemented(self):
+        with self.assertRaises(NotImplementedError):
+            self.base_qs.get()
+
     def test_filter_method_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             self.base_qs.filter()

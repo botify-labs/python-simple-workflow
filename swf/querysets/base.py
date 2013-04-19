@@ -15,6 +15,9 @@ class BaseQuerySet(ConnectedSWFObject):
     def get(self, *args, **kwargs):
         raise NotImplementedError
 
+    def get_or_create(self, *args, **kwargs):
+        raise NotImplementedError
+
     def filter(self, *args, **kwargs):
         raise NotImplementedError
 

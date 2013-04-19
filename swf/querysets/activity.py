@@ -126,6 +126,84 @@ class ActivityTypeQuerySet(BaseQuerySet):
             task_start_to_close_timeout=activity_config.get('defaultTaskStartToCloseTimeout'),
         )
 
+    def get_or_create(self, name, version,
+                      status=REGISTERED,
+                      description=None,
+                      creation_date=0.0,
+                      deprecation_date=0.0,
+                      task_list=None,
+                      task_heartbeat_timeout=0,
+                      task_schedule_to_close_timeout=0,
+                      task_schedule_to_start_timeout=0,
+                      task_start_to_close_timeout=0):
+        """Fetches, or creates the ActivityType with ``name`` and ``version``
+
+        When fetching trying to fetch a matching activity type, only
+        name and version parameters are taken in account.
+        Anyway, If you'd wanna make sure that in case the activity type
+        has to be created it is made with specific values, just provide it.
+
+        :param  name: name of the ActivityType
+        :type   name: str
+
+        :param  version: version of the ActivityType
+        :type   version: str
+
+        :param  status: ActivityType status
+        :type   status: swf.constants.{REGISTERED, DEPRECATED}
+
+        :param  description: ActivityType description
+        :type   description: str | None
+
+        :param   creation_date: creation date of the current ActivityType
+        :type    creation_date: float (timestamp)
+
+        :param   deprecation_date: deprecation date of ActivityType
+        :type    deprecation_date: float (timestamp)
+
+        :param  task_list: specifies the default task list to use for scheduling
+                           tasks of this activity type.
+        :type   task_list: str
+
+        :param  task_heartbeat_timeout: default maximum time before which a worker
+                                        processing a task of this type must report
+                                        progress by calling RecordActivityTaskHeartbeat.
+        :type   task_heartbeat_timeout: int
+
+        :param  task_schedule_to_close_timeout: default maximum duration for a task
+                                                of this activity type.
+        :type   task_schedule_to_close_timeout: int
+
+        :param  task_schedule_to_start_timeout: default maximum duration that a
+                                                task of this activity type can wait
+                                                before being assigned to a worker.
+        :type   task_schedule_to_start_timeout: int
+
+        :param   task_start_to_close_timeout: default maximum duration that a
+                                              worker can take to process tasks of
+                                              this activity type.
+        :type    task_start_to_close_timeout: int
+
+        :returns: Fetched or created ActivityType model object
+        :rtype: ActivityType
+        """
+        try:
+            return self.get(name, version)
+        except DoesNotExistError:
+            return self.create(
+                name,
+                version,
+                status=status,
+                description=description,
+                creation_date=creation_date,
+                deprecation_date=deprecation_date,
+                task_list=task_list,
+                task_heartbeat_timeout=task_heartbeat_timeout,
+                task_schedule_to_close_timeout=task_schedule_to_close_timeout,
+                task_schedule_to_start_timeout=task_schedule_to_start_timeout,
+                task_start_to_close_timeout=task_start_to_close_timeout,
+            )
+
 
     def filter(self, domain=None, registration_status=REGISTERED, name=None):
         """Filters activity types based on their status, and/or name
@@ -197,7 +275,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
         return [self.to_ActivityType(self.domain, activity_info) for activity_info
                 in get_activity_types()]
 
-    def create(self, domain, name, version,
+    def create(self, name, version,
                status=REGISTERED,
                description=None,
                creation_date=0.0,
@@ -210,9 +288,6 @@ class ActivityTypeQuerySet(BaseQuerySet):
                *args, **kwargs):
         """Creates a new remote activity type and returns the 
         created ActivityType model instance.
-
-        :param  domain: Domain the workflow type should be registered in
-        :type   domain: swf.models.Domain
 
         :param  name: name of the ActivityType
         :type   name: str
@@ -256,7 +331,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
         :type    task_start_to_close_timeout: int
         """
         activity_type = ActivityType(
-            domain,
+            self.domain,
             name,
             version,
             status=status,

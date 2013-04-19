@@ -63,6 +63,40 @@ class DomainQuerySet(BaseQuerySet):
             connection=self.connection
         )
 
+    def get_or_create(self, name,
+                      status=REGISTERED,
+                      description=None,
+                      retention_period=30, *args, **kwargs):
+        """Fetches, or creates the Domain with `name`
+
+        When fetching trying to fetch a matching domain, only
+        name parameter is taken in account. Anyway, If you'd wanna
+        make sure that in case the domain has to be created it is
+        made with specific values, just provide it.
+
+        :param      name:  name of the domain to fetch or create
+        :type       name: string
+
+        :param      retention_period: Domain's workflow executions records retention in days
+        :type       retention_period: Integer
+
+        :param      status: Specifies the registration status of the
+                            workflow types to list. Valid values are:
+                            * ``swf.constants.REGISTERED``
+                            * ``swf.constants.DEPRECATED``
+        :type       status: string
+
+        :param      description: Textual description of the domain
+        :type       description: string
+
+        :returns: Fetched or created Domain model object
+        :rtype: Domain
+        """
+        try:
+            return self.get(name)
+        except DoesNotExistError:
+            return self.create(name, status, description, retention_period)
+
     def all(self, registration_status=REGISTERED):
         """Retrieves every domains
 

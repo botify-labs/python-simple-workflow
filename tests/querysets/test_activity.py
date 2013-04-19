@@ -37,6 +37,21 @@ class TestActivityTypeQuerySet(unittest2.TestCase):
 
         self.assertTrue(hasattr(bw, '_domain'))
 
+    def test_get_or_create_existing_activity_type(self):
+        with patch.object(Layer1, 'describe_activity_type', mock_describe_activity_type):
+            activity_type = self.atq.get_or_create("TestActivityType", "testversion")
+
+            self.assertIsInstance(activity_type, ActivityType)
+
+    def test_get_or_create_non_existent_activity_type(self):
+        with patch.object(Layer1, 'describe_activity_type') as mock:
+            mock.side_effect = DoesNotExistError("Mocked exception")
+
+            with patch.object(Layer1, 'register_activity_type', mock_describe_activity_type):
+                activity_type = self.atq.get_or_create("TestDomain", "testversion")
+
+                self.assertIsInstance(activity_type, ActivityType)
+
     def test_instantiation_with_valid_domain(self):
         """Assert instantiation with valid domain object"""
         bw = ActivityTypeQuerySet(self.domain)

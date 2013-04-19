@@ -98,6 +98,21 @@ class TestWorkflowTypeQuerySet(unittest2.TestCase):
                 )
                 self.wtq.get("NonExistentWorkflowType", "0.1")
 
+    def test_get_or_create_existing_workflow_type(self):
+        with patch.object(Layer1, 'describe_workflow_type', mock_describe_workflow_type):
+            workflow_type = self.wtq.get_or_create("TestActivityType", "testversion")
+
+            self.assertIsInstance(workflow_type, WorkflowType)
+
+    def test_get_or_create_non_existent_workflow_type(self):
+        with patch.object(Layer1, 'describe_workflow_type') as mock:
+            mock.side_effect = DoesNotExistError("Mocked exception")
+
+            with patch.object(Layer1, 'register_workflow_type', mock_describe_workflow_type):
+                workflow_type = self.wtq.get_or_create("TestDomain", "testversion")
+
+                self.assertIsInstance(workflow_type, WorkflowType)
+
     def test__list_non_empty_workflow_types(self):
         with patch.object(
             self.wtq.connection,

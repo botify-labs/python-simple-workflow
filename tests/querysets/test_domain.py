@@ -70,6 +70,21 @@ class TestDomainQuerySet(unittest2.TestCase):
                 )
                 self.qs.get('whatever')
 
+    def test_get_or_create_existing_domain(self):
+        with patch.object(Layer1, 'describe_domain', mock_describe_domain):
+            domain = self.qs.get_or_create("TestDomain")
+
+            self.assertIsInstance(domain, Domain)
+
+    def test_get_or_create_non_existent_domain(self):
+        with patch.object(Layer1, 'describe_domain') as mock:
+            mock.side_effect = DoesNotExistError("Mocked exception")
+
+            with patch.object(Layer1, 'register_domain', mock_describe_domain):
+                domain = self.qs.get_or_create("TestDomain")
+
+                self.assertIsInstance(domain, Domain)
+
     def test_all_with_existent_domains(self):
         with patch.object(self.qs.connection, 'list_domains', mock_list_domains):
             domains = self.qs.all()
