@@ -49,6 +49,13 @@ Activity Type
     :members:
     :inherited-members:
 
+Activity Task
+-------------
+
+.. autoclass:: swf.models.activity.ActivityTask
+    :members:
+    :inherited-members:
+
 
 
 Querysets
@@ -95,3 +102,4 @@ ActivityWorker
 
 .. autoclass:: swf.actors.worker.ActivityWorker
     :members:
+    :inherited-members:
