@@ -8,7 +8,6 @@
 from boto.swf.layer1 import Layer1
 
 from swf.credentials import extract_aws_credentials
-from swf.utils import immutable
 
 AWS_CREDENTIALS = extract_aws_credentials()
 

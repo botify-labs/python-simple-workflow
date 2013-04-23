@@ -1,12 +1,11 @@
 #! -*- coding:utf-8 -*-
 
-import threading
-
+from swf.core import ConnectedSWFObject
 from swf.models import Domain
 from swf.utils import enum
 
 
-class Actor(threading.Thread):
+class Actor(ConnectedSWFObject):
     """SWF Actor base class
 
     Actor is running through a thread in order for it's polling
@@ -25,10 +24,8 @@ class Actor(threading.Thread):
     :param  last_token: last seen task token
     :type   last_token: string
     """
-    STATES = enum('RUNNING', 'STOPPED')
-
     def __init__(self, domain, task_list, last_token=None):
-        self.state = self.STATES.STOPPED
+        super(Actor, self).__init__()
 
         self._set_domain(domain)
         self.task_list = task_list
@@ -54,4 +51,4 @@ class Actor(threading.Thread):
         waits for the last polling operation to end before
         shutting down.
         """
-        self.state = self.STATES.STOPPED
+        raise NotImplementedError
