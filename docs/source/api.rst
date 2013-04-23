@@ -78,3 +78,20 @@ ActivityTypeQuerySet
 
 .. autoclass:: swf.querysets.activity.ActivityTypeQuerySet
     :members:
+
+
+Actors
+======
+
+
+Actor
+-----
+
+.. autoclass:: swf.actors.core.Actor
+    :members:
+
+ActivityWorker
+--------------
+
+.. autoclass:: swf.actors.worker.ActivityWorker
+    :members:
