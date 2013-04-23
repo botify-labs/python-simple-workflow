@@ -97,7 +97,7 @@ class ActivityWorker(Actor):
         """
         activity_task = ActivityTask.from_poll(
             self.connection.poll_for_activity_task(
-                self.domain,
+                self.domain.name,
                 self.task_list,
             )
         )
