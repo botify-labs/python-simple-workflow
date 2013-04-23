@@ -36,6 +36,7 @@ setup(
 
     packages=[
         'swf',
+        'swf.actors',
         'swf.models',
         'swf.querysets',
     ],
