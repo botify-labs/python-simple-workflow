@@ -11,7 +11,6 @@ from swf.constants import REGISTERED, DEPRECATED
 from swf.utils import immutable
 from swf.models import BaseModel
 from swf.models.base import Diff
-from swf.core import ConnectedSWFObject
 from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
 
 
@@ -64,18 +63,18 @@ class ActivityType(BaseModel):
     :type    task_start_to_close_timeout: int
     """
     __slots__ = [
-    'domain',
-    'name',
-    'version',
-    'status',
-    'description',
-    'creation_date',
-    'deprecation_date',
-    'task_list',
-    'task_heartbeat_timeout',
-    'task_schedule_to_close_timeout',
-    'task_schedule_to_start_timeout',
-    'task_start_to_close_timeout',
+        'domain',
+        'name',
+        'version',
+        'status',
+        'description',
+        'creation_date',
+        'deprecation_date',
+        'task_list',
+        'task_heartbeat_timeout',
+        'task_schedule_to_close_timeout',
+        'task_schedule_to_start_timeout',
+        'task_start_to_close_timeout',
     ]
 
     def __init__(self, domain, name, version,
@@ -104,7 +103,7 @@ class ActivityType(BaseModel):
         self.task_schedule_to_close_timeout = task_schedule_to_close_timeout
         self.task_schedule_to_start_timeout = task_schedule_to_start_timeout
         self.task_start_to_close_timeout = task_start_to_close_timeout
-        
+
         # immutable decorator rebinds class name,
         # so have to use generice self.__class__
         super(self.__class__, self).__init__(*args, **kwargs)
@@ -158,7 +157,7 @@ class ActivityType(BaseModel):
         :rtype: bool
         """
         try:
-            description = self.connection.describe_activity_type(
+            self.connection.describe_activity_type(
                 self.domain.name,
                 self.name,
                 self.version
@@ -194,9 +193,11 @@ class ActivityType(BaseModel):
     def delete(self):
         """Deprecates the domain amazon side"""
         try:
-            self.connection.deprecate_activity_type(self.domain.name,
-                                                 self.name,
-                                                 self.version)
+            self.connection.deprecate_activity_type(
+                self.domain.name,
+                self.name,
+                self.version
+            )
         except SWFResponseError as err:
             if err.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("%s does not exist" % self)
@@ -209,3 +210,57 @@ class ActivityType(BaseModel):
                self.name,
                self.version,
                self.status)
+
+
+@immutable
+class ActivityTask(BaseModel):
+    __slots__ = [
+        'domain',
+        'task_list',
+        'task_token',
+        'activity_type',
+        'workflow_execution',
+        'input',
+        'activity_id',
+        'started_event_id'
+    ]
+
+    def __init__(self, domain, task_list,
+                 task_token=None, activity_type=None,
+                 workflow_execution=None, input=None,
+                 activity_id=None, started_event_id=None):
+        self.domain = domain
+        self.task_list = task_list
+
+        self.task_token = task_token
+        self.activity_type = activity_type
+        self.workflow_execution = workflow_execution
+        self.input = input
+        self.activity_id = activity_id
+        self.started_event_id = started_event_id
+
+    @classmethod
+    def from_poll(cls, domain, task_list, data):
+        from swf.querysets import ActivityTypeQuerySet
+        from swf.querysets import WorkflowExecutionQuerySet
+
+        activity_type = ActivityTypeQuerySet(domain).get(
+            data['activityType']['name'],
+            data['activityType']['version'],
+        )
+
+        workflow_execution = WorkflowExecutionQuerySet(domain).get(
+            data['worfklowExecution']['workflowId'],
+            data['workflowExecution']['runId'],
+        )
+
+        return cls(
+            domain,
+            task_list,
+            task_token=data['taskToken'],
+            activity_type=activity_type,
+            workflow_execution=workflow_execution,
+            input=data['input'],
+            activity_id=data['activityId'],
+            started_event_id=data['startedEventId']
+        )
