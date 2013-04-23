@@ -20,14 +20,11 @@ class ActivityWorker(Actor):
     :param  last_token: last seen task token
     :type   last_token: string
     """
-    def __init__(self, domain, task_list,
-                 last_token=None, *args, **kwargs):
+    def __init__(self, domain, task_list, last_token=None):
         super(ActivityWorker, self).__init__(
-            self,
             domain,
             task_list,
             last_token,
-            *args, **kwargs
         )
 
     def cancel(self, task_token=None, details=None):
