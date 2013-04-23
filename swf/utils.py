@@ -20,6 +20,22 @@ past_day = lambda d: datetime.now() - timedelta(days=d)
 datetime_timestamp = lambda datetime: mktime(datetime.timetuple())
 
 
+def enum(*sequential, **named):
+    """Enums python implementation
+
+    To be used like this :
+        Numbers = enum('ZERO', 'ONE', 'TWO')
+        >>> Numbers.ZERO
+        0
+        >>> Numbers.ONE
+        1
+
+    Found here: http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
+    """
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    return type('Enum', (), enums)
+
+
 def get_subkey(d, key_path):
     """Gets a sub-dict key, and return None if whether
     the parent or child dict key does not exist

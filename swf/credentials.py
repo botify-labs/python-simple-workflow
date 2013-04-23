@@ -8,8 +8,6 @@
 import os
 from ConfigParser import ConfigParser
 
-from boto.swf.layer1 import Layer1
-
 
 def get_credentials_from_file(filepath):
     """Retrieves aws credentials from file
@@ -56,7 +54,7 @@ def get_credentials_from_env():
 
 
 def extract_aws_credentials():
-    """Tries to extract aws credentials from file or 
+    """Tries to extract aws credentials from file or
     from os environment.
 
     First, it will try to retrieve authentication credentials
@@ -92,6 +90,7 @@ def extract_aws_credentials():
     aws_credentials['aws_secret_access_key'] = credentials[1]
 
     return aws_credentials
+
 
 def set_aws_credentials(aws_access_key_id, aws_secret_access_key):
     """Set default credentials."""

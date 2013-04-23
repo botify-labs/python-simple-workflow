@@ -7,11 +7,10 @@ from boto.swf.layer1 import Layer1
 from boto.swf.exceptions import SWFResponseError
 
 from swf.models import Domain, ActivityType
-from swf.exceptions import AlreadyExistsError, DoesNotExistError,\
-                           ResponseError
-from swf.models.base import Diff
+from swf.exceptions import ResponseError
 
 from ..mocks.activity import mock_describe_activity_type
+
 
 class TestActivityType(unittest2.TestCase):
 
