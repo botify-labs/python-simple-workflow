@@ -175,6 +175,9 @@ class History(object):
     def __init__(self, *args, **kwargs):
         self.container = kwargs.pop('events', [])
 
+    def __len__(self):
+        return len(self.container)
+
     def __getitem__(self, val):
         if isinstance(val, int):
             return self.container[val]
