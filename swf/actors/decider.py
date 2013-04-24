@@ -2,6 +2,7 @@
 
 from swf.models.event import History
 from swf.actors.core import Actor
+from swf.exceptions import PollTimeout
 
 
 class Decider(Actor):
@@ -46,6 +47,9 @@ class Decider(Actor):
             self.domain.name,
             self.task_list
         )
+
+        if not 'taskToken' in events:
+            raise PollTimeout("Decider poll timed out")
 
         history = History.from_event_list(events['events'])
         self.task_token = events['taskToken']

@@ -2,8 +2,8 @@
 
 from swf.actors import Actor
 from swf.models import ActivityTask
-
-
+from swf.exceptions import PollTimeout
+    
 class ActivityWorker(Actor):
     """Activity task worker actor implementation
 
@@ -92,15 +92,23 @@ class ActivityWorker(Actor):
         """Polls for an activity task to process from current
         actor's instance defined ``task_list``
 
+        if no activity task whas polled, raises a PollTimeout
+        exception.
+
+        :raises: PollTimeout
+
         :returns: polled activity task
         :type: swf.models.ActivityTask
         """
-        activity_task = ActivityTask.from_poll(
-            self.connection.poll_for_activity_task(
-                self.domain.name,
-                self.task_list,
-            )
+        polled_activity_data = self.connection.poll_for_activity_task(
+            self.domain.name,
+            self.task_list,
         )
+
+        if not 'taskToken' in polled_activity_data:
+            raise PollTimeout("Activity Worker poll timed out")
+
+        activity_task = ActivityTask.from_poll(polled_activity_data)
         self.last_token = activity_task.last_token
 
         return activity_task

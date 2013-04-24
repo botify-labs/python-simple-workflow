@@ -5,6 +5,10 @@
 #
 # See the file LICENSE for copying permission.
 
+
+class PollTimeout(Exception):
+	pass
+
 class InvalidCredentialsError(Exception):
     pass
 
