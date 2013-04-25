@@ -88,18 +88,23 @@ class ActivityWorker(Actor):
             details
         )
 
-    def poll(self, **kwargs):
+    def poll(self, task_list=None, **kwargs):
         """Polls for an activity task to process from current
         actor's instance defined ``task_list``
 
-        if no activity task whas polled, raises a PollTimeout
+        if no activity task was polled, raises a PollTimeout
         exception.
+
+        :param  task_list: task list the Actor should watch for tasks on
+        :type   task_list: string
 
         :raises: PollTimeout
 
         :returns: polled activity task
         :type: swf.models.ActivityTask
         """
+        task_list = task_list or self.task_list
+
         polled_activity_data = self.connection.poll_for_activity_task(
             self.domain.name,
             self.task_list,
