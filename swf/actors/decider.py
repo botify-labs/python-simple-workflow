@@ -79,7 +79,6 @@ class Decider(Actor):
         :returns: 
         :rtype: Decision
         """
-        activity_id = activity_type.id
         activity_type = {
             'name': activity_type.name,
             'version': activity_type.version
