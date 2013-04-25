@@ -2,4 +2,5 @@
 
 from swf.actors.core import Actor
 from swf.actors.worker import ActivityWorker
-from swf.actors.decider import Decider
+from swf.actors.decider import Decider, Decision,\
+							   DecisionsList
