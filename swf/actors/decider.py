@@ -34,10 +34,10 @@ class Decider(Actor):
     def schedule(self, activity_id, activity_type,
                  task_list=None,
                  control=None,
-                 heartbeat_timeout=None,
-                 schedule_to_close_timeout=None,
-                 schedule_to_start_timeout=None,
-                 start_to_close_timeout=None,
+                 heartbeat_timeout='300',
+                 schedule_to_close_timeout='300',
+                 schedule_to_start_timeout='300',
+                 start_to_close_timeout='300',
                  input=None):
         """Schedules an activity task
 
@@ -118,11 +118,15 @@ class Decider(Actor):
         """
         task_token = task_token or self.task_token
 
-        self.connection.respond_decision_task_completed(
-            task_token,
-            decisions,
-            execution_context,
-        )
+        try:
+            self.connection.respond_decision_task_completed(
+                task_token,
+                decisions,
+                execution_context,
+            )
+        except Exception as e:
+            import pdb; pdb.set_trace()
+
 
     def poll(self, task_list=None,
              identity=None,
