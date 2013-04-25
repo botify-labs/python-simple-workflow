@@ -57,10 +57,10 @@ class ActivityTypeQuerySet(BaseQuerySet):
             domain,
             type_info['activityType']['name'],
             type_info['activityType']['version'],
-            status=type_info['status'],
-            description=type_info['description'],
-            creation_date=type_info['creationDate'],
-            deprecation_date=type_info['deprecationDate'],
+            status=type_info.get('status'),
+            description=type_info.get('description'),
+            creation_date=type_info.get('creationDate'),
+            deprecation_date=type_info.get('deprecationDate'),
             **kwargs
         )
 
