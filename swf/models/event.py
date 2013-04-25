@@ -186,6 +186,19 @@ class History(object):
 
         raise TypeError("Unknown slice format: %s" % type(val))
 
+    @property
+    def last(self):
+        return self.container[-1]
+
+    def latest(self, n):
+        end_pos = len(self.container)
+        start_pos = len(self.container) - n
+        return self.container[start_pos:end_pos]
+
+    @property
+    def first(self):
+        return self.container[0]
+
     @classmethod
     def from_event_list(cls, data):
         """Instantiates a new Event object from dictionary
