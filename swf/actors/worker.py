@@ -107,7 +107,7 @@ class ActivityWorker(Actor):
 
         polled_activity_data = self.connection.poll_for_activity_task(
             self.domain.name,
-            self.task_list,
+            task_list,
         )
 
         if not 'taskToken' in polled_activity_data:
