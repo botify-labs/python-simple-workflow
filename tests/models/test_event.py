@@ -2,7 +2,8 @@
 
 import unittest2
 
-from swf.models.event import Event, History
+from swf.models.event import Event
+from swf.models.history import History
 
 from ..mocks.event import mock_get_workflow_execution_history
 

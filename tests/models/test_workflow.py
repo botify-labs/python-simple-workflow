@@ -8,7 +8,7 @@ from boto.exception import SWFResponseError
 from boto.swf.exceptions import SWFTypeAlreadyExistsError
 
 from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
-from swf.models.event import History
+from swf.models.history import History
 from swf.models.domain import Domain
 from swf.models.workflow import WorkflowType, WorkflowExecution
 

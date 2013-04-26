@@ -14,8 +14,8 @@ from swf.constants import REGISTERED
 from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 from swf.models import BaseModel
+from swf.models.history import History
 from swf.models.base import Diff
-from swf.models.event import History
 from swf.exceptions import DoesNotExistError, AlreadyExistsError,\
                            ResponseError
 

@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
 
-from swf.models.event import History
+from swf.models.history import History
 from swf.actors.core import Actor
 from swf.exceptions import PollTimeout
 
@@ -73,10 +73,10 @@ class Decider(Actor):
                                          take to process this activity task.
         :type   start_to_close_timeout: string
 
-        :param  input: The input provided to the activity task. 
+        :param  input: The input provided to the activity task.
         :type   input: string
 
-        :returns: 
+        :returns:
         :rtype: Decision
         """
         activity_type = {
@@ -103,7 +103,7 @@ class Decider(Actor):
         decision['scheduleActivityTaskDecisionAttributes'] = decision_attributes
 
         return decision
-        
+
 
     def complete(self, task_token=None,
                  decisions=None, execution_context=None):
@@ -144,7 +144,7 @@ class Decider(Actor):
 
         :param maximum_page_size: The maximum number of history events
         returned in each page. The default is 100.
-        :type maximum_page_size: integer 
+        :type maximum_page_size: integer
 
         :returns: polled decision tasks
         :type: swf.models.History
