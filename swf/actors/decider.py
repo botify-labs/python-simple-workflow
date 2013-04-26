@@ -118,14 +118,11 @@ class Decider(Actor):
         """
         task_token = task_token or self.task_token
 
-        try:
-            self.connection.respond_decision_task_completed(
-                task_token,
-                decisions,
-                execution_context,
-            )
-        except Exception as e:
-            import pdb; pdb.set_trace()
+        self.connection.respond_decision_task_completed(
+            task_token,
+            decisions,
+            execution_context,
+        )
 
 
     def poll(self, task_list=None,
