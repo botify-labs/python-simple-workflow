@@ -20,7 +20,7 @@ past_day = lambda d: datetime.now() - timedelta(days=d)
 datetime_timestamp = lambda datetime: mktime(datetime.timetuple())
 
 
-def enum(*sequential, **named):
+class Enum(object):
     """Enums python implementation
 
     To be used like this :
@@ -30,10 +30,26 @@ def enum(*sequential, **named):
         >>> Numbers.ONE
         1
 
-    Found here: http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
+        or
+
+        Numbers = enum(zero="ZERO", one="ONE")
+        >>> Numbers.zero
+        "ZERO"
+
+    Inspired from:
+    http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
     """
-    enums = dict(zip(sequential, range(len(sequential))), **named)
-    return type('Enum', (), enums)
+    def __init__(self, *sequential, **named):
+        self.enums = dict(zip(sequential, range(len(sequential))), **named)
+
+        for key, value in self.enums.viewitems():
+            setattr(self, key, value)
+
+    def __contains__(self, key):
+        return key in self.enums
+
+    def has_member(self, member):
+        return any(value == member for value in self.enums.itervalues())
 
 
 def get_subkey(d, key_path):
@@ -131,7 +147,7 @@ def immutable(mutableclass):
         raise TypeError('@immutable: class must have __slots__')
 
     class immutableclass(mutableclass):
-        __slots__ = ()                      # No __dict__, please   
+        __slots__ = ()                      # No __dict__, please
 
         def __new__(cls, *args, **kw):
             new = mutableclass(*args, **kw) # __init__ gets called while still mutable
