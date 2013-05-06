@@ -61,7 +61,7 @@ class EventFactory(object):
         event_state = klass._extract_event_state(event_type, event_name)
 
         klass = EventFactory.events[event_type]
-        klass.state = event_state
+        klass._state = event_state
 
         return klass
 

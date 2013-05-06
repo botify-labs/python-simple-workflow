@@ -9,4 +9,4 @@ from swf.models.event.base import Event
 
 
 class TimerEvent(Event):
-    pass
+    _type = 'Timer'

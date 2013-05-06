@@ -9,12 +9,12 @@ from swf.models.event.base import Event
 
 
 class WorkflowExecutionEvent(Event):
-    pass
+    _type = 'WorkflowExecution'
 
 
 class ChildWorkflowExecutionEvent(Event):
-    pass
+    _type = 'ChildWorkflowExecution'
 
 
 class ExternalWorkflowExecutionEvent(Event):
-    pass
+    _type = 'ExternalWorkflowExecution'
