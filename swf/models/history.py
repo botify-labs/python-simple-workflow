@@ -5,7 +5,7 @@
 #
 # See the file LICENSE for copying permission.
 
-from swf.models.event import Event
+from swf.models.event import EventFactory
 from swf.utils import decapitalize
 
 
@@ -97,12 +97,6 @@ class History(object):
         events_history = []
 
         for d in data:
-            event_data_key = decapitalize(d['eventType']) + 'EventAttributes'
-            events_history.append(Event.from_dict(
-                d['eventType'],
-                d['eventId'],
-                d['eventTimestamp'],
-                d[event_data_key])
-            )
+            events_history.append(EventFactory(d))
 
         return cls(events=events_history)
