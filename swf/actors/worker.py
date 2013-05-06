@@ -114,6 +114,6 @@ class ActivityWorker(Actor):
             raise PollTimeout("Activity Worker poll timed out")
 
         activity_task = ActivityTask.from_poll(self.domain, self.task_list, polled_activity_data)
-        self.last_token = activity_task.last_token
+        self.last_token = activity_task.task_token
 
         return activity_task
