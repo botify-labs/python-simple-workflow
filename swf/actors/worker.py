@@ -3,7 +3,7 @@
 from swf.actors import Actor
 from swf.models import ActivityTask
 from swf.exceptions import PollTimeout
-    
+
 class ActivityWorker(Actor):
     """Activity task worker actor implementation
 
@@ -113,7 +113,7 @@ class ActivityWorker(Actor):
         if not 'taskToken' in polled_activity_data:
             raise PollTimeout("Activity Worker poll timed out")
 
-        activity_task = ActivityTask.from_poll(polled_activity_data)
+        activity_task = ActivityTask.from_poll(self.domain, self.task_list, polled_activity_data)
         self.last_token = activity_task.last_token
 
         return activity_task
