@@ -58,31 +58,40 @@ class History(object):
         }
     """
     def __init__(self, *args, **kwargs):
-        self.container = kwargs.pop('events', [])
+        self.events = kwargs.pop('events', [])
 
     def __len__(self):
-        return len(self.container)
+        return len(self.events)
 
     def __getitem__(self, val):
         if isinstance(val, int):
-            return self.container[val]
+            return self.events[val]
         elif isinstance(val, slice):
-            return History(events=self.container[val])
+            return History(events=self.events[val])
 
         raise TypeError("Unknown slice format: %s" % type(val))
 
+    def __repr__(self):
+        events_repr = '\n\t'.join(
+            map(lambda e: '%s:%s' % (e._type, e._state), self.events)
+        )
+        repr_str = '<History\n\t%s\n>' % events_repr
+
+        return repr_str
+
+
     @property
     def last(self):
-        return self.container[-1]
+        return self.events[-1]
 
     def latest(self, n):
-        end_pos = len(self.container)
-        start_pos = len(self.container) - n
-        return self.container[start_pos:end_pos]
+        end_pos = len(self.events)
+        start_pos = len(self.events) - n
+        return self.events[start_pos:end_pos]
 
     @property
     def first(self):
-        return self.container[0]
+        return self.events[0]
 
     @classmethod
     def from_event_list(cls, data):
