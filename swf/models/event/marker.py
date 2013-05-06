@@ -9,4 +9,4 @@ from swf.models.event.base import Event
 
 
 class MarkerEvent(Event):
-    pass
+    type = 'Marker'

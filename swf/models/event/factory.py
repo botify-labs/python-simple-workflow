@@ -13,6 +13,8 @@ from swf.models.event.task import DecisionTaskEvent,\
 from swf.models.event.timer import TimerEvent
 from swf.models.event.marker import MarkerEvent
 
+from swf.utils import camel_to_underscore
+
 
 EVENTS = {
     # WorkflowExecutionEvent States : Started,
@@ -56,7 +58,7 @@ class EventFactory(object):
     def __new__(klass, raw_event):
         event_name = raw_event['eventType']
         event_type = klass._extract_event_type(event_name)
-        event_state = klass._extract_event_state(event_name)
+        event_state = klass._extract_event_state(event_type, event_name)
 
         klass = EventFactory.events[event_type]
         klass.state = event_state
@@ -78,5 +80,15 @@ class EventFactory(object):
         return
 
     @classmethod
-    def _extract_event_state(klass, event_name):
-        pass
+    def _extract_event_state(klass, event_type, event_name):
+        status = None
+        partitioned = event_name.partition(event_type)
+
+        if len(partitioned) == 2:
+            raw_state = partitioned[1]
+        elif len(partitioned) == 3:
+            raw_state = ''.join(partitioned[0::2])
+
+        klass_state = camel_to_underscore(raw_state)
+
+        return klass_state

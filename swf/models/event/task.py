@@ -9,8 +9,8 @@ from swf.models.event.base import Event
 
 
 class ActivityTaskEvent(Event):
-    pass
+    type = 'ActivityTask'
 
 
 class DecisionTaskEvent(Event):
-    pass
+    type = 'DecisionTask'

@@ -26,9 +26,9 @@ EVENT_TYPE = Enum(
 class Event(object):
     """Simple workflow execution event wrapper
     """
-    type = None
-    name = None
-    state = None
+    _type = None
+    _name = None
+    _state = None
 
     def __init__(self, last_event_id=None,
                  control=None, worker_id=None,
@@ -59,7 +59,7 @@ class Event(object):
             setattr(self, key, value)
 
     def __repr__(self):
-        return '<Event %s:%s>' % (self.type, self.id)
+        return '<Event %s:%s>' % (self._type, self.id)
 
     @property
     def type(self):

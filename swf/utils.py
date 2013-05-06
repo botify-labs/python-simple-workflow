@@ -167,3 +167,17 @@ def immutable(mutableclass):
             setattr(immutableclass, name, property(member.__get__))
 
     return immutableclass
+
+
+def camel_to_underscore(string):
+    """Translates amazon Camelcased strings to
+    lowercased underscored strings"""
+    res = []
+
+    for index, char in enumerate(string):
+        if index != 0 and char.isupper():
+            res.extend(['_', char.lower()])
+        else:
+            res.extend([char.lower()])
+
+    return ''.join(res)
