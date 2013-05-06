@@ -250,7 +250,7 @@ class ActivityTask(BaseModel):
         )
 
         workflow_execution = WorkflowExecutionQuerySet(domain).get(
-            data['worfklowExecution']['workflowId'],
+            data['workflowExecution']['workflowId'],
             data['workflowExecution']['runId'],
         )
 
