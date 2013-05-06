@@ -40,5 +40,7 @@ setup(
         'swf.actors',
         'swf.models',
         'swf.querysets',
+
+        'swf.models.event',
     ],
 )
