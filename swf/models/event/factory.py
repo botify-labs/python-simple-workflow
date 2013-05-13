@@ -58,18 +58,24 @@ class EventFactory(object):
     def __new__(klass, raw_event):
         event_id = raw_event['eventId']
         event_name = raw_event['eventType']
+        event_timestamp = raw_event['eventTimestamp']
 
         event_type = klass._extract_event_type(event_name)
         event_state = klass._extract_event_state(event_type, event_name)
         # amazon swf format is not very normalized and event attributes
         # response field is non-capitalized...
-        event_attributes = decapitalize(event_name) + 'EventAttributes'
+        event_attributes_key = decapitalize(event_name) + 'EventAttributes'
 
         klass = EventFactory.events[event_type]
         klass._name = event_name
-        klass._attributes = event_attributes
+        klass._attributes_key = event_attributes_key
 
-        instance = klass(id=event_id, state=event_state, raw_data=raw_event)
+        instance = klass(
+            id=event_id,
+            state=event_state,
+            timestamp=event_timestamp,
+            raw_data=raw_event
+        )
 
         return instance
 

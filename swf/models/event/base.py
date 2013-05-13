@@ -5,8 +5,10 @@
 #
 # See the file LICENSE for copying permission.
 
+from datetime import datetime
+
 from swf.models.event.states import EventState
-from swf.utils import Enum
+from swf.utils import Enum, camel_to_underscore, cached_property
 
 
 EVENT_TYPE = Enum(
@@ -28,39 +30,27 @@ class Event(object):
     """
     _type = None
     _name = None
+    _attributes_key = None
     _attributes = None
 
-    def __init__(self, id, state, raw_data):
+    excluded_attributes = (
+        'eventId',
+        'eventType',
+        'eventTimestamp'
+    )
+
+    def __init__(self, id, state, timestamp, raw_data):
         """
         """
         self._id = id
         self._state = state
+        self._timestamp = timestamp
         self.raw = raw_data or {}
 
-        self.last_event_id = None
-        self.control = None
-        self.identity = None
-        self.task_list = None
-        self.execution = None
-        self.execution_context = None
-        self.dt_decided = None
-        self.dt_started = None
-        self.dt_last_event = None
-        self.last_history_event = None
-        self.event_history_incomplete = None
-        self.cause = None
-        self.cause_details = None
-
-        # Call for automatic attributes set
-        # from data using the from_data method.
-        # should be implemented in child classes
-        self.from_data(raw_data)
+        self.process_attributes()
 
     def __repr__(self):
         return '<Event %s %s : %s >' % (self.id, self.type, self.state)
-
-    def from_data(self, data):
-        raise NotImplementedError
 
     @property
     def id(self):
@@ -77,3 +67,11 @@ class Event(object):
     @property
     def state(self):
         return self._state
+
+    @cached_property
+    def timestamp(self):
+        return datetime.fromtimestamp(self._timestamp)
+
+    def process_attributes(self):
+        for key, value in self.raw[self._attributes_key].iteritems():
+            setattr(self, camel_to_underscore(key), value)
