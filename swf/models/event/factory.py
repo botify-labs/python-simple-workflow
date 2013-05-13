@@ -56,14 +56,16 @@ class EventFactory(object):
     events = EVENTS
 
     def __new__(klass, raw_event):
+        event_id = raw_event['eventId']
         event_name = raw_event['eventType']
         event_type = klass._extract_event_type(event_name)
         event_state = klass._extract_event_state(event_type, event_name)
 
         klass = EventFactory.events[event_type]
-        klass._state = event_state
 
-        return klass
+        instance = klass(id=event_id, state=event_state, data=raw_event)
+
+        return instance
 
     @classmethod
     def _extract_event_type(klass, event_name):

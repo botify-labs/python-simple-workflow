@@ -57,8 +57,10 @@ class History(object):
             ]
         }
     """
+
     def __init__(self, *args, **kwargs):
         self.events = kwargs.pop('events', [])
+        self.raw = kwargs.pop('raw', None)
 
     def __len__(self):
         return len(self.events)
@@ -73,7 +75,7 @@ class History(object):
 
     def __repr__(self):
         events_repr = '\n\t'.join(
-            map(lambda e: '%s:%s' % (e._type, e._state), self.events)
+            map(lambda e: e.__repr__(), self.events)
         )
         repr_str = '<History\n\t%s\n>' % events_repr
 
@@ -105,7 +107,8 @@ class History(object):
         """
         events_history = []
 
-        for d in data:
-            events_history.append(EventFactory(d))
+        for index, d in enumerate(data):
+            event = EventFactory(d)
+            events_history.append(event)
 
-        return cls(events=events_history)
+        return cls(events=events_history, raw=data)
