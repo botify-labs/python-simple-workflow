@@ -13,7 +13,7 @@ from swf.models.event.task import DecisionTaskEvent,\
 from swf.models.event.timer import TimerEvent
 from swf.models.event.marker import MarkerEvent
 
-from swf.utils import camel_to_underscore
+from swf.utils import camel_to_underscore, decapitalize
 
 
 EVENTS = {
@@ -58,12 +58,18 @@ class EventFactory(object):
     def __new__(klass, raw_event):
         event_id = raw_event['eventId']
         event_name = raw_event['eventType']
+
         event_type = klass._extract_event_type(event_name)
         event_state = klass._extract_event_state(event_type, event_name)
+        # amazon swf format is not very normalized and event attributes
+        # response field is non-capitalized...
+        event_attributes = decapitalize(event_name) + 'EventAttributes'
 
         klass = EventFactory.events[event_type]
+        klass._name = event_name
+        klass._attributes = event_attributes
 
-        instance = klass(id=event_id, state=event_state, data=raw_event)
+        instance = klass(id=event_id, state=event_state, raw_data=raw_event)
 
         return instance
 

@@ -28,40 +28,39 @@ class Event(object):
     """
     _type = None
     _name = None
+    _attributes = None
 
-    def __init__(self, id=None, state=None, last_event_id=None,
-                 control=None, worker_id=None,
-                 task_list=None, execution=None,
-                 execution_context=None, dt_decided=None,
-                 dt_started=None, dt_last_event=None,
-                 last_history_event=None,
-                 event_history_incomplete=None,
-                 cause=None, cause_details=None,
-                 **kwargs):
+    def __init__(self, id, state, raw_data):
         """
         """
         self._id = id
         self._state = state
+        self.raw = raw_data or {}
 
-        self.last_event_id = last_event_id
-        self.control = control
-        self.worker_id = worker_id
-        self.task_list = task_list
-        self.execution = execution
-        self.execution_context = execution_context
-        self.dt_decided = dt_decided
-        self.dt_started = dt_started
-        self.dt_last_event = dt_last_event
-        self.last_history_event = last_history_event
-        self.event_history_incomplete = event_history_incomplete
-        self.cause = cause
-        self.cause_details = cause_details
+        self.last_event_id = None
+        self.control = None
+        self.identity = None
+        self.task_list = None
+        self.execution = None
+        self.execution_context = None
+        self.dt_decided = None
+        self.dt_started = None
+        self.dt_last_event = None
+        self.last_history_event = None
+        self.event_history_incomplete = None
+        self.cause = None
+        self.cause_details = None
 
-        for key, value in kwargs.iteritems():
-            setattr(self, key, value)
+        # Call for automatic attributes set
+        # from data using the from_data method.
+        # should be implemented in child classes
+        self.from_data(raw_data)
 
     def __repr__(self):
         return '<Event %s %s : %s >' % (self.id, self.type, self.state)
+
+    def from_data(self, data):
+        raise NotImplementedError
 
     @property
     def id(self):
