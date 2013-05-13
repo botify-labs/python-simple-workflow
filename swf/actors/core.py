@@ -20,16 +20,12 @@ class Actor(ConnectedSWFObject):
 
     :param  task_list: task list the Actor should watch for tasks on
     :type   task_list: string
-
-    :param  last_token: last seen task token
-    :type   last_token: string
     """
-    def __init__(self, domain, task_list, last_token=None):
+    def __init__(self, domain, task_list):
         super(Actor, self).__init__()
 
         self._set_domain(domain)
         self.task_list = task_list
-        self.last_token = last_token
 
     def _set_domain(self, domain):
         if not isinstance(domain, Domain):

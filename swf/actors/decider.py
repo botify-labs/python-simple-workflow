@@ -24,11 +24,10 @@ class Decider(Actor):
     :param  last_token: last seen task token
     :type   last_token: string
     """
-    def __init__(self, domain, task_list, last_token=None):
+    def __init__(self, domain, task_list):
         super(Decider, self).__init__(
             domain,
-            task_list,
-            last_token
+            task_list
         )
 
     def schedule(self, activity_id, activity_type,
@@ -105,7 +104,7 @@ class Decider(Actor):
         return decision
 
 
-    def complete(self, task_token=None,
+    def complete(self, task_token,
                  decisions=None, execution_context=None):
         """Responds to ``swf`` a decision has been made
 
@@ -116,8 +115,6 @@ class Decider(Actor):
                            made by the decider while processing this decision task
         :type   decisions: Decisionslist
         """
-        task_token = task_token or self.task_token
-
         self.connection.respond_decision_task_completed(
             task_token,
             decisions,
@@ -159,6 +156,6 @@ class Decider(Actor):
             raise PollTimeout("Decider poll timed out")
 
         history = History.from_event_list(events['events'])
-        self.task_token = events['taskToken']
+        task_token = events['taskToken']
 
-        return history
+        return task_token, history

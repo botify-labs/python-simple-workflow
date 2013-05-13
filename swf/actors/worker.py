@@ -20,14 +20,13 @@ class ActivityWorker(Actor):
     :param  last_token: last seen task token
     :type   last_token: string
     """
-    def __init__(self, domain, task_list, last_token=None):
+    def __init__(self, domain, task_list):
         super(ActivityWorker, self).__init__(
             domain,
-            task_list,
-            last_token,
+            task_list
         )
 
-    def cancel(self, task_token=None, details=None):
+    def cancel(self, task_token, details=None):
         """Responds to ``swf`` that the activity task was canceled
 
         :param  task_token: canceled activity task token
@@ -36,10 +35,9 @@ class ActivityWorker(Actor):
         :param  details: provided details about cancel
         :type   details: string
         """
-        task_token = task_token or self.last_token
         return self.connection.respond_activity_task_canceled(task_token)
 
-    def complete(self, task_token=None, result=None):
+    def complete(self, task_token, result=None):
         """Responds to ``swf` that the activity task is completed
 
         :param  task_token: completed activity task token
@@ -48,13 +46,12 @@ class ActivityWorker(Actor):
         :param  result: The result of the activity task.
         :type   result: string
         """
-        task_token = task_token or self.last_token
         return self.connection.respond_activity_task_completed(
             task_token,
             result
         )
 
-    def fail(self, task_token=None, details=None, reason=None):
+    def fail(self, task_token, details=None, reason=None):
         """Replies to ``swf`` that the activity task failed
 
         :param  task_token: canceled activity task token
@@ -66,14 +63,13 @@ class ActivityWorker(Actor):
         :param  reason: Description of the error that may assist in diagnostics
         :type   reason: string
         """
-        task_token = task_token or self.last_token
         return self.connection.respond_activity_task_failed(
             task_token,
             details,
             reason
         )
 
-    def heartbeat(self, task_token=None, details=None):
+    def heartbeat(self, task_token, details=None):
         """Records activity task heartbeat
 
         :param  task_token: canceled activity task token
@@ -82,7 +78,6 @@ class ActivityWorker(Actor):
         :param  details: provided details about cancel
         :type   details: string
         """
-        task_token = task_token or self.last_token
         return self.connection.respond_activity_task_heartbeat(
             task_token,
             details
@@ -114,6 +109,6 @@ class ActivityWorker(Actor):
             raise PollTimeout("Activity Worker poll timed out")
 
         activity_task = ActivityTask.from_poll(self.domain, self.task_list, polled_activity_data)
-        self.last_token = activity_task.task_token
+        task_token = activity_task.task_token
 
-        return activity_task
+        return task_token, activity_task
