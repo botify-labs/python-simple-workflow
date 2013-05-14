@@ -251,7 +251,7 @@ class WorkflowType(BaseModel):
             task_start_to_close_timeout=decision_tasks_timeout,
         )['runId']
 
-        return WorkflowExecution(self.domain, workflow_id, run_id)
+        return WorkflowExecution(self.domain, self, workflow_id, run_id=run_id)
 
     def __repr__(self):
         return '<{} domain={} name={} version={} status={}>'.format(
@@ -359,7 +359,7 @@ class WorkflowExecution(BaseModel):
             ('task_list', self.task_list, execution_config['taskList']['name']),
             ('child_policy',  self.child_policy, execution_config['childPolicy']),
             ('execution_timeout', self.execution_timeout, execution_config['executionStartToCloseTimeout']),
-            ('tag_list', self.tag_list, execution_info['tagList']),
+            ('tag_list', self.tag_list, execution_info.get('tagList')),
             ('decision_tasks_timeout', self.decision_tasks_timeout, execution_config['taskStartToCloseTimeout']),
         )
 
