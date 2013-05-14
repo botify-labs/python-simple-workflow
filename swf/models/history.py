@@ -12,7 +12,7 @@ from swf.utils import decapitalize
 class History(object):
     """Simple workflow execution events history
 
-    History object is an Event objects list container
+    History object is an Event subclass objects list container
     which can be built directly against an amazon json response
     using it's from_event_list method.
 
@@ -97,7 +97,12 @@ class History(object):
 
     @classmethod
     def from_event_list(cls, data):
-        """Instantiates a new Event object from dictionary
+        """Instantiates a new ``swf.models.history.History`` instance
+        from amazon service response.
+
+        Every member of the History are ``swf.models.event.Event``
+        subclasses instances, exposing their type, state, and so on to
+        facilitate decisions according to the history.
 
         :param  data: event history description (typically, an amazon response)
         :type   data: dict

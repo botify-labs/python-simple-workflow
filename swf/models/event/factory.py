@@ -53,6 +53,35 @@ EVENTS = {
 
 
 class EventFactory(object):
+    """Processes an input json event representation, and instantiates
+    an ``swf.models.event.Event`` subclass instance accordingly.
+
+    The input:
+
+    .. code-block:: json
+
+    {
+        'eventId': 1,
+        'eventType': 'DecisionTaskScheduled',
+        'decisionTaskScheduledEventAttributes': {
+            'startToCloseTimeout': '300',
+            'taskList': {
+                'name': 'test'
+            }
+        },
+        'eventTimestamp': 1365177769.585
+    }
+
+    will instantiate a ``swf.models.event.task.DecisionTaskEvent`` with state
+    set to 'scheduled' from input attributes.
+
+    :param  raw_event: The input json event representation provided by
+                       amazon service
+    :type   raw_event: dict
+
+    :returns: ``swf.models.event.Event`` subclass instance
+    """
+    # eventType to Event subclass bindings
     events = EVENTS
 
     def __new__(klass, raw_event):
@@ -81,6 +110,10 @@ class EventFactory(object):
 
     @classmethod
     def _extract_event_type(klass, event_name):
+        """Extracts event type from raw event_name
+
+        :param  event_name:
+        """
         for name in klass.events.iterkeys():
             splitted = event_name.partition(name)
 
@@ -95,6 +128,7 @@ class EventFactory(object):
 
     @classmethod
     def _extract_event_state(klass, event_type, event_name):
+        """Extracts event state from raw event type and name"""
         status = None
         partitioned = event_name.partition(event_type)
 
