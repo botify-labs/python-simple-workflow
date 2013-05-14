@@ -10,7 +10,7 @@ from boto.swf.exceptions import SWFTypeAlreadyExistsError, SWFResponseError
 from swf.constants import REGISTERED, DEPRECATED
 from swf.utils import immutable
 from swf.models import BaseModel
-from swf.models.base import Diff
+from swf.models.base import ModelDiff
 from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
 
 
@@ -112,7 +112,7 @@ class ActivityType(BaseModel):
         """Checks for differences between ActivityType instance
         and upstream version
 
-        :returns: A list of swf.models.base.Diff namedtuple describing
+        :returns: A list of swf.models.base.ModelDiff namedtuple describing
                   differences
         :rtype: list
         """
@@ -131,23 +131,18 @@ class ActivityType(BaseModel):
         info = description['typeInfo']
         config = description['configuration']
 
-        attributes_comparison = [
-            Diff('name', self.name, info['activityType']['name']),
-            Diff('version', self.version, info['activityType']['version']),
-            Diff('status', self.status, info['status']),
-            Diff('description', self.description, info['description']),
-            Diff('creation_date', self.creation_date, info['creationDate']),
-            Diff('deprecation_date', self.deprecation_date, info['deprecationDate']),
-            Diff('task_list', self.task_list, config['defaultTaskList']['name']),
-            Diff('task_heartbeat_timeout', self.task_heartbeat_timeout, config['defaultTaskHeartbeatTimeout']),
-            Diff('task_schedule_to_close_timeout', self.task_schedule_to_close_timeout, config['defaultTaskScheduleToCloseTimeout']),
-            Diff('task_schedule_to_start_timeout', self.task_schedule_to_start_timeout, config['defaultTaskScheduleToStartTimeout']),
-            Diff('task_start_to_close_timeout', self.task_start_to_close_timeout, config['defaultTaskStartToCloseTimeout']),
-        ]
-
-        return filter(
-            lambda data: data.local_value != data.remote_value,
-            attributes_comparison
+        return ModelDiff(
+            ('name', self.name, info['activityType']['name']),
+            ('version', self.version, info['activityType']['version']),
+            ('status', self.status, info['status']),
+            ('description', self.description, info['description']),
+            ('creation_date', self.creation_date, info['creationDate']),
+            ('deprecation_date', self.deprecation_date, info['deprecationDate']),
+            ('task_list', self.task_list, config['defaultTaskList']['name']),
+            ('task_heartbeat_timeout', self.task_heartbeat_timeout, config['defaultTaskHeartbeatTimeout']),
+            ('task_schedule_to_close_timeout', self.task_schedule_to_close_timeout, config['defaultTaskScheduleToCloseTimeout']),
+            ('task_schedule_to_start_timeout', self.task_schedule_to_start_timeout, config['defaultTaskScheduleToStartTimeout']),
+            ('task_start_to_close_timeout', self.task_start_to_close_timeout, config['defaultTaskStartToCloseTimeout']),
         )
 
     @property

@@ -10,8 +10,48 @@ from collections import namedtuple
 from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 
+Difference = namedtuple('Difference', ('attr', 'local', 'upstream'))
 
-Diff = namedtuple('Diff', ['attribute', 'local_value', 'remote_value'])
+class ModelDiff(object):
+    """Holds differences between local and upstream model version.
+
+    :param  input: triples (tuples) storing in order: compared attribute name,
+                   local model attribute value, upstream model attribute value.
+    :type   input: *args
+    """
+    def __init__(self, *input):
+        self.container = self._process_input(input)
+
+    def __contains__(self, attr):
+        return attr in self.container
+
+    def _process_input(self, input):
+        return {
+            attr:(local, upstream) for (attr, local, upstream)
+            in input
+            if local != upstream
+        }
+
+    def add_input(self, *input):
+        """Adds input differing data into ModelDiff instance"""
+        self.container.update(self._process_input(input))
+
+    def merge(self, model_diff):
+        """Merges another ModelDiff instance into the current one"""
+        self.container.update(model_diff.container)
+
+    def differing_fields(self):
+        """Returns the name of fields differing from upstream"""
+        return self.container.keys()
+
+    def as_list(self):
+        """Outputs models differences as a list of
+        swf.models.base.Difference namedtuple
+        """
+        return [
+            Difference(k, v[0], v[1]) for k,v
+            in self.container.iteritems()
+        ]
 
 
 class BaseModel(ConnectedSWFObject):
@@ -49,7 +89,7 @@ class BaseModel(ConnectedSWFObject):
         """Returns changes between current model instance, and
         remote object representation
 
-        :returns: A list of swf.models.base.Diff namedtuple describing
+        :returns: A list of swf.models.base.ModelDiff namedtuple describing
                   differences
         :rtype: list
         """

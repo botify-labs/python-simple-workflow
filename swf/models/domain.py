@@ -9,7 +9,7 @@ from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.models import BaseModel
-from swf.models.base import Diff
+from swf.models.base import ModelDiff
 from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 from swf.exceptions import (AlreadyExistsError, DoesNotExistError,
@@ -59,7 +59,7 @@ class Domain(BaseModel):
         """Checks for differences between Domain instance
         and upstream version
 
-        :returns: A list of swf.models.base.Diff namedtuple describing
+        :returns: A list of swf.models.base.ModelDiff namedtuple describing
                   differences
         :rtype: list
         """
@@ -74,16 +74,11 @@ class Domain(BaseModel):
         domain_info = description['domainInfo']
         domain_config = description['configuration']
 
-        attributes_comparison = [
-            Diff('name', self.name, domain_info['name']),
-            Diff('status', self.status, domain_info['status']),
-            Diff('description', self.description, domain_info['description']),
-            Diff('retention_period', self.retention_period, domain_config['workflowExecutionRetentionPeriodInDays']),
-        ]
-
-        return filter(
-            lambda data: data[1] != data[2],
-            attributes_comparison
+        return  ModelDiff(
+            ('name', self.name, domain_info['name']),
+            ('status', self.status, domain_info['status']),
+            ('description', self.description, domain_info.get('description')),
+            ('retention_period', self.retention_period, domain_config['workflowExecutionRetentionPeriodInDays']),
         )
 
     @property

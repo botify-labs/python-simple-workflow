@@ -15,7 +15,7 @@ from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 from swf.models import BaseModel
 from swf.models.history import History
-from swf.models.base import Diff
+from swf.models.base import ModelDiff
 from swf.exceptions import DoesNotExistError, AlreadyExistsError,\
                            ResponseError
 
@@ -124,7 +124,7 @@ class WorkflowType(BaseModel):
         """Checks for differences between WorkflowType instance
         and upstream version
 
-        :returns: A list of swf.models.base.Diff namedtuple describing
+        :returns: A list of swf.models.base.ModelDiff namedtuple describing
                   differences
         :rtype: list
         """
@@ -143,22 +143,17 @@ class WorkflowType(BaseModel):
         workflow_info = description['typeInfo']
         workflow_config = description['configuration']
 
-        attributes_comparison = [
-            Diff('name', self.name, workflow_info['workflowType']['name']),
-            Diff('version', self.version, workflow_info['workflowType']['version']),
-            Diff('status', self.status, workflow_info['status']),
-            Diff('creation_date', self.creation_date, workflow_info['creationDate']),
-            Diff('deprecation_date', self.deprecation_date, workflow_info['deprecationDate']),
-            Diff('task_list', self.task_list, workflow_config['defaultTaskList']['name']),
-            Diff('child_policy', self.child_policy, workflow_config['defaultChildPolicy']),
-            Diff('execution_timeout', self.execution_timeout, workflow_config['defaultExecutionStartToCloseTimeout']),
-            Diff('decision_tasks_timout', self.decision_tasks_timeout, workflow_config['defaultTaskStartToCloseTimeout']),
-            Diff('description', self.description, workflow_info['description']),
-        ]
-
-        return filter(
-            lambda data: data[1] != data[2],
-            attributes_comparison
+        return ModelDiff(
+            ('name', self.name, workflow_info['workflowType']['name']),
+            ('version', self.version, workflow_info['workflowType']['version']),
+            ('status', self.status, workflow_info['status']),
+            ('creation_date', self.creation_date, workflow_info['creationDate']),
+            ('deprecation_date', self.deprecation_date, workflow_info['deprecationDate']),
+            ('task_list', self.task_list, workflow_config['defaultTaskList']['name']),
+            ('child_policy', self.child_policy, workflow_config['defaultChildPolicy']),
+            ('execution_timeout', self.execution_timeout, workflow_config['defaultExecutionStartToCloseTimeout']),
+            ('decision_tasks_timout', self.decision_tasks_timeout, workflow_config['defaultTaskStartToCloseTimeout']),
+            ('description', self.description, workflow_info['description']),
         )
 
     @property
@@ -329,7 +324,7 @@ class WorkflowExecution(BaseModel):
         self.input = input
         self.tag_list = tag_list or []
         self.decision_tasks_timeout = decision_tasks_timeout
-        
+
         # immutable decorator rebinds class name,
         # so have to use generice self.__class__
         super(self.__class__, self).__init__(*args, **kwargs)
@@ -357,20 +352,15 @@ class WorkflowExecution(BaseModel):
         execution_info = description['executionInfo']
         execution_config = description['executionConfiguration']
 
-        attributes_comparison = [
-            Diff('workflow_id', self.workflow_id, execution_info['execution']['workflowId']),
-            Diff('run_id', self.run_id, execution_info['execution']['runId']),
-            Diff('status',  self.status, execution_info['executionStatus']),
-            Diff('task_list', self.task_list, execution_config['taskList']['name']),
-            Diff('child_policy',  self.child_policy, execution_config['childPolicy']),
-            Diff('execution_timeout', self.execution_timeout, execution_config['executionStartToCloseTimeout']),
-            Diff('tag_list', self.tag_list, execution_info['tagList']),
-            Diff('decision_tasks_timeout', self.decision_tasks_timeout, execution_config['taskStartToCloseTimeout']),
-        ]
-
-        return filter(
-            lambda data: data[1] != data[2],
-            attributes_comparison
+        return ModelDiff(
+            ('workflow_id', self.workflow_id, execution_info['execution']['workflowId']),
+            ('run_id', self.run_id, execution_info['execution']['runId']),
+            ('status',  self.status, execution_info['executionStatus']),
+            ('task_list', self.task_list, execution_config['taskList']['name']),
+            ('child_policy',  self.child_policy, execution_config['childPolicy']),
+            ('execution_timeout', self.execution_timeout, execution_config['executionStartToCloseTimeout']),
+            ('tag_list', self.tag_list, execution_info['tagList']),
+            ('decision_tasks_timeout', self.decision_tasks_timeout, execution_config['taskStartToCloseTimeout']),
         )
 
     @property
