@@ -28,15 +28,14 @@ class ActivityTaskDecision(Decision):
                  control=None, heartbeat_timeout=None,
                  input=None, duration_timeout=None,
                  schedule_timeout=None, task_timeout=None,
-                 taskList=None):
+                 task_list=None):
         """Schedule activity task decision builder
 
         :param  activity_id: activity id of the activity task
         :type   activity_id: String
 
-        :param  activity_type: type of the activity task to schedule, as a dictionary
-                               containing the 'name' and 'version' keys
-        :type   activity_type: dict
+        :param  activity_type: type of the activity task to schedule
+        :type   activity_type: swf.models.activity.ActivityType
 
         :param  control: data attached to the event that can be used by the decider in subsequent workflow tasks
         :type   control: String
@@ -57,7 +56,7 @@ class ActivityTaskDecision(Decision):
         :type   task_timeout: String
 
         :param  : Specifies the name of the task list in which to schedule the activity task
-        :type   : TaskList object
+        :type   :str
         """
         self.update_attributes({
             'activityId': activity_id,
