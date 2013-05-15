@@ -3,13 +3,7 @@
 from swf.models.history import History
 from swf.actors.core import Actor
 from swf.exceptions import PollTimeout
-
-
-class Decision(dict):
-    pass
-
-class DecisionsList(list):
-    pass
+from swf.models.decision.task import ActivityTaskDecision
 
 
 class Decider(Actor):
@@ -30,97 +24,23 @@ class Decider(Actor):
             task_list
         )
 
-    def schedule(self, activity_id, activity_type,
-                 task_list=None,
-                 control=None,
-                 heartbeat_timeout='300',
-                 schedule_to_close_timeout='300',
-                 schedule_to_start_timeout='300',
-                 start_to_close_timeout='300',
-                 input=None):
-        """Schedules an activity task
-
-        :param  activity_id: Id the activity task to schedule
-        :type   activity_id: string
-
-        :param  activity_type: activity type of the task to schedule
-        :type   activity_type: swf.models.ActivityType
-
-        :param  task_list: task list the Actor should watch for tasks on
-        :type   task_list: string
-
-        :param  control: Optional data attached to the event that can be used
-                         by the decider in subsequent workflow tasks.
-        :type   control: string
-
-        :param  heartbeat_timeout: specifies the maximum time before which
-                                   a worker processing a task of this type must
-                                   report progress by calling RecordActivityTaskHeartbeat
-        :type   heartbeat_timeout: string
-
-        :param  schedule_to_close_timeout:  The maximum duration for this activity task.
-                                            The valid values are integers greater than or equal to 0.
-                                            An integer value can be used to specify the duration in
-                                            seconds while NONE can be used to specify unlimited duration.
-        :type   schedule_to_close_timeout: string
-
-        :param  schedule_to_start_timeout: specifies the maximum duration the activity task
-                                           can wait to be assigned to a worker.
-        :type   schedule_to_start_timeout: string
-
-        :param  start_to_close_timeout:  specifies the maximum duration a worker may
-                                         take to process this activity task.
-        :type   start_to_close_timeout: string
-
-        :param  input: The input provided to the activity task.
-        :type   input: string
-
-        :returns:
-        :rtype: Decision
-        """
-        activity_type = {
-            'name': activity_type.name,
-            'version': activity_type.version
-        }
-        task_list = {'name': task_list } if task_list else None
-
-        decision_attributes = {
-            k:v for k, v in {
-                'taskList': task_list,
-                'activityId': activity_id,
-                'activityType': activity_type,
-                'control': control,
-                'heartbeatTimeout': heartbeat_timeout,
-                'scheduleToCloseTimeout': schedule_to_close_timeout,
-                'scheduleToStartTimeout': schedule_to_start_timeout,
-                'startToCloseTimeout': start_to_close_timeout,
-                'input': input,
-            }.iteritems() if v is not None
-        }
-        decision = Decision()
-        decision['decisionType'] = 'ScheduleActivityTask'
-        decision['scheduleActivityTaskDecisionAttributes'] = decision_attributes
-
-        return decision
-
-
     def complete(self, task_token,
                  decisions=None, execution_context=None):
-        """Responds to ``swf`` a decision has been made
+        """Responds to ``swf`` decisions have been made about
+        the task with `task_token``
 
         :param  task_token: completed decision task token
         :type   task_token: string
 
         :param  decisions: The list of decisions (possibly empty)
                            made by the decider while processing this decision task
-        :type   decisions: Decisionslist
+        :type   decisions: list (of swf.models.decision.Decision)
         """
         self.connection.respond_decision_task_completed(
             task_token,
             decisions,
             execution_context,
         )
-
 
     def poll(self, task_list=None,
              identity=None,
