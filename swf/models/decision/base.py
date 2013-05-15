@@ -33,8 +33,13 @@ class Decision(dict):
     _attributes_key_suffix = 'DecisionAttributes'
     _base_type = None
 
-    def __init__(self):
+    def __init__(self, action=None, *args, **kwargs):
         super(Decision, self).__init__()
+
+        if action and hasattr(self, action):
+            action_method = getattr(self, action)
+            if callable(action_method):
+                action_method(*args, **kwargs)
 
     def _fill_from_action(self, action):
         self.type = action.capitalize() + self._base_type
