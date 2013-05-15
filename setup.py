@@ -42,5 +42,6 @@ setup(
         'swf.querysets',
 
         'swf.models.event',
+        'swf.models.decision',
     ],
 )
