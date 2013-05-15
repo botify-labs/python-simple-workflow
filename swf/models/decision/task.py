@@ -10,7 +10,7 @@ from swf.models.decision.base import Decision, decision_action
 
 
 class ActivityTaskDecision(Decision):
-    _base_type = 'Decision'
+    _base_type = 'ActivityTask'
 
     @decision_action
     def request_cancel(self, activity_id):
@@ -60,7 +60,10 @@ class ActivityTaskDecision(Decision):
         """
         self.update_attributes({
             'activityId': activity_id,
-            'activityType': activity_type,
+            'activityType': {
+                'name': activity_type.name,
+                'version': activity_type.version,
+            },
             'control': control,
             'heartbeatTimeout': heartbeat_timeout,
             'input': input,
