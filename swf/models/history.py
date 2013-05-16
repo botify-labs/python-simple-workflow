@@ -81,7 +81,6 @@ class History(object):
 
         return repr_str
 
-
     @property
     def last(self):
         return self.events[-1]
@@ -94,6 +93,34 @@ class History(object):
     @property
     def first(self):
         return self.events[0]
+
+    def filter(self, **kwargs):
+        """Filters the history based on kwargs events attributes
+
+        example:
+
+        .. code-block:: python
+
+            >>> history_obj.filter(type='ActivityTask', state='completed')
+            <History
+                <Event 23 ActivityTask : completed>
+                <Event 42 ActivityTask : completed>
+                <Event 61 ActivityTask : completed>
+            >
+            >>> history_obj.filter(type='DecisionTask')
+            <History
+                <Event 2 DecisionTask : scheduled>
+                <Event 3 DecisionTask : started>
+                <Event 7 DecisionTask : scheduled>
+                <Event 8 DecisionTask : started>
+                <Event 20 DecisionTask : scheduled>
+                <Event 21 DecisionTask : started>
+            >
+        """
+        return filter(
+            lambda e: all(getattr(e, k) == v for k,v in kwargs.iteritems()),
+            self.events
+        )
 
     @classmethod
     def from_event_list(cls, data):
