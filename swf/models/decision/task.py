@@ -70,5 +70,5 @@ class ActivityTaskDecision(Decision):
             'scheduleToCloseTimeout': duration_timeout,
             'scheduleToStartTimeout': schedule_timeout,
             'startToCloseTimeout': task_timeout,
-            'taskList': task_list,
+            'taskList': {'name': task_list},
         })
