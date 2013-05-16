@@ -16,15 +16,15 @@ class ActivityTaskEvent(Event):
 class CompiledActivityTaskEvent(CompiledEvent):
     _type = 'ActivityTask'
     states = (
-        'scheduled',
-        'schedule_failed',
-        'started',
-        'completed',
-        'failed',
-        'timed_out',
-        'canceled',
-        'cancel_requested',
-        'request_cancel_failed',
+        'scheduled',  # An activity task was scheduled for execution
+        'schedule_failed',  # Failed to process schedule decision
+        'started',  #  The scheduled activity task was dispatched to a worker
+        'completed',  # An activity worker successfully completed an activity task
+        'failed',  # An activity worker failed an activity task
+        'timed_out',  # The activity task timed out
+        'canceled',  # The activity task was successfully canceled
+        'cancel_requested',  # A request_cancel decision was received by the system
+        'request_cancel_failed',  # Failed to process request_cancel decision
     )
 
     transitions = {
@@ -47,10 +47,10 @@ class DecisionTaskEvent(Event):
 class CompiledDecisionTaskEvent(CompiledEvent):
     _type = 'DecisionTask'
     states = (
-        'scheduled',
-        'started',
-        'completed',
-        'timed_out'
+        'scheduled',  # A decision task was scheduled for the workflow execution
+        'started',  # The decision task was dispatched to a decider
+        'completed',  # The decider successfully completed a decision task
+        'timed_out'  # The decision task timed out
     )
 
     transitions = {
