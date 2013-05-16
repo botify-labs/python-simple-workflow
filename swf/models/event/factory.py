@@ -6,49 +6,52 @@
 # See the file LICENSE for copying permission.
 
 from swf.models.event.workflow import WorkflowExecutionEvent,\
+                                      CompiledWorkflowExecutionEvent,\
                                       ChildWorkflowExecutionEvent,\
-                                      ExternalWorkflowExecutionEvent
+                                      CompiledChildWorkflowExecutionEvent,\
+                                      ExternalWorkflowExecutionEvent,\
+                                      CompiledExternalWorkflowExecutionEvent
 from swf.models.event.task import DecisionTaskEvent,\
-                                  ActivityTaskEvent
-from swf.models.event.timer import TimerEvent
-from swf.models.event.marker import MarkerEvent
+                                  CompiledDecisionTaskEvent,\
+                                  ActivityTaskEvent,\
+                                  CompiledActivityTaskEvent
+from swf.models.event.timer import TimerEvent,\
+                                   CompiledTimerEvent
+from swf.models.event.marker import MarkerEvent,\
+                                    CompiledMarkerEvent
 
 from swf.utils import camel_to_underscore, decapitalize
 
 
 EVENTS = {
-    # WorkflowExecutionEvent States : Started,
-    # Completed, Failed, Signaled,
-    # TimedOut, Canceled, Terminated
-    # ContinuedAsNew, CancelRequested
-    'WorkflowExecution': WorkflowExecutionEvent,
-
-    # Decision Task states: Scheduled
-    # Started, Completed, TimedOut
-    'DecisionTask': DecisionTaskEvent,
-
-    # Activity task states: Scheduled
-    # Started, Completed, Failed,
-    # TimedOut, Canceled, CancelRequested,
-    # (Schedule, Failed), (RequestCancel, Failed)
-    'ActivityTask': ActivityTaskEvent,
-
-    # Marker states: Recorded
-    'Marker': MarkerEvent,
-
-    # Timer states: Started, Fired, Canceled,
-    # (Start, Failed), (Cancel, Failed)
-    'Timer': TimerEvent,
-
-    # Child workflow execution states: Started,
-    # Completed, Failed, TimedOut, Canceled, Terminated,
-    # (Start, Initiated), (Start, Failed)
-    'ChildWorkflowExecution': ChildWorkflowExecutionEvent,
-
-    # External workflow execution states: Signaled,
-    # Requested, (Signal, Initiated), (Signal, Failed)
-    # (RequestCancel, Initiated), (RequestCancel, Failed)
-    'ExternalWorkflow': ExternalWorkflowExecutionEvent,
+    'WorkflowExecution': {
+        'event':  WorkflowExecutionEvent,
+        'compiled_event': CompiledWorkflowExecutionEvent,
+    },
+    'DecisionTask': {
+        'event': DecisionTaskEvent,
+        'compiled_event': CompiledDecisionTaskEvent,
+    },
+    'ActivityTask': {
+        'event': ActivityTaskEvent,
+        'compiled_event': CompiledActivityTaskEvent,
+    },
+    'Marker': {
+        'event': MarkerEvent,
+        'compiled': CompiledMarkerEvent,
+    },
+    'Timer': {
+        'event': TimerEvent,
+        'compiled': CompiledTimerEvent,
+    },
+    'ChildWorkflowExecution': {
+        'event': ChildWorkflowExecutionEvent,
+        'compiled': CompiledChildWorkflowExecutionEvent,
+    },
+    'ExternalWorkflow': {
+        'event': ExternalWorkflowExecutionEvent,
+        'compiled': CompiledExternalWorkflowExecutionEvent,
+    },
 }
 
 
@@ -95,7 +98,7 @@ class EventFactory(object):
         # response field is non-capitalized...
         event_attributes_key = decapitalize(event_name) + 'EventAttributes'
 
-        klass = EventFactory.events[event_type]
+        klass = EventFactory.events[event_type]['event']
         klass._name = event_name
         klass._attributes_key = event_attributes_key
 
@@ -118,7 +121,7 @@ class EventFactory(object):
             splitted = event_name.partition(name)
 
             if len(splitted) == 2:
-                if splitted[0] == name:
+                if splitted[0] ==  name:
                     return name
             elif len(splitted) == 3:
                 if splitted[1] == name:
@@ -140,3 +143,16 @@ class EventFactory(object):
         klass_state = camel_to_underscore(raw_state)
 
         return klass_state
+
+
+class CompiledEventFactory(object):
+    events = EVENTS
+
+    def __new__(cls, event):
+        event_type = event.type
+        event_state = event.state
+
+        klass = cls.events[event_type]['compiled_event']
+        instance = klass(event)
+
+        return instance

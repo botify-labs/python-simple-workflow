@@ -7,7 +7,7 @@
 
 from itertools import groupby
 
-from swf.models.event import EventFactory
+from swf.models.event import EventFactory, CompiledEventFactory
 from swf.utils import decapitalize
 
 
@@ -133,6 +133,21 @@ class History(object):
             distinct_events.append(list(group))
 
         return distinct_events
+
+    def compile(self):
+        distinct_events = self.distinct
+        compiled_history = []
+
+        for events_list in distinct_events:
+            if len(events_list) > 0:
+                compiled_event = CompiledEventFactory(events_list[0])
+
+                for event in events_list[1:]:
+                    compiled_event.transit(event)
+
+                compiled_history.append(compiled_event)
+
+        return compiled_history
 
     @classmethod
     def from_event_list(cls, data):
