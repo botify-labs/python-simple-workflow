@@ -147,7 +147,7 @@ class History(object):
 
                 compiled_history.append(compiled_event)
 
-        return compiled_history
+        return History(events=compiled_history)
 
     @classmethod
     def from_event_list(cls, data):
