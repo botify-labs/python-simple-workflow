@@ -5,6 +5,8 @@
 #
 # See the file LICENSE for copying permission.
 
+from itertools import groupby
+
 from swf.models.event import EventFactory
 from swf.utils import decapitalize
 
@@ -121,6 +123,16 @@ class History(object):
             lambda e: all(getattr(e, k) == v for k,v in kwargs.iteritems()),
             self.events
         )
+
+    @property
+    def distinct(self):
+        """Extracts distinct history events"""
+        distinct_events = []
+
+        for key, group in groupby(self.events, lambda e: e.type):
+            distinct_events.append(list(group))
+
+        return distinct_events
 
     @classmethod
     def from_event_list(cls, data):
