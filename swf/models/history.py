@@ -8,15 +8,18 @@
 from itertools import groupby
 
 from swf.models.event import EventFactory, CompiledEventFactory
-from swf.utils import decapitalize
+from swf.utils import decapitalize, cached_property
 
 
 class History(object):
-    """Simple workflow execution events history
+    """Execution events history container
 
-    History object is an Event subclass objects list container
+    History object is an Event subclass objects container
     which can be built directly against an amazon json response
     using it's from_event_list method.
+
+    It is iterable and exposes a list-like __getitem__ for easier
+    manipulation.
 
     :param  events: Events list to build History upon
     :type   events: list
@@ -63,6 +66,7 @@ class History(object):
     def __init__(self, *args, **kwargs):
         self.events = kwargs.pop('events', [])
         self.raw = kwargs.pop('raw', None)
+        self.it_pos = 0
 
     def __len__(self):
         return len(self.events)
@@ -83,21 +87,54 @@ class History(object):
 
         return repr_str
 
+    def __iter__(self):
+        return self
+
+    def next(self):
+        try:
+            next_event = self.events[self.it_pos]
+            self.it_pos += 1
+        except IndexError:
+            self.it_pos = 0
+            raise StopIteration
+        return next_event
+
+
     @property
     def last(self):
+        """Returns the last stored event
+
+        :rtype: swf.models.event.Event
+        """
         return self.events[-1]
 
     def latest(self, n):
+        """Returns the n latest events stored in the History
+
+        :param  n: latest events count to return
+        :type   n: int
+
+        :rtype: list
+        """
         end_pos = len(self.events)
         start_pos = len(self.events) - n
         return self.events[start_pos:end_pos]
 
     @property
     def first(self):
+        """Returns the first stored event
+
+        :rtype: swf.models.event.Event
+        """
         return self.events[0]
 
     def filter(self, **kwargs):
         """Filters the history based on kwargs events attributes
+
+        Basically, allows to filter the history events upon their
+        types and states. Can be used for example to retrieve every
+        'DecisionTask' in the history, to check the presence of a specific
+        event and so on...
 
         example:
 
@@ -118,6 +155,8 @@ class History(object):
                 <Event 20 DecisionTask : scheduled>
                 <Event 21 DecisionTask : started>
             >
+
+        :rtype: swf.models.history.History
         """
         return filter(
             lambda e: all(getattr(e, k) == v for k,v in kwargs.iteritems()),
@@ -126,7 +165,10 @@ class History(object):
 
     @property
     def distinct(self):
-        """Extracts distinct history events"""
+        """Extracts distinct history events based on their types
+
+        :rtype: list of swf.models.event.Event
+        """
         distinct_events = []
 
         for key, group in groupby(self.events, lambda e: e.type):
@@ -135,6 +177,14 @@ class History(object):
         return distinct_events
 
     def compile(self):
+        """Compiles history events into a stateful History
+        based on events types and states transitions.
+
+        Every events stored in the resulting history are stateful
+        CompiledEvent subclasses instances then.
+
+        :rtype: swf.models.history.History made of swf.models.event.CompiledEvent
+        """
         distinct_events = self.distinct
         compiled_history = []
 
@@ -148,6 +198,14 @@ class History(object):
                 compiled_history.append(compiled_event)
 
         return History(events=compiled_history)
+
+    @cached_property
+    def compiled(self):
+        """Compiled history version
+
+        :rtype: swf.models.history.History made of swf.models.event.CompiledEvent
+        """
+        return self.compile()
 
     @classmethod
     def from_event_list(cls, data):
