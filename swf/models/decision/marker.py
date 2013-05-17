@@ -9,7 +9,6 @@ from swf.models.decision.base import Decision, decision_action
 
 
 class MarkerDecision(Decision):
-    """Marker decision message wrapper"""
     _base_type = 'Marker'
 
     @decision_action

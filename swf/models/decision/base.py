@@ -12,7 +12,8 @@ from swf.utils import decapitalize
 
 def decision_action(fn):
     """Ensures the decorated method class instance is bootstraped
-    with decision type, attributes_key, and body"""
+    with decision type, attributes_key, and body
+    """
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
         self._fill_from_action(fn.__name__)
@@ -27,8 +28,11 @@ class Decision(dict):
     to build a suitable Decision message that Amazon service will
     understand.
 
-    It is meant to be subclassed, and does not intend to be intstantiated
-    by itself.
+    It is meant to be subclassed, and does not intend to be instantiated
+    as is.
+
+    :param  action: Decision action type
+    :type   action: string
     """
     _attributes_key_suffix = 'DecisionAttributes'
     _base_type = None
@@ -50,7 +54,11 @@ class Decision(dict):
 
     def update_attributes(self, data):
         """Updates Decision instance attributes_key dictionary
-        with provided data which values is not None"""
+        with provided data which values is not None
+
+        :param  data:
+        :type   data:
+        """
         if not hasattr(self, 'attributes_key'):
             raise AttributeError("Can't update unset attributes_key"
                                  "decision attritute")
