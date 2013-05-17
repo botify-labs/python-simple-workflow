@@ -17,11 +17,41 @@ class TransitionError(Exception):
 
 
 class Stateful(object):
+    """Base stateful object implementation"""
     states = ()
     transitions = {}
 
 
 class CompiledEvent(Event, Stateful):
+    """State-aware history event base representation
+
+    Amazon service history events comes with a type and
+    a state. swf.models.eventEvent class already implements
+    these specifities.
+
+    But history manipulation and analysis in order to take
+    decisions calls for state-aware events.
+
+    CompiledEvent has to be instantiated against an swf.models.event.Event
+    from which it will validate state as initial. Then, you will be able
+    to apply transitions to it from events of the same type that comes next
+    in the history using the .transit() method, which will
+    validate the state transition is attended and valid.
+
+    compiled events inherits from swf.models.compiled.event.Stateful and should
+    should implement:
+
+    * ``initial_state`` class attribute: constructor supplied event attended state
+
+    * ``states`` (tuple) class attribute: every event type possible states should
+    be listed
+
+    * ``transitions`` (dictionary) class attribute: every initial state to possible
+    target state should be listed.
+
+    Implementation **example** can be found in swf.models.event submodules as Compiled*Event
+    classes.
+    """
     initial_state = None
 
     def __init__(self, event):
@@ -44,6 +74,10 @@ class CompiledEvent(Event, Stateful):
 
     @property
     def next_states(self):
+        """Returns attended next compiled event states
+
+        :rtype: list
+        """
         return self.transitions[self.state]
 
 
