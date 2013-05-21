@@ -203,6 +203,11 @@ class WorkflowType(BaseModel):
             if e.error_code in ['UnknownResourceFault', 'TypeDeprecatedFault']:
                 raise DoesNotExistError(e.body['message'])
 
+    def upstream(self):
+        from swf.querysets.workflow import WorkflowTypeQuerySet
+        qs = WorkflowTypeQuerySet(self.domain)
+        return qs.get(self.name, self.version)
+
     def start_execution(self, workflow_id=None, task_list=None,
                         child_policy=None, execution_timeout=None,
                         input=None, tag_list=None, decision_tasks_timeout=None):
@@ -382,6 +387,11 @@ class WorkflowExecution(BaseModel):
             return False
 
         return True
+
+    def upsteam(self):
+        from swf.querysets.workflow import WorkflowExecutionQuerySet
+        qs = WorkflowExecutionQuerySet(self.domain)
+        return qs.get(self.workflow_id, self.run_id)
 
     def history(self, *args, **kwargs):
         """Returns workflow execution history report

@@ -213,8 +213,9 @@ class ActivityTypeQuerySet(BaseQuerySet):
 
         :param      registration_status: activity type registration status to match,
                                          Valid values are:
-                                        * ``swf.constants.REGISTERED``
-                                        * ``swf.constants.DEPRECATED``
+                                         * ``swf.constants.REGISTERED``
+                                         * ``swf.constants.DEPRECATED``
+
         :type       registration_status: string
 
         :param      name: activity type name to match
@@ -233,8 +234,9 @@ class ActivityTypeQuerySet(BaseQuerySet):
 
         :param      registration_status: activity type registration status to match,
                                          Valid values are:
-                                        * ``swf.constants.REGISTERED``
-                                        * ``swf.constants.DEPRECATED``
+                                         * ``swf.constants.REGISTERED``
+                                         * ``swf.constants.DEPRECATED``
+                                         
         :type       registration_status: string
 
         :returns: list of matched ActivityType models objects
@@ -286,7 +288,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
                task_schedule_to_start_timeout=0,
                task_start_to_close_timeout=0,
                *args, **kwargs):
-        """Creates a new remote activity type and returns the 
+        """Creates a new remote activity type and returns the
         created ActivityType model instance.
 
         :param  name: name of the ActivityType

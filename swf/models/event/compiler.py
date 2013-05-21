@@ -39,19 +39,19 @@ class CompiledEvent(Event, Stateful):
     validate the state transition is attended and valid.
 
     compiled events inherits from swf.models.compiled.event.Stateful and should
-    should implement:
+    should implement
 
     * ``initial_state`` class attribute: constructor supplied event attended state
-
     * ``states`` (tuple) class attribute: every event type possible states should
     be listed
-
     * ``transitions`` (dictionary) class attribute: every initial state to possible
     target state should be listed.
-
+    
     Implementation **example** can be found in swf.models.event submodules as Compiled*Event
     classes.
+
     """
+
     initial_state = None
 
     def __init__(self, event):

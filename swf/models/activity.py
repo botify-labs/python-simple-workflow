@@ -198,6 +198,11 @@ class ActivityType(BaseModel):
                 raise DoesNotExistError("%s does not exist" % self)
         self.status = DEPRECATED
 
+    def upstream(self):
+        from swf.querysets.activity import ActivityTypeQuerySet
+        qs = ActivityTypeQuerySet(self.domain)
+        return qs.get(self.name, self.version)
+
     def __repr__(self):
         return '<{} domain={} name={} version={} status={}>'.format(
                self.__class__.__name__,

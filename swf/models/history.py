@@ -211,16 +211,16 @@ class History(object):
     def from_event_list(cls, data):
         """Instantiates a new ``swf.models.history.History`` instance
         from amazon service response.
-
+        
         Every member of the History are ``swf.models.event.Event``
         subclasses instances, exposing their type, state, and so on to
         facilitate decisions according to the history.
-
+        
         :param  data: event history description (typically, an amazon response)
         :type   data: dict
-
+        
         :returns: History model instance built upon data description
-        :rtype  : swf.model.event.History
+        :rtype : swf.model.event.History
         """
         events_history = []
 

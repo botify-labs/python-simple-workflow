@@ -5,20 +5,31 @@
 #
 # See the file LICENSE for copying permission.
 
-from swf.models.event.workflow import WorkflowExecutionEvent,\
-                                      CompiledWorkflowExecutionEvent,\
-                                      ChildWorkflowExecutionEvent,\
-                                      CompiledChildWorkflowExecutionEvent,\
-                                      ExternalWorkflowExecutionEvent,\
-                                      CompiledExternalWorkflowExecutionEvent
-from swf.models.event.task import DecisionTaskEvent,\
-                                  CompiledDecisionTaskEvent,\
-                                  ActivityTaskEvent,\
-                                  CompiledActivityTaskEvent
-from swf.models.event.timer import TimerEvent,\
-                                   CompiledTimerEvent
-from swf.models.event.marker import MarkerEvent,\
-                                    CompiledMarkerEvent
+from swf.models.event.workflow import (
+    WorkflowExecutionEvent,
+    CompiledWorkflowExecutionEvent,
+    ChildWorkflowExecutionEvent,
+    CompiledChildWorkflowExecutionEvent,
+    ExternalWorkflowExecutionEvent,
+    CompiledExternalWorkflowExecutionEvent
+)
+
+from swf.models.event.task import (
+    DecisionTaskEvent,
+    CompiledDecisionTaskEvent,
+    ActivityTaskEvent,
+    CompiledActivityTaskEvent
+)
+
+from swf.models.event.timer import (
+    TimerEvent,
+    CompiledTimerEvent
+)
+
+from swf.models.event.marker import (
+    MarkerEvent,
+    CompiledMarkerEvent
+)
 
 from swf.utils import camel_to_underscore, decapitalize
 
@@ -63,17 +74,17 @@ class EventFactory(object):
 
     .. code-block:: json
 
-    {
-        'eventId': 1,
-        'eventType': 'DecisionTaskScheduled',
-        'decisionTaskScheduledEventAttributes': {
-            'startToCloseTimeout': '300',
-            'taskList': {
-                'name': 'test'
-            }
-        },
-        'eventTimestamp': 1365177769.585
-    }
+        {
+            'eventId': 1,
+            'eventType': 'DecisionTaskScheduled',
+            'decisionTaskScheduledEventAttributes': {
+                'startToCloseTimeout': '300',
+                'taskList': {
+                    'name': 'test'
+                }
+            },
+            'eventTimestamp': 1365177769.585
+        }
 
     will instantiate a ``swf.models.event.task.DecisionTaskEvent`` with state
     set to 'scheduled' from input attributes.
@@ -83,7 +94,9 @@ class EventFactory(object):
     :type   raw_event: dict
 
     :returns: ``swf.models.event.Event`` subclass instance
+    
     """
+
     # eventType to Event subclass bindings
     events = EVENTS
 

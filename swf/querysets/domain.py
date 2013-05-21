@@ -84,6 +84,7 @@ class DomainQuerySet(BaseQuerySet):
                             workflow types to list. Valid values are:
                             * ``swf.constants.REGISTERED``
                             * ``swf.constants.DEPRECATED``
+
         :type       status: string
 
         :param      description: Textual description of the domain
@@ -102,8 +103,9 @@ class DomainQuerySet(BaseQuerySet):
 
         :param      registration_status: domain registration status to match,
                                          Valid values are:
-                                        * ``swf.constants.REGISTERED``
-                                        * ``swf.constants.DEPRECATED``
+                                         * ``swf.constants.REGISTERED``
+                                         * ``swf.constants.DEPRECATED``
+                                         
         :type       registration_status: string
 
         A typical Amazon response looks like:

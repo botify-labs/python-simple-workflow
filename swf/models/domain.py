@@ -35,6 +35,7 @@ class Domain(BaseModel):
     :param      description: Textual description of the domain
     :type       description: string
     """
+
     __slots__ = [
         'name',
         'status',
@@ -113,6 +114,11 @@ class Domain(BaseModel):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)
+
+    def upstream(self):
+        from swf.querysets.domain import DomainQuerySet
+        qs = DomainQuerySet()
+        return qs.get(self.name)
 
     def workflows(self, status=REGISTERED):
         """Lists the current domain's workflow types

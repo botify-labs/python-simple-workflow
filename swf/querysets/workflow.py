@@ -216,15 +216,16 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 
     def filter(self, domain=None, registration_status=REGISTERED, name=None):
         """Filters workflows based on the ``domain`` they belong to,
-        their ``status`, and/or their ``name
+        their ``status``, and/or their ``name``
 
         :param      domain: domain the workflow type belongs to
         :type       domain: swf.models.domain.Domain
 
         :param      registration_status: workflow type registration status to match,
                                          Valid values are:
-                                        * ``swf.constants.REGISTERED``
-                                        * ``swf.constants.DEPRECATED``
+                                         * ``swf.constants.REGISTERED``
+                                         * ``swf.constants.DEPRECATED``
+
         :type       registration_status: string
 
         :param      name: workflow type name to match
@@ -244,8 +245,9 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 
         :param      registration_status: workflow type registration status to match,
                                  Valid values are:
-                                * ``swf.constants.REGISTERED``
-                                * ``swf.constants.DEPRECATED``
+                                 * ``swf.constants.REGISTERED``
+                                 * ``swf.constants.DEPRECATED``
+                                 
         :type       registration_status: string
 
         A typical Amazon response looks like:

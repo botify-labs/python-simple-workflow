@@ -7,7 +7,6 @@
 
 from datetime import datetime
 
-from swf.models.event.states import EventState
 from swf.utils import Enum, camel_to_underscore, cached_property
 
 

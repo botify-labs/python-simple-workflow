@@ -10,7 +10,9 @@ from collections import namedtuple
 from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 
+
 Difference = namedtuple('Difference', ('attr', 'local', 'upstream'))
+
 
 class ModelDiff(object):
     """Holds differences between local and upstream model version.
@@ -71,7 +73,6 @@ class BaseModel(ConnectedSWFObject):
         """Checks if the connected swf object exists amazon-side"""
         raise NotImplementedError
 
-
     @property
     def is_synced(self):
         """Checks if current Model instance has changes, comparing
@@ -101,4 +102,8 @@ class BaseModel(ConnectedSWFObject):
 
     def delete(self):
         """Deprecates the connected swf object amazon side"""
+        raise NotImplementedError
+
+    def upstream(self):
+        """Instantiates a new upstream version of the model"""
         raise NotImplementedError
