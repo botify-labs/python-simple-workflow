@@ -17,13 +17,11 @@ Installation
 
 	pip install simple-workflow
 
-.. _usage:
+.. _authentication:
 
-Usage
-=====
 
-Before you ask
---------------
+Authentication
+==============
 
 To be able to communicate with Amazon service, the python simple workflow package modules have to be aware of your AWS credentials. Three credentials providing methods are available and evaluated by the module in the following order
 
@@ -53,6 +51,11 @@ Helper function
         [Domain('test1'), Domain('test2')]
 
 
+Batteries Included
+==================
+
+.. _models:
+
 Models
 ------
 
@@ -78,6 +81,7 @@ A good walkthrough example worths it all. For more details about models, see `py
         retention_period=60
     )
 
+.. code-block:: python
     # Now, a Domain model instance has been created, but just as in Django,
     # it's totally local, nothing has been sent to amazon swf. If we want to,
     # let's just save it
@@ -111,6 +115,7 @@ A good walkthrough example worths it all. For more details about models, see `py
         ),
     ]
 
+.. _querysets:
 
 QuerySets
 ---------
@@ -135,3 +140,31 @@ they're behaving like django managers.
 
     >>> workflow_qs.filter(status=DEPRECATED)
     [WorkflowType("DeprecatedType1"),]
+
+.. _events:
+
+Events
+------
+
+(coming soon)
+
+.. _history:
+
+History
+-------
+
+(coming soon)
+
+.. _decisions:
+
+Decisions
+---------
+
+(coming soon)
+
+.. _actors:
+
+Actors
+------
+
+(coming soon)
