@@ -167,4 +167,34 @@ Decisions
 Actors
 ------
 
-(coming soon)
+Swf workflows are based on a worker-decider pattern. Every actions in the flow is executed by a worker which runs supplied activity tasks. And every actions is the result of a decision taken by the decider reading the workflow events history and deciding what to do next. In order to ease the development of such workers and decider, python-simple-workflow exposes base classes for them located in ``swf.actors`` submodule.
+
+* An ``Actor`` must basically implement a ``start`` and ``stop`` method and can actually inherits from whatever runtime implementation you need: thread, gevent, multiprocess...
+
+    .. code-block:: python
+
+    class Actor(ConnectedSWFObject):
+        def __init__(self, domain, task_list)
+        def start(self):
+        def stop(self):
+
+* ``Decider`` base class implements the core functionality of a swf decider: polling for decisions tasks, and sending back a decision task copleted decision. Every other special needs implementations are left up to the user.
+
+    .. code-block:: python
+
+    class Decider(Actor):
+        def __init__(self, domain, task_list)
+        def complete(self, task_token, decisions=None, execution_context=None)
+        def poll(self, task_list=None, identity=None, maximum_page_size=None)
+
+* ``Worker`` base class implements the core functionality of a swf worker whoes role is to process activity tasks. It is basically able to poll for new activity tasks to process, send back a heartbeat to swf service in order to let it know it hasn't failed or crashed, and to complete, fail or cancel the activity task it's processing.
+
+    .. code-block:: python
+
+    class ActivityWorker(Actor):
+        def __init__(self, domain, task_list)
+        def cancel(self, task_token, details=None)
+        def complete(self, task_token, result=None)
+        def fail(self, task_token, details=None, reason=None)
+        def heartbeat(self, task_token, details=None)
+        def poll(self, task_list=None, **kwargs)
