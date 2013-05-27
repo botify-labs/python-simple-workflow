@@ -407,3 +407,33 @@ class WorkflowExecution(BaseModel):
         )['events']
 
         return History.from_event_list(event_list)
+
+    def signal(self, signal_name, input=None, *args, **kwargs):
+        """Records a signal event in the workflow execution history and
+        creates a decision task.
+
+        The signal event is recorded with the specified user defined
+        ``signal_name`` and ``input`` (if provided).
+
+        :param  signal_name: The name of the signal. This name must be
+                             meaningful to the target workflow.
+        :type   signal_name: str
+
+        :param  input: Data to attach to the WorkflowExecutionSignaled
+                       event in the target workflow execution’s history.
+        :type   input: str
+        """
+        try:
+            self.connection.signal_workflow_execution(
+                self.domain.name,
+                signal_name,
+                self.workflow_id,
+                input=input,
+                run_id=self.run_id)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote Domain does not exist")
+
+            raise ResponseError(e.body['message'])
+
+        return
