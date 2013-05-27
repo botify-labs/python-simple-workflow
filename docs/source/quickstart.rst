@@ -59,61 +59,59 @@ Batteries Included
 Models
 ------
 
-Simple Workflow concepts are to be manipulated through python-simple-workflow using ``models``. They look
-quite the same as django's models, and are there to help representing amazon simple workflow concepts as
-objects.
-
-Models are an ``swf`` immutable object modelisation. They provide an immutable interface to objects attributes.
-Provides local/remote synchronization, and changes diff watch between local and remote objects.
-
-A good walkthrough example worths it all. For more details about models, see `python-simple-workflow api documentation <https://python-simple-workflow.readthedocs.org/en/latest/api.html>`_ .
+Simple Workflow entities such as domains, workflow types, workflow executions and activity types are to be manipulated through python-simple-workflow using ``models``. They are immutable ``swf`` objects representations providing an interface to objects attributes, local/remote objects synchronization and changes watch between these local and remote objects.
 
 .. code-block:: python
 
     # Models resides in swf.models module
-    >>> from swf.models import Domain, WorkflowType, WorkflowExecution, ActivityType, Event, History
+    >>> from swf.models import Domain, WorkflowType, WorkflowExecution, ActivityType
 
-    # Once imported you're ready to create a model instance, let's say,
-    # a domain for example.
+    # Once imported you're ready to create a local model instance
     >>> D = Domain(
         "my-test-domain-name",
         description="my-test-domain-description",
         retention_period=60
     )
 
-.. code-block:: python
-    # Now, a Domain model instance has been created, but just as in Django,
-    # it's totally local, nothing has been sent to amazon swf. If we want to,
-    # let's just save it
+    # a Domain model local instance has been created, but nothing has been
+    # sent to amazon. To do so, you have to save it.
     >>> D.save()
 
-    # Okay, now, if no errors happened, this should be saved amazon-side,
-    # need a proof? exists method let you know if the model your manipulating
-    # has an upstream version
+Now you have a local ``Domain`` model object, and if no errors were raised, the ``save`` method have saved amazon-side. But, sometimes, you won't be able to know if the model you're manipulating has an upstream version: whether you've acquired it through a queryset, or the remote object has been deleted for example. Fortunately, models are shipped with a set of functions to make sure your local objects keep synced and consistent.
+
+.. code-block:: python
+
+    # Exists method let's you know if you're model instance has an upstream version
     >>> D.exists
     True
 
-    # So now we've got a model existing both locally and remotly, but if whatever
-    # changes are made to the object, how to ensure local and remote models are still synced
-    # and which changes have been maid you must ask yourself.
+    # What if changes have been made to the remote object?
+    # synced  and changes methods help ensuring local and remote models
+    #are still synced and which changes have been maid.
     >>> D.is_synced
     True
     >>> D.changes
-    []
-    >>> D.name = "My Brand New Shinny Name"  # Let's update one of our domain attribute
-    >>> D.is_synced  # local and remote model representation are now out of sync
-    False
+    ModelDiff()
 
-    # .changes models method lets you know what exactly are the changes between
-    # local and remote versions
+
+What if your local object is out of sync? Models ``upstream`` method will fetch the remote version of your object and will build a new model instance using it's attributes.
+
+.. code-block:: python
+
+    >>> D.is_synced
+    False
     >>> D.changes
-    [
-        Diff(
-            attribute='name',
-            local_value='My Brand New Shinny Name',
-            remote_value='my-test-domain-name'
-        ),
-    ]
+    ModelDiff(
+        Difference('status', 'REGISTERED', 'DEPRECATED')
+    )
+
+    # Let's pull the upstream version
+    >>> D = D.upstream()
+    >>> D.is_synced
+    True
+    >>> D.changes
+    ModelDiff()
+
 
 .. _querysets:
 
@@ -171,7 +169,7 @@ Swf workflows are based on a worker-decider pattern. Every actions in the flow i
 
 * An ``Actor`` must basically implement a ``start`` and ``stop`` method and can actually inherits from whatever runtime implementation you need: thread, gevent, multiprocess...
 
-    .. code-block:: python
+.. code-block:: python
 
     class Actor(ConnectedSWFObject):
         def __init__(self, domain, task_list)
@@ -180,7 +178,7 @@ Swf workflows are based on a worker-decider pattern. Every actions in the flow i
 
 * ``Decider`` base class implements the core functionality of a swf decider: polling for decisions tasks, and sending back a decision task copleted decision. Every other special needs implementations are left up to the user.
 
-    .. code-block:: python
+.. code-block:: python
 
     class Decider(Actor):
         def __init__(self, domain, task_list)
@@ -189,7 +187,7 @@ Swf workflows are based on a worker-decider pattern. Every actions in the flow i
 
 * ``Worker`` base class implements the core functionality of a swf worker whoes role is to process activity tasks. It is basically able to poll for new activity tasks to process, send back a heartbeat to swf service in order to let it know it hasn't failed or crashed, and to complete, fail or cancel the activity task it's processing.
 
-    .. code-block:: python
+.. code-block:: python
 
     class ActivityWorker(Actor):
         def __init__(self, domain, task_list)
