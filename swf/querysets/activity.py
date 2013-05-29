@@ -67,7 +67,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
     def _list(self, *args, **kwargs):
         return self.connection.list_workflow_types(*args, **kwargs)
 
-    def get(self, name, version):
+    def get(self, name, version, *args, **kwargs):
         """Fetches the activity type with provided ``name`` and ``version``
 
         :param      name: activity type name to fetch
@@ -135,7 +135,8 @@ class ActivityTypeQuerySet(BaseQuerySet):
                       task_heartbeat_timeout=0,
                       task_schedule_to_close_timeout=0,
                       task_schedule_to_start_timeout=0,
-                      task_start_to_close_timeout=0):
+                      task_start_to_close_timeout=0,
+                      *args, **kwargs):
         """Fetches, or creates the ActivityType with ``name`` and ``version``
 
         When fetching trying to fetch a matching activity type, only
@@ -205,7 +206,9 @@ class ActivityTypeQuerySet(BaseQuerySet):
             )
 
 
-    def filter(self, domain=None, registration_status=REGISTERED, name=None):
+    def filter(self, domain=None,
+               registration_status=REGISTERED,
+               name=None, *args, **kwargs):
         """Filters activity types based on their status, and/or name
 
         :param      domain: domain the activity type belongs to
@@ -229,14 +232,15 @@ class ActivityTypeQuerySet(BaseQuerySet):
         return [self.to_ActivityType(domain, activity_type) for activity_type in
                 self._list_items(domain.name, registration_status, name=name)]
 
-    def all(self, registration_status=REGISTERED):
+    def all(self, registration_status=REGISTERED,
+            *args, **kwargs):
         """Retrieves every activity types
 
         :param      registration_status: activity type registration status to match,
                                          Valid values are:
                                          * ``swf.constants.REGISTERED``
                                          * ``swf.constants.DEPRECATED``
-                                         
+
         :type       registration_status: string
 
         :returns: list of matched ActivityType models objects
