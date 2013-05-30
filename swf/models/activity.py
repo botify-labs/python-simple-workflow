@@ -260,7 +260,7 @@ class ActivityTask(BaseModel):
             task_token=data['taskToken'],
             activity_type=activity_type,
             workflow_execution=workflow_execution,
-            input=data['input'],
+            input=data.get('input'),
             activity_id=data['activityId'],
             started_event_id=data['startedEventId']
         )

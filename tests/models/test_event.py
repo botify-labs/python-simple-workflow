@@ -4,6 +4,7 @@ import unittest2
 
 from swf.models.event import Event
 from swf.models.history import History
+import swf.constants
 
 from ..mocks.event import mock_get_workflow_execution_history
 
@@ -17,12 +18,12 @@ class TestEvent(unittest2.TestCase):
         pass
 
     def test_instantiate_with_invalid_type(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             Event("WrongType")
 
     def test_repr_with_missing_attr(self):
         with self.assertRaises(AttributeError):
-            ev = Event('WorkflowExecutionStarted')
+            ev = Event('WorkflowExecutionStarted', swf.contants.REGISTERED, 0, None)
             delattr(ev, 'id')
             ev.__repr__()
 
@@ -49,13 +50,13 @@ class TestHistory(unittest2.TestCase):
         val = self.history[0:1]
         self.assertIsNotNone(val)
         self.assertIsInstance(val, History)
-        self.assertEqual(len(val.container), 1)
+        self.assertEqual(len(val), 1)
 
     def test_get_by_invalid_slice(self):
         h = self.history[45:99]
         self.assertIsNotNone(h)
         self.assertIsInstance(h, History)
-        self.assertEqual(len(h.container), 0)
+        self.assertEqual(len(h), 0)
 
     def test_get_by_invalid_index_type(self):
         with self.assertRaises(TypeError):

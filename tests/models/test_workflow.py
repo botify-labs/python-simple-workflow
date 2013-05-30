@@ -50,9 +50,9 @@ class TestWorkflowType(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 6)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_workflow_type__diff_with_identical_workflow_type(self):
         with patch.object(
@@ -77,7 +77,7 @@ class TestWorkflowType(unittest2.TestCase):
 
             diffs = workflow_type._diff()
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
 
     def test_exists_with_existing_workflow_type(self):
         with patch.object(Layer1, 'describe_workflow_type'):
@@ -140,9 +140,9 @@ class TestWorkflowType(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 6)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_workflow_type_changes_with_identical_workflow_type(self):
         with patch.object(
@@ -167,7 +167,7 @@ class TestWorkflowType(unittest2.TestCase):
 
             diffs = workflow_type.changes
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
 
 
     def test_save_already_existing_type(self):
@@ -258,9 +258,9 @@ class TestWorkflowExecution(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 7)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_workflow_execution__diff_with_identical_workflow_execution(self):
         with patch.object(
@@ -284,7 +284,7 @@ class TestWorkflowExecution(unittest2.TestCase):
 
             diffs = workflow_execution._diff()
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
 
     def test_exists_with_existing_workflow_execution(self):
         with patch.object(Layer1, 'describe_workflow_execution'):
@@ -347,9 +347,9 @@ class TestWorkflowExecution(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 7)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_workflow_execution_changes_with_identical_workflow_execution(self):
         with patch.object(
@@ -373,7 +373,7 @@ class TestWorkflowExecution(unittest2.TestCase):
 
             diffs = workflow_execution.changes
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
 
     def test_history(self):
         with patch.object(

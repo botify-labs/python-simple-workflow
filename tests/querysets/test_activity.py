@@ -7,9 +7,7 @@ from mock import patch
 from boto.swf.layer1 import Layer1
 from boto.exception import SWFResponseError
 
-from swf.credentials import set_aws_credentials
-from swf.exceptions import (ResponseError, DoesNotExistError,
-                            InvalidCredentialsError)
+from swf.exceptions import (ResponseError, DoesNotExistError)
 from swf.models.domain import Domain
 from swf.models.activity import ActivityType
 from swf.querysets.activity import ActivityTypeQuerySet
@@ -17,7 +15,10 @@ from swf.querysets.activity import ActivityTypeQuerySet
 from ..mocks.activity import mock_list_activity_types,\
                            mock_describe_activity_type
 
-set_aws_credentials('fakeaccesskey', 'fakesecretkey')
+import swf.settings
+
+swf.settings.set(aws_access_key_id='fakeaccesskey',
+                 aws_secret_access_key='fakesecret')
 
 
 class TestActivityTypeQuerySet(unittest2.TestCase):

@@ -5,10 +5,9 @@
 #
 # See the file LICENSE for copying permission.
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from swf.core import ConnectedSWFObject
-from swf.utils import immutable
 
 
 Difference = namedtuple('Difference', ('attr', 'local', 'upstream'))
@@ -27,12 +26,17 @@ class ModelDiff(object):
     def __contains__(self, attr):
         return attr in self.container
 
+    def __len__(self):
+        return len(self.container)
+
+    def __getitem__(self, index):
+        attr, (local, upstream) = self.container.items()[index]
+        return Difference(attr, local, upstream)
+
     def _process_input(self, input):
-        return {
-            attr:(local, upstream) for (attr, local, upstream)
-            in input
-            if local != upstream
-        }
+        return OrderedDict((attr, (local, upstream)) for
+                           attr, local, upstream in input if
+                           local != upstream)
 
     def add_input(self, *input):
         """Adds input differing data into ModelDiff instance"""

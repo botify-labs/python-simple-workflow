@@ -4,6 +4,13 @@
 API
 ===
 
+Settings
+========
+
+.. automodule:: swf.settings
+    :members:
+    :inherited-members:
+
 Models
 ======
 

@@ -20,13 +20,23 @@ Installation
 .. _authentication:
 
 
-Authentication
-==============
+Settings
+========
 
-To be able to communicate with Amazon service, the python simple workflow package modules have to be aware of your AWS credentials. Three credentials providing methods are available and evaluated by the module in the following order
+Mandatory:
 
-Credential file
-    a ``.swf`` is seeked in the user's home directory, it's content has to match the following pattern
+- aws_access_key_id
+- aws_secret_access_key
+
+Optional:
+
+- region
+
+
+Settings are found respectively in:
+
+A credential file
+    a ``.swf`` file in the user's home directory:
 
     .. code-block:: ini
 
@@ -34,17 +44,22 @@ Credential file
         aws_access_key_id=<aws_access_key_id>
         aws_secret_access_key=<aws_secret_access_key>
 
-Environment variables
-    python-simple-workflow will check for ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` environment variables to be set to relevant values.
+        [defaults]
+        region=us-east-1
 
-Helper function
-    if neither previous methods were used, you'll still be able to set the global module aws credentials using the ``swf.credentials.set_aws_credentials`` method.
+The following environment variables
+    - `AWS_ACCESS_KEY_ID`
+    - `AWS_SECRET_ACCESS_KEY`
+    - `region`
 
-    .. code-block:: shell
+If neither of the previous methods were used, you can still set the AWS credentials with :meth:`swf.settings.set`:
 
-        >>> from swf.credentials import set_aws_credentials
-        >>> set_aws_credentials('MYAWSACCESSKEYID', 'MYAWSSECRETACCESSKEY')
+.. code-block:: shell
 
+        >>> import swf.settings
+        >>> swf.settings.set(aws_access_key_id='MYAWSACCESSKEYID',
+        ...                  aws_secret_access_key='MYAWSSECRETACCESSKEY',
+        ...                  region='REGION')
         # And then you're good to go...
         >>> queryset = DomainQuery()
         >>> queryset.all()
