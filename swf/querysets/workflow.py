@@ -86,7 +86,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
             **kwargs
         )
 
-    def get(self, name, version):
+    def get(self, name, version, *args, **kwargs):
         """Fetches the Workflow Type with `name` and `version`
 
         :param  name: name of the workflow type
@@ -149,7 +149,8 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
                       child_policy=CHILD_POLICIES.TERMINATE,
                       execution_timeout='300',
                       decision_tasks_timeout='300',
-                      description=None):
+                      description=None,
+                      *args, **kwargs):
         """Fetches, or creates the ActivityType with ``name`` and ``version``
 
         When fetching trying to fetch a matching workflow type, only
@@ -214,7 +215,10 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
     def _list(self, *args, **kwargs):
         return self.connection.list_workflow_types(*args, **kwargs)
 
-    def filter(self, domain=None, registration_status=REGISTERED, name=None):
+    def filter(self, domain=None,
+               registration_status=REGISTERED,
+               name=None,
+               *args, **kwargs):
         """Filters workflows based on the ``domain`` they belong to,
         their ``status``, and/or their ``name``
 
@@ -240,14 +244,14 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         return [self.to_WorkflowType(domain, wf) for wf in
                 self._list_items(domain.name, registration_status, name=name)]
 
-    def all(self, registration_status=REGISTERED):
+    def all(self, registration_status=REGISTERED, *args, **kwargs):
         """Retrieves every Workflow types
 
         :param      registration_status: workflow type registration status to match,
                                  Valid values are:
                                  * ``swf.constants.REGISTERED``
                                  * ``swf.constants.DEPRECATED``
-                                 
+
         :type       registration_status: string
 
         A typical Amazon response looks like:
@@ -286,8 +290,9 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
                child_policy=CHILD_POLICIES.TERMINATE,
                execution_timeout='300',
                decision_tasks_timeout='300',
-               description=None, *args, **kwargs):
-        """Creates a new remote workflow type and returns the 
+               description=None,
+               *args, **kwargs):
+        """Creates a new remote workflow type and returns the
         created WorkflowType model instance.
 
         :param  name: name of the workflow type
@@ -407,7 +412,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             **kwargs
         )
 
-    def get(self, workflow_id, run_id):
+    def get(self, workflow_id, run_id, *args, **kwargs):
         """ """
         try:
             response = self.connection.describe_workflow_execution(
@@ -523,7 +528,8 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         return self.list_workflow_executions(*args, **kwargs)
 
     def all(self, status=WorkflowExecution.STATUS_OPEN,
-            start_oldest_date=30):
+            start_oldest_date=30,
+            *args, **kwargs):
         """Fetch every workflow executions during the last `start_oldest_date`
         days, with `status`
 

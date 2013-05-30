@@ -21,7 +21,7 @@ class DomainQuerySet(BaseQuerySet):
     through a django-queryset like interface
     """
 
-    def get(self, name):
+    def get(self, name, *args, **kwargs):
         """Fetches the Domain with `name`
 
         :param      name:  name of the domain to fetch
@@ -66,7 +66,8 @@ class DomainQuerySet(BaseQuerySet):
     def get_or_create(self, name,
                       status=REGISTERED,
                       description=None,
-                      retention_period=30, *args, **kwargs):
+                      retention_period=30,
+                      *args, **kwargs):
         """Fetches, or creates the Domain with `name`
 
         When fetching trying to fetch a matching domain, only
@@ -98,14 +99,15 @@ class DomainQuerySet(BaseQuerySet):
         except DoesNotExistError:
             return self.create(name, status, description, retention_period)
 
-    def all(self, registration_status=REGISTERED):
+    def all(self, registration_status=REGISTERED,
+            *args, **kwargs):
         """Retrieves every domains
 
         :param      registration_status: domain registration status to match,
                                          Valid values are:
                                          * ``swf.constants.REGISTERED``
                                          * ``swf.constants.DEPRECATED``
-                                         
+
         :type       registration_status: string
 
         A typical Amazon response looks like:
@@ -140,7 +142,8 @@ class DomainQuerySet(BaseQuerySet):
     def create(self, name,
                status=REGISTERED,
                description=None,
-               retention_period=30, *args, **kwargs):
+               retention_period=30,
+               *args, **kwargs):
         """Creates a new remote domain and returns the Domain model instance
 
         :param      name: Name of the domain to register (unique)
