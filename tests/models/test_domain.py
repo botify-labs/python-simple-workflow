@@ -62,9 +62,9 @@ class TestDomain(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 4)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_domain__diff_with_identical_domain(self):
         with patch.object(
@@ -82,7 +82,7 @@ class TestDomain(unittest2.TestCase):
 
             diffs = domain._diff()
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
 
     def test_domain_exists_with_existing_domain(self):
         with patch.object(self.domain.connection, 'describe_domain'):
@@ -141,9 +141,9 @@ class TestDomain(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 4)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_domain_changes_with_identical_domain(self):
         with patch.object(
@@ -161,7 +161,7 @@ class TestDomain(unittest2.TestCase):
 
             diffs = domain.changes
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
 
     def test_domain_save_valid_domain(self):
         with patch.object(self.domain.connection, 'register_domain') as mock:

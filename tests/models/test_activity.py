@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import unittest2
+import collections
 
 from mock import patch
 from boto.swf.layer1 import Layer1
@@ -41,9 +42,9 @@ class TestActivityType(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 10)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_activity_type__diff_with_identical_activity_type(self):
         with patch.object(
@@ -69,7 +70,7 @@ class TestActivityType(unittest2.TestCase):
 
             diffs = activity._diff()
 
-            self.assertEqual(diffs, [])
+            self.assertEquals(len(diffs), 0)
 
     def test_exists_with_existing_activity_type(self):
         with patch.object(Layer1, 'describe_activity_type'):
@@ -132,9 +133,9 @@ class TestActivityType(unittest2.TestCase):
             self.assertIsNotNone(diffs)
             self.assertEqual(len(diffs), 10)
 
-            self.assertTrue(hasattr(diffs[0], 'attribute'))
-            self.assertTrue(hasattr(diffs[0], 'local_value'))
-            self.assertTrue(hasattr(diffs[0], 'remote_value'))
+            self.assertTrue(hasattr(diffs[0], 'attr'))
+            self.assertTrue(hasattr(diffs[0], 'local'))
+            self.assertTrue(hasattr(diffs[0], 'upstream'))
 
     def test_activity_type_changes_with_identical_activity_type(self):
         with patch.object(
@@ -160,4 +161,4 @@ class TestActivityType(unittest2.TestCase):
 
             diffs = activity_type.changes
 
-            self.assertEqual(diffs, [])
+            self.assertEqual(len(diffs), 0)
