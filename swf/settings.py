@@ -22,14 +22,27 @@ def from_stream(stream):
     ... aws_secret_access_key=SECRET
     ...
     ... [defaults]
-    ... region=eu-west-1''')
+    ... region=eu-west-1
     ...
+    ... ''')
     >>> settings = from_stream(stream)
     >>> settings['aws_access_key_id'] == 'KEY_ID'
     True
     >>> settings['aws_secret_access_key'] == 'SECRET'
     True
     >>> settings['region'] == 'eu-west-1'
+    True
+    >>> stream = StringIO('''
+    ...
+    ... [credentials]
+    ... aws_access_key_id=KEY_ID
+    ... aws_secret_access_key=SECRET
+    ...
+    ... ''')
+    >>> settings = from_stream(stream)
+    >>> settings['aws_access_key_id'] == 'KEY_ID'
+    True
+    >>> settings['aws_secret_access_key'] == 'SECRET'
     True
 
     :param      stream: of chars in INI format.
@@ -40,15 +53,23 @@ def from_stream(stream):
     ..note:: some fields may be None.
 
     """
-    config = ConfigParser()
+    config = ConfigParser(allow_no_value=True)
     config.readfp(stream)
 
-    return {'aws_access_key_id': config.get('credentials',
+    settings = {}
+
+    if config.has_section('credentials'):
+        settings.update({
+            'aws_access_key_id': config.get('credentials',
                                             'aws_access_key_id'),
             'aws_secret_access_key': config.get('credentials',
-                                                'aws_secret_access_key'),
-            'region': config.get('defaults', 'region')
-    }
+                                                'aws_secret_access_key')
+        })
+
+    if config.has_section('defaults'):
+        settings['region'] = config.get('defaults', 'region')
+
+    return settings
 
 
 def from_file(path):
