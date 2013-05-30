@@ -2,11 +2,13 @@
 
 import unittest2
 
+import swf.settings
 from swf.models import Domain
 from swf.actors import Actor
-from swf.credentials import set_aws_credentials
 
-set_aws_credentials('fakeaccesskey', 'fakesecret')
+
+swf.settings.set(aws_access_key_id='fakeaccesskey',
+                 aws_secret_access_key='fakesecret')
 
 
 class TestActor(unittest2.TestCase):

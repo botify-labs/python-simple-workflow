@@ -7,7 +7,7 @@ from boto.swf.layer1 import Layer1
 from boto.exception import SWFResponseError
 from boto.swf.exceptions import SWFDomainAlreadyExistsError
 
-from swf.credentials import set_aws_credentials
+import swf.settings
 from swf.constants import REGISTERED, DEPRECATED
 from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
 from swf.models.domain import Domain
@@ -17,7 +17,9 @@ from swf.querysets.workflow import WorkflowTypeQuerySet
 from ..mocks import MiniMock
 from ..mocks.domain import mock_describe_domain
 
-set_aws_credentials('fakeaccesskey', 'fakesecretkey')
+
+swf.settings.set(aws_access_key_id='fakeaccesskey',
+                 aws_secret_access_key='fakesecret')
 
 
 class TestDomain(unittest2.TestCase):

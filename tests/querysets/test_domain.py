@@ -7,7 +7,7 @@ from mock import patch
 from boto.exception import SWFResponseError
 from boto.swf.layer1 import Layer1
 
-from swf.credentials import set_aws_credentials
+import swf.settings
 from swf.exceptions import (ResponseError, DoesNotExistError,
                             InvalidCredentialsError)
 from swf.models.domain import Domain
@@ -15,7 +15,9 @@ from swf.querysets.domain import DomainQuerySet
 
 from ..mocks.domain import mock_describe_domain, mock_list_domains
 
-set_aws_credentials('fakeaccesskey', 'fakesecretkey')
+
+swf.settings.set(aws_access_key_id='fakeaccesskey',
+                 aws_secret_access_key='fakesecret')
 
 
 class TestDomainQuerySet(unittest2.TestCase):
