@@ -5,18 +5,22 @@
 #
 # See the file LICENSE for copying permission.
 
-from boto.swf.layer1 import Layer1
+import boto.swf
 
-from swf.credentials import extract_aws_credentials
+from . import settings
 
-AWS_CREDENTIALS = extract_aws_credentials()
+
+SETTINGS = settings.get()
 
 
 class ConnectedSWFObject(object):
     """Authenticated object interface
 
-    Once inherited, implements the AWS authentication
-    into the child, adding a `connection` property.
+    Provides the instance attributes:
+
+    - `region`: name of the AWS region
+    - `connection`: to the SWF endpoint (`boto.swf.layer1.Layer1` object):
+
     """
     __slots__ = [
         'region',
@@ -24,10 +28,12 @@ class ConnectedSWFObject(object):
     ]
 
     def __init__(self, *args, **kwargs):
-        self.region = kwargs.pop('region', None)
+        settings_ = {k: v for k, v in SETTINGS.iteritems()}
+        settings_.update(kwargs)
 
-        self.connection = Layer1(
-            AWS_CREDENTIALS['aws_access_key_id'],
-            AWS_CREDENTIALS['aws_secret_access_key'],
-            region=self.region
-        )
+        self.region = (settings_.pop('region') or
+                       boto.swf.layer1.Layer1.DefaultRegionName)
+
+        self.connection = boto.swf.connect_to_region(self.region, **settings_)
+        if self.connection is None:
+            raise ValueError('invalid region: {}'.format(self.region))
