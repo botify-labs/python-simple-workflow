@@ -31,7 +31,7 @@ class ConnectedSWFObject(object):
         settings_ = {k: v for k, v in SETTINGS.iteritems()}
         settings_.update(kwargs)
 
-        self.region = (settings_.pop('region') or
+        self.region = (settings_.pop('region', None) or
                        boto.swf.layer1.Layer1.DefaultRegionName)
 
         self.connection = boto.swf.connect_to_region(self.region, **settings_)
