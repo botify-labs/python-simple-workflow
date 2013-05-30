@@ -28,12 +28,15 @@ class ConnectedSWFObject(object):
     ]
 
     def __init__(self, *args, **kwargs):
-        settings_ = {k: v for k, v in SETTINGS.iteritems()}
-        settings_.update(kwargs)
+        settings_ = {key: SETTINGS.get(key, kwargs.get(key)) for key in
+                     ('aws_access_key_id',
+                      'aws_secret_access_key')}
 
-        self.region = (settings_.pop('region', None) or
+        self.region = (SETTINGS.get('region') or
+                       kwargs.get('region') or
                        boto.swf.layer1.Layer1.DefaultRegionName)
 
-        self.connection = boto.swf.connect_to_region(self.region, **settings_)
+        self.connection = (kwargs.pop('connection', None) or
+                           boto.swf.connect_to_region(self.region, **settings_))
         if self.connection is None:
             raise ValueError('invalid region: {}'.format(self.region))
