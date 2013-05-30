@@ -388,7 +388,7 @@ class WorkflowExecution(BaseModel):
 
         return True
 
-    def upsteam(self):
+    def upstream(self):
         from swf.querysets.workflow import WorkflowExecutionQuerySet
         qs = WorkflowExecutionQuerySet(self.domain)
         return qs.get(self.workflow_id, self.run_id)
