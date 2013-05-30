@@ -437,3 +437,37 @@ class WorkflowExecution(BaseModel):
             raise ResponseError(e.body['message'])
 
         return
+
+    def request_cancel(self, *args, **kwargs):
+        """Requests the workflow execution cancel"""
+        try:
+            self.connection.request_cancel_workflow_execution(
+                self.domain.name,
+                self.workflow_id,
+                run_id=self.run_id)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote Domain does not exist")
+
+            raise ResponseError(e.body['message'])
+
+        return
+
+    def terminate(self, *args, **kwargs):
+        """Terminates the workflow execution"""
+        try:
+            self.connection.terminate_workflow_execution(
+                self.domain.name,
+                self.workflow_id,
+                run_id=self.run_id
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Remote Domain does not exist")
+
+            raise ResponseError(e.body['message'])
+
+        return
+
+
+
