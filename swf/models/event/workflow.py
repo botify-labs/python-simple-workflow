@@ -17,6 +17,7 @@ class CompiledWorkflowExecutionEvent(CompiledEvent):
     _type = 'WorkflowExecution'
     states = (
         'started',  # The workflow execution was started
+        'signaled',
         'completed',  # The workflow execution was closed due to successful completion
         'failed',  # The workflow execution closed due to a failure
         'timed_out',  # The workflow execution was closed because a time out was exceeded
@@ -28,6 +29,7 @@ class CompiledWorkflowExecutionEvent(CompiledEvent):
 
     transitions = {
         'started': (
+            'signaled',
             'failed',
             'timed_out',
             'canceled',
