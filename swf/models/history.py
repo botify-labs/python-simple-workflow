@@ -172,7 +172,17 @@ class History(object):
         distinct_events = []
 
         for key, group in groupby(self.events, lambda e: e.type):
-            distinct_events.append(list(group))
+            g = list(group)
+
+            # Merge every WorkflowExecution events into same group
+            if (len(g) == 1 and
+                len(distinct_events) >= 1 and
+                g[0].type == "WorkflowExecution"):
+                # WorfklowExecution group will always be in first position
+                distinct_events[0].extend(g)
+            else:
+                distinct_events.append(list(g))
+
 
         return distinct_events
 
@@ -211,14 +221,14 @@ class History(object):
     def from_event_list(cls, data):
         """Instantiates a new ``swf.models.history.History`` instance
         from amazon service response.
-        
+
         Every member of the History are ``swf.models.event.Event``
         subclasses instances, exposing their type, state, and so on to
         facilitate decisions according to the history.
-        
+
         :param  data: event history description (typically, an amazon response)
         :type   data: dict
-        
+
         :returns: History model instance built upon data description
         :rtype : swf.model.event.History
         """
