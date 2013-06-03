@@ -8,6 +8,7 @@
 from collections import namedtuple, OrderedDict
 
 from swf.core import ConnectedSWFObject
+from swf.exceptions import DoesNotExistError
 
 
 Difference = namedtuple('Difference', ('attr', 'local', 'upstream'))
@@ -55,7 +56,7 @@ class ModelDiff(object):
         swf.models.base.Difference namedtuple
         """
         return [
-            Difference(k, v[0], v[1]) for k,v
+            Difference(k, v[0], v[1]) for k, v
             in self.container.iteritems()
         ]
 
