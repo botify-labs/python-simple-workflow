@@ -7,7 +7,8 @@
 
 
 class PollTimeout(Exception):
-	pass
+    pass
+
 
 class InvalidCredentialsError(Exception):
     pass
