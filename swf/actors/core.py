@@ -2,7 +2,6 @@
 
 from swf.core import ConnectedSWFObject
 from swf.models import Domain
-from swf.utils import Enum
 
 
 class Actor(ConnectedSWFObject):

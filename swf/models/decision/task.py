@@ -5,7 +5,6 @@
 #
 # See the file LICENSE for copying permission.
 
-from swf.models.workflow import CHILD_POLICIES
 from swf.models.decision.base import Decision, decision_action
 
 

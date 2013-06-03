@@ -10,7 +10,6 @@ from boto.swf.exceptions import SWFResponseError, SWFDomainAlreadyExistsError
 from swf.constants import REGISTERED
 from swf.models import BaseModel
 from swf.models.base import ModelDiff
-from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 from swf.exceptions import (AlreadyExistsError, DoesNotExistError,
                             ResponseError)
@@ -75,7 +74,7 @@ class Domain(BaseModel):
         domain_info = description['domainInfo']
         domain_config = description['configuration']
 
-        return  ModelDiff(
+        return ModelDiff(
             ('name', self.name, domain_info['name']),
             ('status', self.status, domain_info['status']),
             ('description', self.description, domain_info.get('description')),
@@ -89,7 +88,7 @@ class Domain(BaseModel):
         :rtype: bool
         """
         try:
-            description = self.connection.describe_domain(self.name)
+            self.connection.describe_domain(self.name)
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 return False

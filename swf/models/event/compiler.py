@@ -80,7 +80,6 @@ class CompiledEvent(Event, Stateful):
         """
         return self.transitions[self.state]
 
-
     def transit(self, event):
         """Tries to apply CompiledEvent transition to the provided ``event``
         state

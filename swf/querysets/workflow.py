@@ -9,11 +9,11 @@ from boto.swf.exceptions import SWFResponseError
 
 from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
-from swf.models.workflow import WorkflowType, WorkflowExecution,\
-                                CHILD_POLICIES
+from swf.models.workflow import (WorkflowType, WorkflowExecution,
+                                 CHILD_POLICIES)
 from swf.utils import datetime_timestamp, past_day, get_subkey
-from swf.exceptions import ResponseError, DoesNotExistError,\
-                           InvalidKeywordArgumentError
+from swf.exceptions import (ResponseError, DoesNotExistError,
+                            InvalidKeywordArgumentError)
 
 
 class BaseWorkflowQuerySet(BaseQuerySet):
@@ -210,7 +210,6 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
                 decision_tasks_timeout=decision_tasks_timeout,
                 description=description,
             )
-
 
     def _list(self, *args, **kwargs):
         return self.connection.list_workflow_types(*args, **kwargs)

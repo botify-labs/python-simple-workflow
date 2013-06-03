@@ -11,19 +11,19 @@ import collections
 from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.constants import REGISTERED
-from swf.core import ConnectedSWFObject
 from swf.utils import immutable
 from swf.models import BaseModel
 from swf.models.history import History
 from swf.models.base import ModelDiff
-from swf.exceptions import DoesNotExistError, AlreadyExistsError,\
-                           ResponseError
+from swf.exceptions import (DoesNotExistError, AlreadyExistsError,
+                            ResponseError)
 
 
-_POLICIES = ('TERMINATE',       # child executions will be terminated
-             'REQUEST_CANCEL',  # a request to cancel will be attempted for
-                                # each child execution
-             'ABANDON',         # no action will be taken
+_POLICIES = (
+    'TERMINATE',       # child executions will be terminated
+    'REQUEST_CANCEL',  # a request to cancel will be attempted for
+    # each child execution
+    'ABANDON',         # no action will be taken
 )
 
 CHILD_POLICIES = collections.namedtuple('CHILD_POLICY',
@@ -163,7 +163,7 @@ class WorkflowType(BaseModel):
         :rtype: bool
         """
         try:
-            description = self.connection.describe_workflow_type(
+            self.connection.describe_workflow_type(
                 self.domain.name,
                 self.name,
                 self.version
@@ -360,9 +360,9 @@ class WorkflowExecution(BaseModel):
         return ModelDiff(
             ('workflow_id', self.workflow_id, execution_info['execution']['workflowId']),
             ('run_id', self.run_id, execution_info['execution']['runId']),
-            ('status',  self.status, execution_info['executionStatus']),
+            ('status', self.status, execution_info['executionStatus']),
             ('task_list', self.task_list, execution_config['taskList']['name']),
-            ('child_policy',  self.child_policy, execution_config['childPolicy']),
+            ('child_policy', self.child_policy, execution_config['childPolicy']),
             ('execution_timeout', self.execution_timeout, execution_config['executionStartToCloseTimeout']),
             ('tag_list', self.tag_list, execution_info.get('tagList')),
             ('decision_tasks_timeout', self.decision_tasks_timeout, execution_config['taskStartToCloseTimeout']),
@@ -375,7 +375,7 @@ class WorkflowExecution(BaseModel):
         :rtype: bool
         """
         try:
-            description = self.connection.describe_workflow_execution(
+            self.connection.describe_workflow_execution(
                 self.domain.name,
                 self.run_id,
                 self.workflow_id
@@ -468,6 +468,3 @@ class WorkflowExecution(BaseModel):
             raise ResponseError(e.body['message'])
 
         return
-
-
-

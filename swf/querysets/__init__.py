@@ -2,5 +2,5 @@
 
 from swf.querysets.activity import ActivityTypeQuerySet
 from swf.querysets.domain import DomainQuerySet
-from swf.querysets.workflow import WorkflowTypeQuerySet,\
-								   WorkflowExecutionQuerySet
+from swf.querysets.workflow import (WorkflowTypeQuerySet,
+                                    WorkflowExecutionQuerySet)

@@ -36,7 +36,7 @@ from swf.utils import camel_to_underscore, decapitalize
 
 EVENTS = {
     'WorkflowExecution': {
-        'event':  WorkflowExecutionEvent,
+        'event': WorkflowExecutionEvent,
         'compiled_event': CompiledWorkflowExecutionEvent,
     },
     'DecisionTask': {
@@ -94,7 +94,6 @@ class EventFactory(object):
     :type   raw_event: dict
 
     :returns: ``swf.models.event.Event`` subclass instance
-    
     """
 
     # eventType to Event subclass bindings
@@ -133,19 +132,17 @@ class EventFactory(object):
         for name in klass.events.iterkeys():
             splitted = event_name.partition(name)
 
-            if len(splitted) == 2:
-                if splitted[0] ==  name:
-                    return name
-            elif len(splitted) == 3:
-                if splitted[1] == name:
-                    return name
+            length = len(splitted)
+
+            if ((length == 2 and splitted[0] == name) or
+                    (length == 3 and splitted[1] == name)):
+                return name
 
         return
 
     @classmethod
     def _extract_event_state(klass, event_type, event_name):
         """Extracts event state from raw event type and name"""
-        status = None
         partitioned = event_name.partition(event_type)
 
         if len(partitioned) == 2:
@@ -163,7 +160,6 @@ class CompiledEventFactory(object):
 
     def __new__(cls, event):
         event_type = event.type
-        event_state = event.state
 
         klass = cls.events[event_type]['compiled_event']
         instance = klass(event)

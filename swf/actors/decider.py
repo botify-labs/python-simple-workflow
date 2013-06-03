@@ -3,7 +3,6 @@
 from swf.models.history import History
 from swf.actors.core import Actor
 from swf.exceptions import PollTimeout
-from swf.models.decision.task import ActivityTaskDecision
 
 
 class Decider(Actor):

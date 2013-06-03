@@ -45,7 +45,6 @@ class WorkflowExecutionDecision(Decision):
             'reason': reason
         })
 
-
     @decision_action
     def continue_as_new(self, child_policy=CHILD_POLICIES.TERMINATE,
                         execution_timeout='300', task_timeout='300',

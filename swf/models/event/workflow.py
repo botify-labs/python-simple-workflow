@@ -59,9 +59,9 @@ class CompiledChildWorkflowExecutionEvent(CompiledEvent):
 
     states = (
         'start_initiated',  # A request was made to start a child workflow execution
-        'start_failed',  #  Failed to process start decision
+        'start_failed',  # Failed to process start decision
         'started',  # successfully started
-        'completed',  #  started by this workflow execution, completed successfully and was closed
+        'completed',  # started by this workflow execution, completed successfully and was closed
         'failed',  # started by this workflow execution, failed to complete successfully and was closed
         'timed_out',  # started by this workflow execution, timed out and was closed
         'canceled',  # started by this workflow execution, was canceled and closed
@@ -88,7 +88,7 @@ class CompiledExternalWorkflowExecutionEvent(CompiledEvent):
         'signal_initiated',  # A request to signal an external workflow was made
         'signaled',  # A signal, requested by this workflow execution, was successfully delivered to the target external workflow execution
         'signal_failed',  # The request to signal an external workflow execution failed
-        'request_cancel_initiated',  #  A request was made to request the cancellation of an external workflow execution
+        'request_cancel_initiated',  # A request was made to request the cancellation of an external workflow execution
         'cancel_requested',  # Request to cancel an external workflow execution was successfully delivered to the target execution
         'request_cancel_failed',  # Request to cancel an external workflow execution failed
     )

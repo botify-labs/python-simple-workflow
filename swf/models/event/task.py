@@ -18,7 +18,7 @@ class CompiledActivityTaskEvent(CompiledEvent):
     states = (
         'scheduled',  # An activity task was scheduled for execution
         'schedule_failed',  # Failed to process schedule decision
-        'started',  #  The scheduled activity task was dispatched to a worker
+        'started',  # The scheduled activity task was dispatched to a worker
         'completed',  # An activity worker successfully completed an activity task
         'failed',  # An activity worker failed an activity task
         'timed_out',  # The activity task timed out
@@ -39,6 +39,7 @@ class CompiledActivityTaskEvent(CompiledEvent):
     }
 
     initial_state = 'scheduled'
+
 
 class DecisionTaskEvent(Event):
     _type = 'DecisionTask'

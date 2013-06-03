@@ -4,6 +4,7 @@ from swf.actors import Actor
 from swf.models import ActivityTask
 from swf.exceptions import PollTimeout
 
+
 class ActivityWorker(Actor):
     """Activity task worker actor implementation
 

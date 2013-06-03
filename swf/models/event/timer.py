@@ -18,9 +18,9 @@ class CompiledTimerEvent(CompiledEvent):
 
     states = (
         'started',  # A timer was started for the workflow execution
-        'start_failed',  #  Failed to process StartTimer decision
+        'start_failed',  # Failed to process StartTimer decision
         'fired',  # A timer, previously started for this workflow execution, fired
-        'canceled',  #  A timer, previously started for this workflow execution, was successfully canceled
+        'canceled',  # A timer, previously started for this workflow execution, was successfully canceled
         'cancel_failed',  # Failed to process CancelTimer decision
 
     )

@@ -8,7 +8,7 @@
 from itertools import groupby
 
 from swf.models.event import EventFactory, CompiledEventFactory
-from swf.utils import decapitalize, cached_property
+from swf.utils import cached_property
 
 
 class History(object):
@@ -99,7 +99,6 @@ class History(object):
             raise StopIteration
         return next_event
 
-
     @property
     def last(self):
         """Returns the last stored event
@@ -159,7 +158,7 @@ class History(object):
         :rtype: swf.models.history.History
         """
         return filter(
-            lambda e: all(getattr(e, k) == v for k,v in kwargs.iteritems()),
+            lambda e: all(getattr(e, k) == v for k, v in kwargs.iteritems()),
             self.events
         )
 
@@ -177,12 +176,11 @@ class History(object):
             # Merge every WorkflowExecution events into same group
             if (len(g) == 1 and
                 len(distinct_events) >= 1 and
-                g[0].type == "WorkflowExecution"):
+                    g[0].type == "WorkflowExecution"):
                 # WorfklowExecution group will always be in first position
                 distinct_events[0].extend(g)
             else:
                 distinct_events.append(list(g))
-
 
         return distinct_events
 
