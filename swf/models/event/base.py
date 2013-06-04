@@ -5,6 +5,8 @@
 #
 # See the file LICENSE for copying permission.
 
+import json
+
 from datetime import datetime
 
 from swf.utils import camel_to_underscore, cached_property
@@ -56,6 +58,7 @@ class Event(object):
         self._id = id
         self._state = state
         self._timestamp = timestamp
+        self._input = {}
         self.raw = raw_data or {}
 
         self.process_attributes()
@@ -82,6 +85,14 @@ class Event(object):
     @cached_property
     def timestamp(self):
         return datetime.fromtimestamp(self._timestamp)
+
+    @property
+    def input(self):
+        return self._input
+
+    @input.setter
+    def input(self, value):
+        self._input = json.loads(value)
 
     def process_attributes(self):
         """Processes the event raw_data attributes_key elements
