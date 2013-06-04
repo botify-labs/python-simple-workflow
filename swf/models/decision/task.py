@@ -5,6 +5,8 @@
 #
 # See the file LICENSE for copying permission.
 
+import json
+
 from swf.models.decision.base import Decision, decision_action
 
 
@@ -43,7 +45,7 @@ class ActivityTaskDecision(Decision):
         :type   heartbeat_timeout: String
 
         :param  input: input provided to the activity task
-        :type   input: String
+        :type   input: dict
 
         :param  duration_timeout: Maximum duration for this activity task
         :type   duration_timeout: String
@@ -57,6 +59,8 @@ class ActivityTaskDecision(Decision):
         :param  : Specifies the name of the task list in which to schedule the activity task
         :type   :str
         """
+        input = json.dumps(input) or None
+
         self.update_attributes({
             'activityId': activity_id,
             'activityType': {

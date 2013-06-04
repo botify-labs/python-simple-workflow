@@ -6,6 +6,7 @@
 # See the file LICENSE for copying permission.
 
 import time
+import json
 import collections
 
 from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
@@ -22,7 +23,7 @@ from swf.exceptions import (DoesNotExistError, AlreadyExistsError,
 _POLICIES = (
     'TERMINATE',       # child executions will be terminated
     'REQUEST_CANCEL',  # a request to cancel will be attempted for
-    # each child execution
+                       # each child execution
     'ABANDON',         # no action will be taken
 )
 
@@ -224,13 +225,13 @@ class WorkflowType(BaseModel):
                               of this workflow execution.
         :type   child_policy: CHILD_POLICIES.{TERMINATE |
                                               REQUEST_CANCEL |
-                                              ABANDON}
+                                        ABANDON}
 
         :param  execution_timeout: maximum duration for the workflow execution
         :type   execution_timeout: String
 
         :param  input: Input of the workflow execution
-        :type   input: String
+        :type   input: dict
 
         :param  tag_list: Tags associated with the workflow execution
         :type   tag_list: String
@@ -242,6 +243,7 @@ class WorkflowType(BaseModel):
         workflow_id = workflow_id or '%s-%s-%i' % (self.name, self.version, time.time())
         task_list = task_list or self.task_list
         child_policy = child_policy or self.child_policy
+        input = json.dumps(input) or None
 
         run_id = self.connection.start_workflow_execution(
             self.domain.name,
@@ -287,6 +289,14 @@ class WorkflowExecution(BaseModel):
     :param  status: Whether the WorkflowExecution instance represents an opened or
                     closed execution
     :type   status: String constant
+
+    :param  task_list: The task list to use for the decision tasks generated
+                       for this workflow execution.
+    :type   task_list: string
+
+    :param  input: input data of the execution, which will be passed around using
+                   serialized json
+    :type   input: dict
     """
     STATUS_OPEN = "OPEN"
     STATUS_CLOSED = "CLOSED"
@@ -421,14 +431,16 @@ class WorkflowExecution(BaseModel):
 
         :param  input: Data to attach to the WorkflowExecutionSignaled
                        event in the target workflow execution’s history.
-        :type   input: str
+        :type   input: dict
         """
+        input = json.dumps(input) or None
+
         try:
             self.connection.signal_workflow_execution(
                 self.domain.name,
                 signal_name,
                 self.workflow_id,
-                input=input,
+                input=json.dumps(input),
                 run_id=self.run_id)
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':

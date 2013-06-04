@@ -5,6 +5,8 @@
 #
 # See the file LICENSE for copying permission.
 
+import json
+
 from swf.models.workflow import CHILD_POLICIES
 from swf.models.decision.base import Decision, decision_action
 
@@ -59,7 +61,7 @@ class WorkflowExecutionDecision(Decision):
         :type   execution_timeout: str
 
         :param  input: The input provided to the new workflow execution
-        :type   input: str
+        :type   input: dict
 
         :param  tag_list: list of tags to associate with the new workflow execution
         :type   tag_list: list
@@ -73,6 +75,7 @@ class WorkflowExecutionDecision(Decision):
         :param  workflow_type_version: workflow type version the execution shold belong to
         :type   workflow_type_version: str
         """
+        input = json.dumps(input) or None
         self.update_attributes({
             'childPolicy': child_policy,
             'executionStartToCloseTimeout': execution_timeout,
@@ -116,6 +119,8 @@ class ChildWorkflowExecutionDecision(Decision):
         :param  workflow_type_version: workflow type version the execution shold belong to
         :type   workflow_type_version: str
         """
+        input = json.dumps(input) or None
+
         self.update_attributes({
             'childPolicy': child_policy,
             'executionStartToCloseTimeout': execution_timeout,
@@ -172,6 +177,8 @@ class ExternalWorkflowExecutionDecision(Decision):
         :param  run_id: run id of the workflow execution to be signaled
         :type   run_id: str
         """
+        input = json.dumps(input) or None
+
         self.update_attributes({
             'signalName': signal_name,
             'workflowId': workflow_id,
