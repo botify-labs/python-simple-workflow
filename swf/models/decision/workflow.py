@@ -76,6 +76,7 @@ class WorkflowExecutionDecision(Decision):
         :type   workflow_type_version: str
         """
         input = json.dumps(input) or None
+
         self.update_attributes({
             'childPolicy': child_policy,
             'executionStartToCloseTimeout': execution_timeout,
