@@ -163,6 +163,11 @@ class History(object):
         )
 
     @property
+    def reversed(self):
+        for i in xrange(len(self.events) - 1, -1, -1):
+            yield self.events[i]
+
+    @property
     def distinct(self):
         """Extracts distinct history events based on their types
 
