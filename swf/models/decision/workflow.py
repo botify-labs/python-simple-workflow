@@ -92,11 +92,16 @@ class ChildWorkflowExecutionDecision(Decision):
     _base_type = 'ChildWorkflowExecution'
 
     @decision_action
-    def start(self, child_policy=CHILD_POLICIES.TERMINATE,
+    def start(self, workflow_type, workflow_id, child_policy=CHILD_POLICIES.TERMINATE,
               execution_timeout='300', task_timeout='300',
-              input=None, tag_list=None, task_list=None,
-              workflow_type_version=None):
+              input=None, tag_list=None, task_list=None):
         """Child workflow execution decision builder
+
+        :param  workflow_type: workflow type to start
+        :type   workflow_type: str
+
+        :param  workflow_id: unique id to recognize the workflow execution
+        :type   workflow_id: str
 
         :param  child_policy: specifies the policy to use for the
                               child workflow executions
@@ -117,8 +122,6 @@ class ChildWorkflowExecutionDecision(Decision):
         :param  task_timeout: maximum duration of decision tasks for the child workflow execution
         :type   task_timeout: str
 
-        :param  workflow_type_version: workflow type version the execution shold belong to
-        :type   workflow_type_version: str
         """
         input = json.dumps(input) or None
 
@@ -128,8 +131,14 @@ class ChildWorkflowExecutionDecision(Decision):
             'taskStartToCloseTimeout': task_timeout,
             'input': input,
             'tagList': tag_list,
-            'taskList': task_list,
-            'workflowTypeVersion': workflow_type_version,
+            'taskList': {
+                'name': task_list,
+            },
+            'workflowId': workflow_id,
+            'workflowType': {
+                'name': workflow_type.name,
+                'version': workflow_type.version,
+            }
         })
 
 
