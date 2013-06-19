@@ -228,7 +228,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
         # name, domain filter is disposable, but not mandatory.
         domain = domain or self.domain
         return [self.to_ActivityType(domain, activity_type) for activity_type in
-                self._list_items(domain.name, registration_status, name=name)]
+                self._list(domain.name, registration_status, name=name)]
 
     def all(self, registration_status=REGISTERED,
             *args, **kwargs):
