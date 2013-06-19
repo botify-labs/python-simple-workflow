@@ -64,7 +64,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
         )
 
     def _list(self, *args, **kwargs):
-        return self.connection.list_workflow_types(*args, **kwargs)
+        return self.connection.list_activity_types(*args, **kwargs)['typeInfos']
 
     def get(self, name, version, *args, **kwargs):
         """Fetches the activity type with provided ``name`` and ``version``
@@ -227,7 +227,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
         """
         # name, domain filter is disposable, but not mandatory.
         domain = domain or self.domain
-        return [self.to_ActivityType(domain, activity_type) for activity_type in
+        return [self.to_ActivityType(domain, type_info) for type_info in
                 self._list(domain.name, registration_status, name=name)]
 
     def all(self, registration_status=REGISTERED,
