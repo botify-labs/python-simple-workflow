@@ -194,7 +194,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
         :rtype: ActivityType
         """
         try:
-            return self.get(name, version)
+            return self.get(name, version, *args, **kwargs)
         except DoesNotExistError:
             return self.create(
                 name,
