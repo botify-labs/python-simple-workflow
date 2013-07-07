@@ -119,10 +119,16 @@ class ActivityTypeQuerySet(BaseQuerySet):
             self.domain,
             activity_info,
             task_list=get_subkey(activity_config, ['defaultTaskList', 'name']),  # Avoid non-existing task-list
-            task_heartbeat_timeout=activity_config.get('defaultTaskHeartbeatTimeout'),
-            task_schedule_to_close_timeout=activity_config.get('defaultTaskScheduleToCloseTimeout'),
-            task_schedule_to_start_timeout=activity_config.get('defaultTaskScheduleToStartTimeout'),
-            task_start_to_close_timeout=activity_config.get('defaultTaskStartToCloseTimeout'),
+            task_heartbeat_timeout=(kwargs.get('task_heartbeat_timeout') or
+                                    activity_config.get(
+                                        'defaultTaskHeartbeatTimeout')),
+            task_schedule_to_close_timeout=(kwargs.get('task_schedule_to-close_timeout') or
+                                            activity_config.get(
+                                                'defaultTaskScheduleToCloseTimeout')),
+            task_schedule_to_start_timeout=(kwargs.get('task_schedule_to_start_timeout') or
+                                            activity_config.get('defaultTaskScheduleToStartTimeout')),
+            task_start_to_close_timeout=(kwargs.get('task_start_to_close_timeout') or
+                                         activity_config.get('defaultTaskStartToCloseTimeout')),
         )
 
     def get_or_create(self, name, version,
