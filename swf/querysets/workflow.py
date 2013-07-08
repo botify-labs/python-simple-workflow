@@ -132,13 +132,36 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         wt_info = response[self._infos]
         wt_config = response['configuration']
 
+        task_list = kwargs.get('task_list')
+        if task_list is None:
+            task_list = get_subkey(wt_config, ['defaultTaskList', 'name'])
+
+        child_policy = kwargs.get('child_policy')
+        if child_policy is None:
+            child_policy = wt_config.get('defaultChildPolicy'),
+
+        decision_task_timeout = kwargs.get('decision_task_timeout')
+        if decision_task_timeout is None:
+            decision_task_timeout = wt_config.get(
+                'defaultTaskStartToCloseTimeout')
+
+        execution_timeout = kwargs.get('execution_timeout')
+        if execution_timeout is None:
+            execution_timeout = wt_config.get(
+                'defaultExecutionStartToCloseTimeout')
+
+        decision_tasks_timeout = kwargs.get('decision_tasks_timeout')
+        if decision_tasks_timeout is None:
+            decision_tasks_timeout = wt_config.get(
+                'defaultTaskStartToCloseTimeout')
+
         return self.to_WorkflowType(
             self.domain,
             wt_info,
-            task_list=get_subkey(wt_config, ['defaultTaskList', 'name']),  # Avoid non-existing task-list
-            child_policy=wt_config.get('defaultChildPolicy'),
-            execution_timeout=wt_config.get('defaultExecutionStartToCloseTimeout'),
-            decision_task_timeout=wt_config.get('defaultTaskStartToCloseTimeout'),
+            task_list=task_list,
+            child_policy=child_policy,
+            execution_timeout=execution_timeout,
+            decision_tasks_timeout=decision_tasks_timeout,
         )
 
     def get_or_create(self, name, version,
@@ -196,7 +219,13 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
         :rtype: WorkflowType
         """
         try:
-            return self.get(name, version)
+            return self.get(name,
+                            version,
+                            task_list=task_list,
+                            child_policy=child_policy,
+                            execution_timeout=execution_timeout,
+                            decision_tasks_timeout=decision_tasks_timeout)
+
         except DoesNotExistError:
             return self.create(
                 name,
