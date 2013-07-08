@@ -115,20 +115,40 @@ class ActivityTypeQuerySet(BaseQuerySet):
         activity_info = response[self._infos]
         activity_config = response['configuration']
 
+        task_list = kwargs.get('task_list')
+        if task_list is None:
+            task_list = get_subkey(activity_config, ['defaultTaskList', 'name'])
+
+        task_heartbeat_timeout = kwargs.get('task_heartbeat_timeout')
+        if task_heartbeat_timeout is None:
+            task_heartbeat_timeout = activity_config.get(
+                'defaultTaskHeartbeatTimeout')
+
+        task_schedule_to_close_timeout = kwargs.get(
+            'task_schedule_to_close_timeout')
+        if task_schedule_to_close_timeout is None:
+            task_schedule_to_close_timeout = activity_config.get(
+                'defaultTaskScheduleToCloseTimeout')
+
+        task_schedule_to_start_timeout = kwargs.get(
+            'task_schedule_to_start_timeout')
+        if task_schedule_to_start_timeout is None:
+            task_schedule_to_start_timeout = activity_config.get(
+                'defaultTaskScheduleToStartTimeout')
+
+        task_start_to_close_timeout = kwargs.get('task_start_to_close_timeout')
+        if task_start_to_close_timeout is None:
+            task_start_to_close_timeout = activity_config.get(
+                'defaultTaskStartToCloseTimeout')
+
         return self.to_ActivityType(
             self.domain,
             activity_info,
-            task_list=get_subkey(activity_config, ['defaultTaskList', 'name']),  # Avoid non-existing task-list
-            task_heartbeat_timeout=(kwargs.get('task_heartbeat_timeout') or
-                                    activity_config.get(
-                                        'defaultTaskHeartbeatTimeout')),
-            task_schedule_to_close_timeout=(kwargs.get('task_schedule_to-close_timeout') or
-                                            activity_config.get(
-                                                'defaultTaskScheduleToCloseTimeout')),
-            task_schedule_to_start_timeout=(kwargs.get('task_schedule_to_start_timeout') or
-                                            activity_config.get('defaultTaskScheduleToStartTimeout')),
-            task_start_to_close_timeout=(kwargs.get('task_start_to_close_timeout') or
-                                         activity_config.get('defaultTaskStartToCloseTimeout')),
+            task_list=task_list,
+            task_heartbeat_timeout=task_heartbeat_timeout,
+            task_schedule_to_close_timeout=task_schedule_to_close_timeout,
+            task_schedule_to_start_timeout=task_schedule_to_start_timeout,
+            task_start_to_close_timeout=task_start_to_close_timeout,
         )
 
     def get_or_create(self, name, version,
@@ -194,7 +214,14 @@ class ActivityTypeQuerySet(BaseQuerySet):
         :rtype: ActivityType
         """
         try:
-            return self.get(name, version, *args, **kwargs)
+            return self.get(name,
+                            version,
+                            task_list=task_list,
+                            task_heartbeat_timeout=task_heartbeat_timeout,
+                            task_schedule_to_close_timeout=task_schedule_to_close_timeout,
+                            task_schedule_to_start_timeout=task_schedule_to_start_timeout,
+                            task_start_to_close_timeout=task_start_to_close_timeout,
+                            *args, **kwargs)
         except DoesNotExistError:
             return self.create(
                 name,
