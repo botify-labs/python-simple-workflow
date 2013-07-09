@@ -138,7 +138,7 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
 
         child_policy = kwargs.get('child_policy')
         if child_policy is None:
-            child_policy = wt_config.get('defaultChildPolicy'),
+            child_policy = wt_config.get('defaultChildPolicy')
 
         decision_task_timeout = kwargs.get('decision_task_timeout')
         if decision_task_timeout is None:
