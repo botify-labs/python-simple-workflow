@@ -93,7 +93,7 @@ class ChildWorkflowExecutionDecision(Decision):
 
     @decision_action
     def start(self, workflow_type, workflow_id, child_policy=CHILD_POLICIES.TERMINATE,
-              execution_timeout='300', task_timeout='300',
+              execution_timeout='300', task_timeout='300', control=None,
               input=None, tag_list=None, task_list=None):
         """Child workflow execution decision builder
 
@@ -129,6 +129,7 @@ class ChildWorkflowExecutionDecision(Decision):
             'childPolicy': child_policy,
             'executionStartToCloseTimeout': execution_timeout,
             'taskStartToCloseTimeout': task_timeout,
+            'control': control,
             'input': input,
             'tagList': tag_list,
             'taskList': {
