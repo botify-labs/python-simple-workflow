@@ -271,7 +271,6 @@ class TestWorkflowExecution(unittest2.TestCase):
             mocked = mock_describe_workflow_execution()
             workflow_execution = WorkflowExecution(
                 self.domain,
-                self.wt,
                 mocked['executionInfo']['execution']['workflowId'],
                 run_id=mocked['executionInfo']['execution']['runId'],
                 status=mocked['executionInfo']['executionStatus'],
@@ -360,7 +359,6 @@ class TestWorkflowExecution(unittest2.TestCase):
             mocked = mock_describe_workflow_execution()
             workflow_execution = WorkflowExecution(
                 self.domain,
-                self.wt,
                 mocked['executionInfo']['execution']['workflowId'],
                 run_id=mocked['executionInfo']['execution']['runId'],
                 status=mocked['executionInfo']['executionStatus'],
