@@ -322,7 +322,7 @@ class WorkflowExecution(BaseModel):
         'decision_tasks_timeout',
     ]
 
-    def __init__(self, domain, workflow_type,
+    def __init__(self, domain,
                  workflow_id, run_id=None,
                  status=STATUS_OPEN, task_list=None,
                  child_policy=None, execution_timeout=None,
