@@ -432,7 +432,6 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
     def to_WorkflowExecution(self, domain, execution_info, **kwargs):
         return WorkflowExecution(
             domain,
-            self.get_workflow_type(execution_info),  # workflow_type
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
             status=execution_info.get('executionStatus'),
