@@ -16,13 +16,16 @@ class Heart(threading.Thread):
 
     :param  heartbeat_interval: interval between each heartbeats (in seconds)
     :type   heartbeat_interval: integer
+
+    :param  closure_args: feel free to provide arguments to your heartbeating closure
     """
 
-    def __init__(self, heartbeating_closure,
+    def __init__(self, heartbeating_closure, closure_args,
                  heartbeat_interval, *args, **kwargs):
         threading.Thread.__init__(self)
 
         self.heartbeating_closure = heartbeating_closure
+        self.closure_args = closure_args
         self.heartbeat_interval = heartbeat_interval
         self.keep_beating = True
 
@@ -35,5 +38,5 @@ class Heart(threading.Thread):
 
     def run(self):
         while self.keep_beating is True:
-            self.heartbeating_closure()
+            self.heartbeating_closure(self.closure_args)
             time.sleep(self.heartbeat_interval)
