@@ -4,28 +4,30 @@ import time
 import threading
 
 
-class Heart(threading.Thread):
+class Heartbeater(threading.Thread):
     """Implementation of an heart beating routine
 
     To be used by actors to send swf heartbeats notifications
     once in a while.
 
-    :param  heartbeating_closure: Function to be called on heart
+    :param  heartbeat_closure: Function to be called on heart
                                   beat tick. It takes not argument as input
-    :type   heartbeating_closure: function
+    :type   heartbeat_closure: function
+
+    :param  task_token: task token the heartbeat is attached to
+    :type   task_token: string
 
     :param  heartbeat_interval: interval between each heartbeats (in seconds)
     :type   heartbeat_interval: integer
-
-    :param  closure_args: feel free to provide arguments to your heartbeating closure
     """
-
-    def __init__(self, heartbeating_closure, closure_args,
-                 heartbeat_interval, *args, **kwargs):
+    def __init__(self, heartbeat_closure,
+                 heartbeat_interval,
+                 task_token=None,
+                 *args, **kwargs):
         threading.Thread.__init__(self)
 
-        self.heartbeating_closure = heartbeating_closure
-        self.closure_args = closure_args
+        self.heartbeat_closure = heartbeat_closure
+        self.task_token = task_token
         self.heartbeat_interval = heartbeat_interval
         self.keep_beating = True
 
@@ -37,6 +39,10 @@ class Heart(threading.Thread):
         self.keep_beating = False
 
     def run(self):
+        if not self.task_token:
+            raise ValueError("Canno't start heartbeating without a "
+                             "task_token set")
+
         while self.keep_beating is True:
-            self.heartbeating_closure(self.closure_args)
+            self.heartbeat_closure(self.task_token)
             time.sleep(self.heartbeat_interval)
