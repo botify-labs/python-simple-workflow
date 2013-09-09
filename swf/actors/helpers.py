@@ -1,48 +1,55 @@
 #! -*- coding:utf-8 -*-
 
-import time
 import threading
 
 
-class Heartbeater(threading.Thread):
-    """Implementation of an heart beating routine
+class Every(object):
+    def __init__(self, nseconds, call, *args, **kwargs):
+        self.nseconds = nseconds
+        self._call = call
+        self._args = args
+        self._kwargs = kwargs
+        self._is_stopped = threading.Event()
+        self._thread = None
 
-    To be used by actors to send swf heartbeats notifications
-    once in a while.
+    def __call__(self):
+        def repeat():
+            while not self._is_stopped.wait(self.nseconds):
+                if self._is_stopped.is_set():
+                    return
 
-    :param  heartbeat_closure: Function to be called on heart
-                                  beat tick. It takes not argument as input
-    :type   heartbeat_closure: function
+                self._call(*self._args, **self._kwargs)
 
-    :param  task_token: task token the heartbeat is attached to
-    :type   task_token: string
-
-    :param  heartbeat_interval: interval between each heartbeats (in seconds)
-    :type   heartbeat_interval: integer
-    """
-    def __init__(self, heartbeat_closure,
-                 heartbeat_interval,
-                 task_token=None,
-                 *args, **kwargs):
-        threading.Thread.__init__(self)
-
-        self.heartbeat_closure = heartbeat_closure
-        self.task_token = task_token
-        self.heartbeat_interval = heartbeat_interval
-        self.keep_beating = True
+        self._thread = threading.Thread(target=repeat)
+        self._thread.daemon = True
+        self._thread.start()
+        return self
 
     def stop(self):
-        """Explicitly call for a heart stop.
+        self._is_stopped.set()
 
-        .join() method should be called after stop though.
-        """
-        self.keep_beating = False
 
-    def run(self):
-        if not self.task_token:
-            raise ValueError("Canno't start heartbeating without a "
-                             "task_token set")
+def meanwhile(calling_this, call_that, *args, **kwargs):
+    """
 
-        while self.keep_beating is True:
-            self.heartbeat_closure(self.task_token)
-            time.sleep(self.heartbeat_interval)
+    :param calling_this: function that executes in a thread or subprocess in
+    parallel of *call_that*.
+    :type calling_this: callable without argument.
+
+    :param call_that: main function to execute
+    :type call_that: callable
+
+    """
+    calling_this()
+    error_happened = False
+    try:
+        result = call_that(*args, **kwargs)
+    except:
+        error_happened = True
+    finally:
+        calling_this.stop()
+
+    if error_happened:
+        raise
+
+    return result
