@@ -11,7 +11,8 @@ class heartbeat_on(object):
 
         @wraps(func)
         def with_heartbeat(*args, **kwargs):
-            return meanwhile(Every(self._interval, self._heartbeat),
+            return meanwhile(Every(self._interval,
+                                   self._heartbeat, *args, **kwargs),
                              func, *args, **kwargs)
 
         return with_heartbeat
