@@ -79,7 +79,7 @@ class ActivityWorker(Actor):
         :param  details: provided details about cancel
         :type   details: string
         """
-        return self.connection.respond_activity_task_heartbeat(
+        return self.connection.record_activity_task_heartbeat(
             task_token,
             details
         )
