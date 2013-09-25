@@ -5,6 +5,12 @@ import threading
 
 class Every(object):
     def __init__(self, nseconds, call, *args, **kwargs):
+        """
+        Every *nseconds* call ``call(*args, **kwargs)``.
+
+        Execute *call* in a thread.
+
+        """
         self.nseconds = nseconds
         self._call = call
         self._args = args
