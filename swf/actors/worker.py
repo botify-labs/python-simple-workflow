@@ -18,14 +18,20 @@ class ActivityWorker(Actor):
     :param  task_list: task list the Actor should watch for tasks on
     :type   task_list: string
 
-    :param  last_token: last seen task token
-    :type   last_token: string
+    :param  identity: Identity of the worker making the request,
+                      which is recorded in the ActivityTaskStarted
+                      event in the workflow history. This enables
+                      diagnostic tracing when problems arise.
+                      The form of this identity is user defined.
+    :type   identity: string
     """
-    def __init__(self, domain, task_list):
+    def __init__(self, domain, task_list, identity=None):
         super(ActivityWorker, self).__init__(
             domain,
             task_list
         )
+
+        self.identity = identity
 
     def cancel(self, task_token, details=None):
         """Responds to ``swf`` that the activity task was canceled
@@ -84,7 +90,7 @@ class ActivityWorker(Actor):
             details
         )
 
-    def poll(self, task_list=None, **kwargs):
+    def poll(self, task_list=None, identity=None):
         """Polls for an activity task to process from current
         actor's instance defined ``task_list``
 
@@ -94,22 +100,35 @@ class ActivityWorker(Actor):
         :param  task_list: task list the Actor should watch for tasks on
         :type   task_list: string
 
+        :param  identity: Identity of the worker making the request,
+                          which is recorded in the ActivityTaskStarted
+                          event in the workflow history. This enables
+                          diagnostic tracing when problems arise.
+                          The form of this identity is user defined.
+        :type   identity: string
+
         :raises: PollTimeout
 
         :returns: polled activity task
         :type: swf.models.ActivityTask
         """
         task_list = task_list or self.task_list
+        identity = identity or self.identity
 
         polled_activity_data = self.connection.poll_for_activity_task(
             self.domain.name,
             task_list,
+            identity=identity
         )
 
         if not 'taskToken' in polled_activity_data:
             raise PollTimeout("Activity Worker poll timed out")
 
-        activity_task = ActivityTask.from_poll(self.domain, self.task_list, polled_activity_data)
+        activity_task = ActivityTask.from_poll(
+            self.domain,
+            self.task_list,
+            polled_activity_data
+        )
         task_token = activity_task.task_token
 
         return task_token, activity_task
