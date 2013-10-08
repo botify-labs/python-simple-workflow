@@ -43,7 +43,7 @@ class Decider(Actor):
 
     def poll(self, task_list=None,
              identity=None,
-             maximum_page_size=None):
+             **kwargs):
         """Polls for decision tasks to process from current
         actor's instance defined ``task_list``
 
@@ -55,10 +55,6 @@ class Decider(Actor):
         workflow history.
         :type identity: string
 
-        :param maximum_page_size: The maximum number of history events
-        returned in each page. The default is 100.
-        :type maximum_page_size: integer
-
         :returns: polled decision tasks
         :type: swf.models.History
         """
@@ -68,7 +64,7 @@ class Decider(Actor):
             self.domain.name,
             task_list=task_list,
             identity=identity,
-            maximum_page_size=maximum_page_size
+            **kwargs
         )
 
         if not 'taskToken' in events:
