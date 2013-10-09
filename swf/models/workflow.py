@@ -409,14 +409,28 @@ class WorkflowExecution(BaseModel):
         :returns: The workflow execution complete events history
         :rtype: swf.models.event.History
         """
-        event_list = self.connection.get_workflow_execution_history(
+        response = self.connection.get_workflow_execution_history(
             self.domain.name,
             self.run_id,
             self.workflow_id,
             **kwargs
-        )['events']
+        )
 
-        return History.from_event_list(event_list)
+        events = response['events']
+        next_page = response.get('nextPageToken')
+        while next_page is not None:
+            response = self.connection.get_workflow_execution_history(
+                self.domain.name,
+                self.run_id,
+                self.workflow_id,
+                next_page_token=next_page,
+                **kwargs
+            )
+
+            events.extend(response['events'])
+            next_page = response.get('nextPageToken')
+
+        return History.from_event_list(events)
 
     def signal(self, signal_name, input=None, *args, **kwargs):
         """Records a signal event in the workflow execution history and
