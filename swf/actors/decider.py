@@ -44,8 +44,9 @@ class Decider(Actor):
     def poll(self, task_list=None,
              identity=None,
              **kwargs):
-        """Polls for decision tasks to process from current
-        actor's instance defined ``task_list``
+        """
+        Polls a decision task and returns the token and the full history of the
+        workflow's events.
 
         :param task_list: task list to poll for decision tasks from.
         :type task_list: string
@@ -55,22 +56,41 @@ class Decider(Actor):
         workflow history.
         :type identity: string
 
-        :returns: polled decision tasks
+        :returns: (token, history)
         :type: swf.models.History
+
         """
         task_list = task_list or self.task_list
 
-        events = self.connection.poll_for_decision_task(
+        task = self.connection.poll_for_decision_task(
             self.domain.name,
             task_list=task_list,
             identity=identity,
             **kwargs
         )
-
-        if not 'taskToken' in events:
+        token = task.get('taskToken')
+        if token is None:
             raise PollTimeout("Decider poll timed out")
 
-        history = History.from_event_list(events['events'])
-        task_token = events['taskToken']
+        events = task['events']
 
-        return task_token, history
+        next_page = task.get('nextPageToken')
+        while next_page:
+            task = self.connection.poll_for_decision_task(
+                self.domain.name,
+                task_list=task_list,
+                identity=identity,
+                next_page_token=next_page,
+                **kwargs
+            )
+
+            token = task.get('taskToken')
+            if token is None:
+                raise PollTimeout("Decider poll timed out")
+
+            events.extend(task['events'])
+            next_page = task.get('nextPageToken')
+
+        history = History.from_event_list(events)
+
+        return token, history
