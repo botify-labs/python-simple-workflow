@@ -241,18 +241,17 @@ class ActivityTask(BaseModel):
 
     @classmethod
     def from_poll(cls, domain, task_list, data):
-        from swf.querysets import ActivityTypeQuerySet
-        from swf.querysets import WorkflowExecutionQuerySet
+        from .workflow import WorkflowExecution
 
-        activity_type = ActivityTypeQuerySet(domain).get(
+        activity_type = ActivityType(
+            domain,
             data['activityType']['name'],
-            data['activityType']['version'],
-        )
+            data['activityType']['version'])
 
-        workflow_execution = WorkflowExecutionQuerySet(domain).get(
+        workflow_execution = WorkflowExecution(
+            domain,
             data['workflowExecution']['workflowId'],
-            data['workflowExecution']['runId'],
-        )
+            data['workflowExecution']['runId'])
 
         return cls(
             domain,
