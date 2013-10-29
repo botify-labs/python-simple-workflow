@@ -435,6 +435,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
             status=execution_info.get('executionStatus'),
+            close_status=execution_info.get('closeStatus'),
             tag_list=execution_info.get('tagList'),
             **kwargs
         )
