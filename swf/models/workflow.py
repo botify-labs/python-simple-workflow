@@ -409,8 +409,10 @@ class WorkflowExecution(BaseModel):
         :returns: The workflow execution complete events history
         :rtype: swf.models.event.History
         """
+        domain = kwargs.pop('domain', self.domain)
+
         response = self.connection.get_workflow_execution_history(
-            self.domain.name,
+            domain.name,
             self.run_id,
             self.workflow_id,
             **kwargs
@@ -420,7 +422,7 @@ class WorkflowExecution(BaseModel):
         next_page = response.get('nextPageToken')
         while next_page is not None:
             response = self.connection.get_workflow_execution_history(
-                self.domain.name,
+                domain.name,
                 self.run_id,
                 self.workflow_id,
                 next_page_token=next_page,
