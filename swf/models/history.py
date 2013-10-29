@@ -8,6 +8,7 @@
 from itertools import groupby
 
 from swf.models.event import EventFactory, CompiledEventFactory
+from swf.models.event.workflow import WorkflowExecutionEvent
 from swf.utils import cached_property
 
 
@@ -126,6 +127,25 @@ class History(object):
         :rtype: swf.models.event.Event
         """
         return self.events[0]
+
+    @property
+    def finished(self):
+        """Checks if the History matches with a finished Workflow
+        Execution history state.
+        """
+        completion_states = (
+            'completed',
+            'failed',
+            'canceled',
+            'terminated'
+        )
+
+        if (isinstance(self.last, WorkflowExecutionEvent) and
+            self.last.state in completion_states):
+            return True
+
+        return False
+
 
     def filter(self, **kwargs):
         """Filters the history based on kwargs events attributes
