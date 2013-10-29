@@ -545,7 +545,12 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                       ', '.join(invalid_kwargs))
             raise InvalidKeywordArgumentError(err_msg)
 
-        start_oldest_date = datetime_timestamp(past_day(kwargs.get('oldest_date', 30)))
+        if status == WorkflowExecution.STATUS_OPEN:
+            oldest_date = kwargs.get('oldest_date', 30)
+        else:
+            oldest_date = kwargs.get('start_oldest_date', 30)
+
+        start_oldest_date = datetime_timestamp(past_day(oldest_date))
         return [self.to_WorkflowExecution(domain, wfe) for wfe in
                 self._list_items(status,
                                  domain,
