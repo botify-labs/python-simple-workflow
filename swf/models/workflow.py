@@ -310,7 +310,6 @@ class WorkflowExecution(BaseModel):
 
     __slots__ = [
         'domain',
-        'workflow_type',
         'workflow_id',
         'run_id',
         'status',
