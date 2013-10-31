@@ -8,7 +8,7 @@ class HistoryQuerySet(BaseQuerySet):
         super(HistoryQuerySet, self).__init__(*args, **kwargs)
         self.domain = domain
 
-    def get(self, run_id, workflow_id, page_size=None, max_results=None, reverse=None):
+    def get(self, run_id, workflow_id, max_results=None, page_size=100, reverse=False):
         """Retrieves a WorkflowExecution history
 
         :param  run_id: unique identifier of the workflow execution
@@ -30,9 +30,8 @@ class HistoryQuerySet(BaseQuerySet):
         :param  reverse: Should the history events be retrieved in reverse order.
         :type   reverse: bool
         """
-        reverse = reverse or False
-        page_size = page_size or 100
         events = []
+        max_results = max_results or page_size
 
         if max_results < page_size:
             page_size = max_results
