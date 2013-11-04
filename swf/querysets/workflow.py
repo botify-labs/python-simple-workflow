@@ -430,10 +430,17 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         )
 
     def to_WorkflowExecution(self, domain, execution_info, **kwargs):
+        workflow_type = WorkflowType(
+            self.domain,
+            execution_info['workflowType']['name'],
+            execution_info['workflowType']['version']
+        )
+
         return WorkflowExecution(
             domain,
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
+            workflow_type=workflow_type,
             status=execution_info.get('executionStatus'),
             close_status=execution_info.get('closeStatus'),
             tag_list=execution_info.get('tagList'),
