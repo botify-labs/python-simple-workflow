@@ -22,5 +22,7 @@ class MarkerDecision(Decision):
         :type   details: str
         """
 
-        self['markerName'] = name
-        self.update_attributes({'details': details})
+        self.update_attributes({
+            'markerName': name,
+            'details': details
+        })
