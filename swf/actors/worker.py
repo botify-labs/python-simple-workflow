@@ -115,11 +115,17 @@ class ActivityWorker(Actor):
         task_list = task_list or self.task_list
         identity = identity or self.identity
 
-        polled_activity_data = self.connection.poll_for_activity_task(
-            self.domain.name,
-            task_list,
-            identity=identity
-        )
+        try:
+            polled_activity_data = self.connection.poll_for_activity_task(
+                self.domain.name,
+                task_list,
+                identity=identity
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError("Canno't poll activity task of a closed workflow execution")
+
+            raise ResponseError(e.body['message'])
 
         if not 'taskToken' in polled_activity_data:
             raise PollTimeout("Activity Worker poll timed out")
