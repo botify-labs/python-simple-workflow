@@ -9,6 +9,7 @@ class SWFError(Exception):
     def __init__(self, message, raw_error, *args):
         Exception.__init__(self, message, *args)
         self.kind, self.details = raw_error.split(':')
+        self.type_ = self.kind.lower().strip().replace(' ', '_') if self.kind else None
 
     def __repr__(self):
         msg = self.message
