@@ -44,10 +44,8 @@ class Decider(Actor):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
-                    "Unable to complete decision task with token: {}.\n"
-                    "Possible reasons: decision already completed or "
-                    "workflow execution is closed.\n"
-                    "Details: {}".format(task_token, e.body['message'])
+                    "Unable to complete decision task with token: {}.\n".format(task_token),
+                    e.body['message']
                 )
 
             raise ResponseError(e.body['message'])
@@ -99,9 +97,8 @@ class Decider(Actor):
             except SWFResponseError as e:
                 if e.error_code == 'UnknownResourceFault':
                     raise DoesNotExistError(
-                        "Unable to poll decision task.\n"
-                        "Reason: workflow execution is probably closed.\n"
-                        "Details: {}".format(task_token, e.body['message'])
+                        "Unable to poll decision task.\n",
+                        e.body['message'],
                     )
 
                 raise ResponseError(e.body['message'])

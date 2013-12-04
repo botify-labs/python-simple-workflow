@@ -47,10 +47,8 @@ class ActivityWorker(Actor):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
-                    "Unable to cancel activity task with token: {}.\n"
-                    "Possible reasons: task already canceled or "
-                    "workflow execution is closed.\n"
-                    "Details: {}".format(task_token)
+                    "Unable to cancel activity task with token: {}.\n".format(task_token),
+                    e.body['message']
                 )
 
                 raise ResponseError(e.body['message'])
@@ -72,10 +70,8 @@ class ActivityWorker(Actor):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
-                    "Unable to complete activity task with token: {}.\n"
-                    "Possible reasons: task already completed or "
-                    "workflow execution is closed.\n"
-                    "Details: {}".format(task_token, e.body['message'])
+                    "Unable to complete activity task with token: {}.\n".format(task_token),
+                    e.body['message']
                 )
 
             raise ResponseError(e.body['message'])
@@ -101,10 +97,8 @@ class ActivityWorker(Actor):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
-                    "Unable to fail activity task with token: {}.\n"
-                    "Possible reasons: task already failed or "
-                    "workflow execution is closed"
-                    "Details: {}".format(task_token, e.body['message'])
+                    "Unable to fail activity task with token: {}.\n".format(task_token),
+                    e.body['message']
                 )
 
             raise ResponseError(e.body['message'])
@@ -126,9 +120,8 @@ class ActivityWorker(Actor):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
-                    "Unable to send activity task {} heartbeat.\n"
-                    "Possible reason: workflow execution is closed.\n"
-                    "Details: {}".format(task_token, e.body['message'])
+                    "Unable to send activity task {} heartbeat.\n".format(task_token),
+                    e.body['message']
                 )
 
             raise ResponseError(e.body['message'])
@@ -167,9 +160,8 @@ class ActivityWorker(Actor):
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
-                    "Unable to poll activity task.\n"
-                    "Possible reason: workflow execution is probably closed.\n"
-                    "Details: {}".format(e.body['message'])
+                    "Unable to poll activity task.\n",
+                    e.body['message']
                 )
 
             raise ResponseError(e.body['message'])

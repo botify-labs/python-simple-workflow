@@ -5,26 +5,47 @@
 #
 # See the file LICENSE for copying permission.
 
+class SWFError(Exception):
+    def __init__(self, message, raw_error, *args):
+        Exception.__init__(self, message, *args)
+        self.kind, self.details = raw_error.split(':')
 
-class PollTimeout(Exception):
+    def __repr__(self):
+        msg = self.message
+
+        if self.kind and self.details:
+            msg += '\nReason: {}, {}'.format(self.kind, self.details)
+
+        return msg
+
+    def __str__(self):
+        msg = self.message
+
+        if self.kind and self.details:
+            msg += '\nReason: {}, {}'.format(self.kind, self.details)
+
+        return msg
+
+
+class PollTimeout(SWFError):
     pass
 
 
-class InvalidCredentialsError(Exception):
+class InvalidCredentialsError(SWFError):
     pass
 
 
-class ResponseError(Exception):
+class ResponseError(SWFError):
     pass
 
 
-class DoesNotExistError(Exception):
+class DoesNotExistError(SWFError):
     pass
 
 
-class AlreadyExistsError(Exception):
+class AlreadyExistsError(SWFError):
     pass
 
 
-class InvalidKeywordArgumentError(Exception):
+class InvalidKeywordArgumentError(SWFError):
     pass
