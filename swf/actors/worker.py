@@ -42,7 +42,18 @@ class ActivityWorker(Actor):
         :param  details: provided details about cancel
         :type   details: string
         """
-        return self.connection.respond_activity_task_canceled(task_token)
+        try:
+            return self.connection.respond_activity_task_canceled(task_token)
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError(
+                    "Unable to cancel activity task with token: {}.\n"
+                    "Possible reasons: task already canceled or "
+                    "workflow execution is closed.\n"
+                    "Details: {}".format(task_token)
+                )
+
+                raise ResponseError(e.body['message'])
 
     def complete(self, task_token, result=None):
         """Responds to ``swf` that the activity task is completed
@@ -53,10 +64,21 @@ class ActivityWorker(Actor):
         :param  result: The result of the activity task.
         :type   result: string
         """
-        return self.connection.respond_activity_task_completed(
-            task_token,
-            result
-        )
+        try:
+            return self.connection.respond_activity_task_completed(
+                task_token,
+                result
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError(
+                    "Unable to complete activity task with token: {}.\n"
+                    "Possible reasons: task already completed or "
+                    "workflow execution is closed.\n"
+                    "Details: {}".format(task_token, e.body['message'])
+                )
+
+            raise ResponseError(e.body['message'])
 
     def fail(self, task_token, details=None, reason=None):
         """Replies to ``swf`` that the activity task failed
@@ -70,11 +92,22 @@ class ActivityWorker(Actor):
         :param  reason: Description of the error that may assist in diagnostics
         :type   reason: string
         """
-        return self.connection.respond_activity_task_failed(
-            task_token,
-            details,
-            reason
-        )
+        try:
+            return self.connection.respond_activity_task_failed(
+                task_token,
+                details,
+                reason
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError(
+                    "Unable to fail activity task with token: {}.\n"
+                    "Possible reasons: task already failed or "
+                    "workflow execution is closed"
+                    "Details: {}".format(task_token, e.body['message'])
+                )
+
+            raise ResponseError(e.body['message'])
 
     def heartbeat(self, task_token, details=None):
         """Records activity task heartbeat
@@ -85,10 +118,20 @@ class ActivityWorker(Actor):
         :param  details: provided details about cancel
         :type   details: string
         """
-        return self.connection.record_activity_task_heartbeat(
-            task_token,
-            details
-        )
+        try:
+            return self.connection.record_activity_task_heartbeat(
+                task_token,
+                details
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError(
+                    "Unable to send activity task {} heartbeat.\n"
+                    "Possible reason: workflow execution is closed.\n"
+                    "Details: {}".format(task_token, e.body['message'])
+                )
+
+            raise ResponseError(e.body['message'])
 
     def poll(self, task_list=None, identity=None):
         """Polls for an activity task to process from current
@@ -123,7 +166,11 @@ class ActivityWorker(Actor):
             )
         except SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
-                raise DoesNotExistError("Canno't poll activity task of a closed workflow execution")
+                raise DoesNotExistError(
+                    "Unable to poll activity task.\n"
+                    "Possible reason: workflow execution is probably closed.\n"
+                    "Details: {}".format(e.body['message'])
+                )
 
             raise ResponseError(e.body['message'])
 
