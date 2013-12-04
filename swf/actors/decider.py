@@ -35,11 +35,23 @@ class Decider(Actor):
                            made by the decider while processing this decision task
         :type   decisions: list (of swf.models.decision.Decision)
         """
-        self.connection.respond_decision_task_completed(
-            task_token,
-            decisions,
-            execution_context,
-        )
+        try:
+            self.connection.respond_decision_task_completed(
+                task_token,
+                decisions,
+                execution_context,
+            )
+        except SWFResponseError as e:
+            if e.error_code == 'UnknownResourceFault':
+                raise DoesNotExistError(
+                    "Unable to complete decision task with token: {}.\n"
+                    "Possible reasons: decision already completed or "
+                    "workflow execution is closed.\n"
+                    "Details: {}".format(task_token, e.body['message'])
+                )
+
+            raise ResponseError(e.body['message'])
+
 
     def poll(self, task_list=None,
              identity=None,
@@ -76,13 +88,23 @@ class Decider(Actor):
 
         next_page = task.get('nextPageToken')
         while next_page:
-            task = self.connection.poll_for_decision_task(
-                self.domain.name,
-                task_list=task_list,
-                identity=identity,
-                next_page_token=next_page,
-                **kwargs
-            )
+            try:
+                task = self.connection.poll_for_decision_task(
+                    self.domain.name,
+                    task_list=task_list,
+                    identity=identity,
+                    next_page_token=next_page,
+                    **kwargs
+                )
+            except SWFResponseError as e:
+                if e.error_code == 'UnknownResourceFault':
+                    raise DoesNotExistError(
+                        "Unable to poll decision task.\n"
+                        "Reason: workflow execution is probably closed.\n"
+                        "Details: {}".format(task_token, e.body['message'])
+                    )
+
+                raise ResponseError(e.body['message'])
 
             token = task.get('taskToken')
             if token is None:
