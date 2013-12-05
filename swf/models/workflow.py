@@ -313,6 +313,7 @@ class WorkflowExecution(BaseModel):
         'workflow_id',
         'run_id',
         'status',
+        'workflow_type',
         'task_list',
         'child_policy',
         'close_status',
@@ -322,17 +323,18 @@ class WorkflowExecution(BaseModel):
         'decision_tasks_timeout',
     ]
 
-    def __init__(self, domain,
-                 workflow_id, run_id=None,
-                 status=STATUS_OPEN, task_list=None,
-                 child_policy=None, close_status=None,
-                 execution_timeout=None, input=None,
-                 tag_list=None, decision_tasks_timeout=None,
+    def __init__(self, domain, workflow_id, run_id=None,
+                 status=STATUS_OPEN, workflow_type=None,
+                 task_list=None, child_policy=None,
+                 close_status=None, execution_timeout=None,
+                 input=None, tag_list=None,
+                 decision_tasks_timeout=None,
                  *args, **kwargs):
         self.domain = domain
         self.workflow_id = workflow_id
         self.run_id = run_id
         self.status = status
+        self.workflow_type = workflow_type
         self.task_list = task_list
         self.child_policy = child_policy
         self.close_status = close_status
