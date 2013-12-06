@@ -1,8 +1,9 @@
 #! -*- coding:utf-8 -*-
 
+import boto.exception
 from swf.actors import Actor
 from swf.models import ActivityTask
-from swf.exceptions import PollTimeout
+from swf.exceptions import PollTimeout, ResponseError, DoesNotExistError
 
 
 class ActivityWorker(Actor):
@@ -44,7 +45,7 @@ class ActivityWorker(Actor):
         """
         try:
             return self.connection.respond_activity_task_canceled(task_token)
-        except SWFResponseError as e:
+        except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
                     "Unable to cancel activity task with token: {}.\n".format(task_token),
@@ -67,7 +68,7 @@ class ActivityWorker(Actor):
                 task_token,
                 result
             )
-        except SWFResponseError as e:
+        except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
                     "Unable to complete activity task with token: {}.\n".format(task_token),
@@ -94,7 +95,7 @@ class ActivityWorker(Actor):
                 details,
                 reason
             )
-        except SWFResponseError as e:
+        except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
                     "Unable to fail activity task with token: {}.\n".format(task_token),
@@ -117,7 +118,7 @@ class ActivityWorker(Actor):
                 task_token,
                 details
             )
-        except SWFResponseError as e:
+        except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
                     "Unable to send activity task {} heartbeat.\n".format(task_token),
@@ -157,7 +158,7 @@ class ActivityWorker(Actor):
                 task_list,
                 identity=identity
             )
-        except SWFResponseError as e:
+        except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
                     "Unable to poll activity task.\n",
