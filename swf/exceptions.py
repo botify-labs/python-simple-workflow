@@ -5,11 +5,59 @@
 #
 # See the file LICENSE for copying permission.
 
+
 class SWFError(Exception):
-    def __init__(self, message, raw_error, *args):
-        Exception.__init__(self, message, *args)
-        self.kind, self.details = raw_error.split(':')
-        self.type_ = self.kind.lower().strip().replace(' ', '_') if self.kind else None
+    def __init__(self, message, raw_error='', *args, **kwargs):
+        """
+        Examples:
+
+        >>> error = SWFError('message')
+        >>> error.message
+        'message'
+        >>> error.details
+        ''
+        >>> error = SWFError('message', 'kind')
+        >>> error.message
+        'message'
+        >>> error.kind
+        'kind'
+        >>> error.details
+        ''
+        >>> error = SWFError('message', 'kind:')
+        >>> error.message
+        'message'
+        >>> error.kind
+        'kind'
+        >>> error.details
+        ''
+        >>> error = SWFError('message', 'kind:details')
+        >>> error.message
+        'message'
+        >>> error.kind
+        'kind'
+        >>> error.details
+        'details'
+        >>> error = SWFError('message', 'kind:  details ')
+        >>> error.message
+        'message'
+        >>> error.kind
+        'kind'
+        >>> error.details
+        'details'
+
+        """
+        Exception.__init__(self, message, *args, **kwargs)
+
+        values = raw_error.split(':', 1)
+
+        if len(values) == 2:
+            self.details = values[1].strip()
+        else:
+            self.details = ''
+
+        self.kind = values[0].strip()
+        self.type_ = (self.kind.lower().strip().replace(' ', '_') if
+                      self.kind else None)
 
     def __repr__(self):
         msg = self.message
