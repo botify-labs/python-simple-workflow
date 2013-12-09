@@ -1,3 +1,5 @@
+import logging
+
 import swf.models
 import swf.querysets
 
