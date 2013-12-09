@@ -30,6 +30,7 @@ setup(
         'mock==1.0.1',
         'unittest2==0.5.1',
         'xworkflows==1.0.0',
+        'futures==2.1.5',
     ],
 
     package_dir={'': '.'},
@@ -40,8 +41,11 @@ setup(
         'swf.actors',
         'swf.models',
         'swf.querysets',
+        'swf.declarative',
 
         'swf.models.event',
         'swf.models.decision',
+
+        'swf.declarative.step',
     ],
 )
