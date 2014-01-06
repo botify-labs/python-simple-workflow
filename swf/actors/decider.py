@@ -1,8 +1,10 @@
 #! -*- coding: utf-8 -*-
 
+import boto.exception
+
 from swf.models.history import History
 from swf.actors.core import Actor
-from swf.exceptions import PollTimeout
+from swf.exceptions import PollTimeout, ResponseError, DoesNotExistError
 
 
 class Decider(Actor):
@@ -41,7 +43,7 @@ class Decider(Actor):
                 decisions,
                 execution_context,
             )
-        except SWFResponseError as e:
+        except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
                 raise DoesNotExistError(
                     "Unable to complete decision task with token: {}.\n".format(task_token),
@@ -49,7 +51,6 @@ class Decider(Actor):
                 )
 
             raise ResponseError(e.body['message'])
-
 
     def poll(self, task_list=None,
              identity=None,
@@ -94,7 +95,7 @@ class Decider(Actor):
                     next_page_token=next_page,
                     **kwargs
                 )
-            except SWFResponseError as e:
+            except boto.exception.SWFResponseError as e:
                 if e.error_code == 'UnknownResourceFault':
                     raise DoesNotExistError(
                         "Unable to poll decision task.\n",
