@@ -7,6 +7,7 @@
 
 from datetime import datetime, timedelta
 from time import mktime
+from itertools import chain, izip, islice
 
 from functools import wraps
 
@@ -181,3 +182,32 @@ def camel_to_underscore(string):
             res.extend([char.lower()])
 
     return ''.join(res)
+
+
+def underscore_to_camel(string):
+    """
+
+    >>> underscore_to_camel('')
+    ''
+    >>> underscore_to_camel('a')
+    'A'
+    >>> underscore_to_camel('A')
+    'A'
+    >>> underscore_to_camel('ab')
+    'Ab'
+    >>> underscore_to_camel('a_b_c')
+    'ABC'
+    >>> underscore_to_camel('ab_cd_ef')
+    'AbCdEf'
+    >>> underscore_to_camel('request_cancel_workflow')
+    'RequestCancelWorkflow'
+
+    """
+    if string == '':
+        return ''
+
+    return ''.join(chain([string[0].upper()],
+                         ((c.upper() if p == '_' else c) if
+                          c != '_' else '' for p, c in
+                          izip(islice(string, 0, None),
+                               islice(string, 1, None)))))
