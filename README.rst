@@ -1,3 +1,5 @@
+.. image:: https://travis-ci.org/botify-labs/python-simple-workflow.png?branch=develop   :target: https://travis-ci.org/botify-labs/python-simple-workflow
+
 ======================
 Python Simple Workflow
 ======================
