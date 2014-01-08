@@ -7,7 +7,7 @@
 
 from functools import wraps
 
-from swf.utils import decapitalize
+from swf.utils import decapitalize, underscore_to_camel
 
 
 def decision_action(fn):
@@ -46,8 +46,9 @@ class Decision(dict):
                 action_method(*args, **kwargs)
 
     def _fill_from_action(self, action):
-        self.type = action.capitalize() + self._base_type
-        self.attributes_key = decapitalize(self.type + self._attributes_key_suffix)
+        self.type = underscore_to_camel(action) + self._base_type
+        self.attributes_key = decapitalize(self.type +
+                                           self._attributes_key_suffix)
 
         self['decisionType'] = self.type
         self[self.attributes_key] = {}
