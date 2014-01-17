@@ -22,23 +22,26 @@ datetime_timestamp = lambda datetime: mktime(datetime.timetuple())
 
 
 class Enum(object):
-    """Enums python implementation
+    """Enumeration type
 
-    To be used like this :
-        Numbers = enum('ZERO', 'ONE', 'TWO')
-        >>> Numbers.ZERO
-        0
-        >>> Numbers.ONE
-        1
+    Examples
+    --------
 
-        or
+    >>> Numbers = Enum('ZERO', 'ONE', 'TWO')
+    >>> Numbers.ZERO
+    0
+    >>> Numbers.ONE
+    1
 
-        Numbers = enum(zero="ZERO", one="ONE")
-        >>> Numbers.zero
-        "ZERO"
+    or
+
+    >>> Numbers = Enum(zero="ZERO", one="ONE")
+    >>> Numbers.zero
+    'ZERO'
 
     Inspired from:
     http://stackoverflow.com/questions/36932/whats-the-best-way-to-implement-an-enum-in-python
+
     """
     def __init__(self, *sequential, **named):
         self.enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -57,25 +60,27 @@ def get_subkey(d, key_path):
     """Gets a sub-dict key, and return None if whether
     the parent or child dict key does not exist
 
-    Example:
-    >>> d = {
-      'a': {
-        '1': 2,
-        '2': 3,
-      }
-    }
-    >>> subkey(d, ['a'])
-    {'1': 2, '2': 3}
-    >>> subkey(d, ['a', '1'])
-    2
-    >>> subkey(d, ['a', '3'])
-    None
-
     :param  d: dict to operate over
     :type   d: dict of dicts
 
     :param  key_path: dict keys path list representation
     :type   key_path: list
+
+    Example
+    -------
+
+    >>> d = {
+    ...   'a': {
+    ...     '1': 2,
+    ...     '2': 3,
+    ...   }
+    ... }
+    >>> get_subkey(d, ['a'])
+    {'1': 2, '2': 3}
+    >>> get_subkey(d, ['a', '1'])
+    2
+    >>> get_subkey(d, ['a', '3'])
+
     """
     if len(key_path) > 1:
         if d.get(key_path[0]) is None:
