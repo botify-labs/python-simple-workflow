@@ -87,9 +87,12 @@ class TestWorkflowType(unittest2.TestCase):
         with patch.object(self.wt.connection, 'describe_workflow_type') as mock:
             mock.side_effect = SWFResponseError(
                     400,
-                    "mocking exception",
-                    {'__type': 'UnknownResourceFault'}
-            )
+                    "Bad Request:",
+                    {'__type': 'com.amazonaws.swf.base.model#UnknownResourceFault',
+                     'message': 'Unknown type: WorkflowType=[workflowId=blah, runId=test]'},
+                    'UnknownResourceFault',
+                )
+
             self.assertFalse(self.wt.exists)
 
     def test_workflow_type_exists_with_whatever_error(self):
@@ -293,9 +296,12 @@ class TestWorkflowExecution(unittest2.TestCase):
         with patch.object(self.we.connection, 'describe_workflow_execution') as mock:
             mock.side_effect = SWFResponseError(
                     400,
-                    "mocking exception",
-                    {'__type': 'UnknownResourceFault'}
-            )
+                    "Bad Request:",
+                    {'__type': 'com.amazonaws.swf.base.model#UnknownResourceFault',
+                     'message': 'Unknown execution: WorkflowExecution=[workflowId=blah, runId=test]'},
+                    'UnknownResourceFault',
+                )
+
             self.assertFalse(self.we.exists)
 
     def test_workflow_execution_exists_with_whatever_error(self):

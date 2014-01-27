@@ -9,8 +9,8 @@ from boto.swf.exceptions import SWFDomainAlreadyExistsError
 
 import swf.settings
 from swf.constants import REGISTERED, DEPRECATED
-from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
-from swf.models.domain import Domain
+from swf.exceptions import AlreadyExistsError, ResponseError
+from swf.models.domain import Domain, DomainDoesNotExist
 from swf.querysets.domain import DomainQuerySet
 from swf.querysets.workflow import WorkflowTypeQuerySet
 
@@ -91,10 +91,13 @@ class TestDomain(unittest2.TestCase):
     def test_domain_exists_with_non_existent_domain(self):
         with patch.object(self.domain.connection, 'describe_domain') as mock:
             mock.side_effect = SWFResponseError(
-                    400,
-                    "mocking exception",
-                    {'__type': 'UnknownResourceFault'}
+                400,
+                "Bad Request",
+                {'message': 'Unknown domain: does not exist',
+                 '__type': 'com.amazonaws.swf.base.model#UnknownResourceFault'},
+                'UnknownResourceFault',
             )
+
             self.assertFalse(self.domain.exists)
 
     def test_domain_exists_with_whatever_error(self):
@@ -174,16 +177,18 @@ class TestDomain(unittest2.TestCase):
                 self.domain.save()
 
     def test_domain_delete_existing_domain(self):
-        with patch.object(self.domain.connection, 'deprecate_domain') as mock:
+        with patch.object(self.domain.connection, 'deprecate_domain'):
             self.domain.delete()
 
     def test_domain_delete_non_existent_domain(self):
         with patch.object(self.domain.connection, 'deprecate_domain') as mock:
-            with self.assertRaises(DoesNotExistError):
+            with self.assertRaises(DomainDoesNotExist):
                 mock.side_effect = SWFResponseError(
                     400,
-                    "mocking exception",
-                    {'__type': 'UnknownResourceFault'}
+                    "Bad Request",
+                    {'message': 'Unknown domain: does not exist',
+                     '__type': 'com.amazonaws.swf.base.model#UnknownResourceFault'},
+                    'UnknownResourceFault',
                 )
                 self.domain.delete()
 

@@ -11,8 +11,17 @@ from swf.constants import REGISTERED
 from swf.models import BaseModel
 from swf.models.base import ModelDiff
 from swf.utils import immutable
-from swf.exceptions import (AlreadyExistsError, DoesNotExistError,
-                            ResponseError)
+from swf import exceptions
+from swf.exceptions import (
+    AlreadyExistsError,
+    DoesNotExistError,
+    ResponseError,
+    raises,
+)
+
+
+class DomainDoesNotExist(DoesNotExistError):
+    pass
 
 
 @immutable
@@ -82,19 +91,18 @@ class Domain(BaseModel):
         )
 
     @property
+    @exceptions.translate(SWFResponseError, to=ResponseError)
+    @exceptions.is_not(DomainDoesNotExist)
+    @exceptions.when(SWFResponseError,
+                     raises(DomainDoesNotExist,
+                            when=exceptions.is_unknown('domain'),
+                            extract=exceptions.extract_resource))
     def exists(self):
         """Checks if the Domain exists amazon-side
 
         :rtype: bool
         """
-        try:
-            self.connection.describe_domain(self.name)
-        except SWFResponseError as e:
-            if e.error_code == 'UnknownResourceFault':
-                return False
-            else:
-                raise ResponseError(e.body['message'])
-
+        self.connection.describe_domain(self.name)
         return True
 
     def save(self):
@@ -106,13 +114,15 @@ class Domain(BaseModel):
         except SWFDomainAlreadyExistsError:
             raise AlreadyExistsError("Domain %s already exists amazon-side" % self.name)
 
+    @exceptions.translate(SWFResponseError,
+                          to=ResponseError)
+    @exceptions.when(SWFResponseError,
+                     raises(DomainDoesNotExist,
+                            when=exceptions.is_unknown('domain'),
+                            extract=exceptions.extract_resource))
     def delete(self):
         """Deprecates the domain amazon side"""
-        try:
-            self.connection.deprecate_domain(self.name)
-        except SWFResponseError as e:
-            if e.error_code == 'UnknownResourceFault':
-                raise DoesNotExistError("Domain %s does not exist amazon-side" % self.name)
+        self.connection.deprecate_domain(self.name)
 
     def upstream(self):
         from swf.querysets.domain import DomainQuerySet

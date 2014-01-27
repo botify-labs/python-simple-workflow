@@ -7,11 +7,21 @@
 
 from boto.swf.exceptions import SWFTypeAlreadyExistsError, SWFResponseError
 
-from swf.constants import REGISTERED, DEPRECATED
+from swf.constants import REGISTERED
 from swf.utils import immutable
 from swf.models import BaseModel
 from swf.models.base import ModelDiff
-from swf.exceptions import AlreadyExistsError, DoesNotExistError, ResponseError
+from swf import exceptions
+from swf.exceptions import (
+    AlreadyExistsError,
+    DoesNotExistError,
+    ResponseError,
+    raises,
+)
+
+
+class ActivityTypeDoesNotExist(Exception):
+    pass
 
 
 @immutable
@@ -62,6 +72,8 @@ class ActivityType(BaseModel):
                                           this activity type.
     :type    task_start_to_close_timeout: int
     """
+    kind = 'type'
+
     __slots__ = [
         'domain',
         'name',
@@ -146,23 +158,21 @@ class ActivityType(BaseModel):
         )
 
     @property
+    @exceptions.is_not(ActivityTypeDoesNotExist)
+    @exceptions.when(SWFResponseError,
+                     raises(ActivityTypeDoesNotExist,
+                            when=exceptions.is_unknown('ActivityType'),
+                            extract=exceptions.extract_resource))
     def exists(self):
         """Checks if the ActivityType exists amazon-side
 
         :rtype: bool
         """
-        try:
-            self.connection.describe_activity_type(
-                self.domain.name,
-                self.name,
-                self.version
-            )
-        except SWFResponseError as err:
-            if err.error_code != 'UnknownResourceFault':
-                raise ResponseError(err.body['message'])
-
-            return False
-
+        self.connection.describe_activity_type(
+            self.domain.name,
+            self.name,
+            self.version
+        )
         return True
 
     def save(self):
@@ -185,18 +195,17 @@ class ActivityType(BaseModel):
                 raise DoesNotExistError(err.body['message'])
             raise
 
+    @exceptions.when(SWFResponseError,
+                     raises(ActivityTypeDoesNotExist,
+                            when=exceptions.is_unknown('ActivityType'),
+                            extract=exceptions.extract_resource))
     def delete(self):
         """Deprecates the domain amazon side"""
-        try:
-            self.connection.deprecate_activity_type(
+        self.connection.deprecate_activity_type(
                 self.domain.name,
                 self.name,
                 self.version
             )
-        except SWFResponseError as err:
-            if err.error_code == 'UnknownResourceFault':
-                raise DoesNotExistError("%s does not exist" % self)
-        self.status = DEPRECATED
 
     def upstream(self):
         from swf.querysets.activity import ActivityTypeQuerySet

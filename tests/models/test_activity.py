@@ -1,16 +1,18 @@
 # -*- coding:utf-8 -*-
 
 import unittest2
-import collections
 
 from mock import patch
 from boto.swf.layer1 import Layer1
-from boto.swf.exceptions import SWFResponseError
+import boto.swf.exceptions
 
 from swf.models import Domain, ActivityType
-from swf.exceptions import ResponseError
 
 from ..mocks.activity import mock_describe_activity_type
+
+
+def throw(exception):
+    raise exception
 
 
 class TestActivityType(unittest2.TestCase):
@@ -77,32 +79,17 @@ class TestActivityType(unittest2.TestCase):
             self.assertTrue(self.activity_type.exists)
 
     def test_exists_with_non_existent_activity_type(self):
-        with patch.object(self.activity_type.connection, 'describe_activity_type') as mock:
-            mock.side_effect = SWFResponseError(
+        with patch.object(self.activity_type.connection,
+                          'describe_activity_type') as mock:
+            mock.side_effect = (lambda *_, **__:
+                throw(boto.swf.exceptions.SWFResponseError(
                     400,
-                    "mocking exception",
-                    {'__type': 'UnknownResourceFault'}
-            )
+                    "Bad Request:",
+                    {'__type': 'com.amazonaws.swf.base.model#UnknownResourceFault',
+                     'message': 'Unknown type: ActivityType=[name=blah, version=test]'},
+                    'UnknownResourceFault',
+                )))
             self.assertFalse(self.activity_type.exists)
-
-    def test_activity_type_exists_with_whatever_error(self):
-        with patch.object(self.activity_type.connection, 'describe_activity_type') as mock:
-            with self.assertRaises(ResponseError):
-                mock.side_effect = SWFResponseError(
-                        400,
-                        "mocking exception",
-                        {
-                            '__type': 'WhateverError',
-                            'message': 'Whatever'
-                        }
-                )
-                self.domain.exists
-
-    def test_is_synced_with_unsynced_activity_type(self):
-        pass
-
-    def test_is_synced_with_synced_activity_type(self):
-        pass
 
     def test_is_synced_over_non_existent_activity_type(self):
         with patch.object(

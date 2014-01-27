@@ -159,13 +159,13 @@ class History(object):
 
         .. code-block:: python
 
-            >>> history_obj.filter(type='ActivityTask', state='completed')
+            >>> history_obj.filter(type='ActivityTask', state='completed')  # doctest: +SKIP
             <History
                 <Event 23 ActivityTask : completed>
                 <Event 42 ActivityTask : completed>
                 <Event 61 ActivityTask : completed>
             >
-            >>> history_obj.filter(type='DecisionTask')
+            >>> history_obj.filter(type='DecisionTask')  # doctest: +SKIP
             <History
                 <Event 2 DecisionTask : scheduled>
                 <Event 3 DecisionTask : started>
