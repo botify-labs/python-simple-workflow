@@ -301,7 +301,7 @@ class ActivityTypeQuerySet(BaseQuerySet):
             response = {'nextPageToken': None}
             while 'nextPageToken' in response:
                 response = self.connection.list_activity_types(
-                    self.domain,
+                    self.domain.name,
                     registration_status,
                     next_page_token=response['nextPageToken']
                 )
