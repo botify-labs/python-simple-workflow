@@ -471,11 +471,13 @@ class WorkflowExecution(BaseModel):
                        event in the target workflow execution’s history.
         :type   input: dict
         """
+        if input is None:
+            input = {}
         self.connection.signal_workflow_execution(
             self.domain.name,
             signal_name,
             self.workflow_id,
-            input=json.dumps(input or '{}'),
+            input=json.dumps(input),
             run_id=self.run_id)
 
     @exceptions.translate(SWFResponseError,
