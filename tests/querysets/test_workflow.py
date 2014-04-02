@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import unittest2
+import unittest
 
 from mock import patch
 from boto.swf.layer1 import Layer1
@@ -22,7 +22,7 @@ from ..mocks.workflow import mock_describe_workflow_type,\
                              mock_describe_workflow_execution
 
 
-class TestBaseWorkflowTypeQuerySet(unittest2.TestCase):
+class TestBaseWorkflowTypeQuerySet(unittest.TestCase):
 
     def setUp(self):
         self.domain = Domain("TestDomain")
@@ -53,7 +53,7 @@ class TestBaseWorkflowTypeQuerySet(unittest2.TestCase):
             self.bw._list()
 
 
-class TestWorkflowTypeQuerySet(unittest2.TestCase):
+class TestWorkflowTypeQuerySet(unittest.TestCase):
 
     def setUp(self):
         self.domain = Domain("TestDomain")
@@ -154,7 +154,7 @@ class TestWorkflowTypeQuerySet(unittest2.TestCase):
             self.assertIsInstance(new_wt, WorkflowType)
 
 
-class TestWorkflowExecutionQuerySet(unittest2.TestCase):
+class TestWorkflowExecutionQuerySet(unittest.TestCase):
 
     def setUp(self):
         self.domain = Domain("TestDomain")

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from mock import Mock, patch
 from boto.swf.layer1 import Layer1
@@ -22,7 +22,7 @@ swf.settings.set(aws_access_key_id='fakeaccesskey',
                  aws_secret_access_key='fakesecret')
 
 
-class TestDomain(unittest2.TestCase):
+class TestDomain(unittest.TestCase):
     def setUp(self):
         self.domain = Domain("testdomain")
         self.qs = DomainQuerySet(self)

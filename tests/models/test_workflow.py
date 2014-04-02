@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from mock import patch
 from boto.swf.layer1 import Layer1
@@ -17,7 +17,7 @@ from ..mocks.workflow import mock_describe_workflow_type,\
 from ..mocks.event import mock_get_workflow_execution_history
 
 
-class TestWorkflowType(unittest2.TestCase):
+class TestWorkflowType(unittest.TestCase):
     def setUp(self):
         self.domain = Domain("test-domain")
         self.wt = WorkflowType(self.domain, "TestType", "1.0")
@@ -219,7 +219,7 @@ class TestWorkflowType(unittest2.TestCase):
                 self.wt.delete()
 
 
-class TestWorkflowExecution(unittest2.TestCase):
+class TestWorkflowExecution(unittest.TestCase):
     def setUp(self):
         self.domain = Domain("TestDomain")
         self.wt = WorkflowType(self.domain, "TestType", "1.0")

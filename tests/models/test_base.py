@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from boto.swf.layer1 import Layer1
 
@@ -9,7 +9,7 @@ from mock import patch
 from swf.models import BaseModel
 
 
-class TestBaseModel(unittest2.TestCase):
+class TestBaseModel(unittest.TestCase):
 
     def setUp(self):
         self.obj = BaseModel()

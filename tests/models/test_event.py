@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from swf.models.event import Event
 from swf.models.history import History
@@ -9,7 +9,7 @@ import swf.constants
 from ..mocks.event import mock_get_workflow_execution_history
 
 
-class TestEvent(unittest2.TestCase):
+class TestEvent(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -28,7 +28,7 @@ class TestEvent(unittest2.TestCase):
             ev.__repr__()
 
 
-class TestHistory(unittest2.TestCase):
+class TestHistory(unittest.TestCase):
 
     def setUp(self):
         self.event_list = mock_get_workflow_execution_history()

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from mock import patch
 
@@ -21,7 +21,7 @@ swf.settings.set(aws_access_key_id='fakeaccesskey',
                  aws_secret_access_key='fakesecret')
 
 
-class TestActivityTypeQuerySet(unittest2.TestCase):
+class TestActivityTypeQuerySet(unittest.TestCase):
 
     def setUp(self):
         self.domain = Domain("TestDomain")

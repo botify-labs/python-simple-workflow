@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from swf.querysets.base import BaseQuerySet
 
 
-class TestBaseQuerySet(unittest2.TestCase):
+class TestBaseQuerySet(unittest.TestCase):
 
     def setUp(self):
         self.base_qs = BaseQuerySet()

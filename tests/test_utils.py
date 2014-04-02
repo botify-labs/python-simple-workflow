@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from swf.utils import *
 
 
-class TestUtils(unittest2.TestCase):
+class TestUtils(unittest.TestCase):
 
     def setUp(self):
         pass

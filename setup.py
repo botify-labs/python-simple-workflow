@@ -28,7 +28,6 @@ setup(
     install_requires=[
         'boto',
         'mock==1.0.1',
-        'unittest2==0.5.1',
         'xworkflows==1.0.0',
     ],
 

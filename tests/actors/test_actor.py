@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
 
-import unittest2
+import unittest
 
 import swf.settings
 from swf.models import Domain
@@ -11,7 +11,7 @@ swf.settings.set(aws_access_key_id='fakeaccesskey',
                  aws_secret_access_key='fakesecret')
 
 
-class TestActor(unittest2.TestCase):
+class TestActor(unittest.TestCase):
     def setUp(self):
         self.domain = Domain("TestDomain")
         self.actor = Actor(self.domain, "test-task-list")

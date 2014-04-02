@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import unittest2
+import unittest
 
 from mock import patch
 from boto.swf.layer1 import Layer1
@@ -15,7 +15,7 @@ def throw(exception):
     raise exception
 
 
-class TestActivityType(unittest2.TestCase):
+class TestActivityType(unittest.TestCase):
 
     def setUp(self):
         self.domain = Domain("test-domain")
