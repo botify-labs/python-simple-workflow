@@ -37,10 +37,11 @@ setup(
     packages=[
         'swf',
         'swf.actors',
-        'swf.models',
         'swf.querysets',
 
+        'swf.models',
         'swf.models.event',
         'swf.models.decision',
+        'swf.models.history',
     ],
 )
