@@ -271,6 +271,27 @@ class History(swf.models.History):
 
         return self
 
+    def add_activity_task_timed_out(self,
+                                    timeout_type,
+                                    scheduled=None,
+                                    started=None):
+        if scheduled is None:
+            scheduled = self.last_id - 1
+
+        if started is None:
+            started = self.last_id
+
+        self.events.append(EventFactory({
+            'eventId': self.next_id,
+            'eventTimestamp': new_timestamp_string(),
+            'eventType': 'ActivityTaskTimedOut',
+            'activityTaskTimedOutEventAttributes': {
+                'scheduledEventId': scheduled,
+                'startedEventId': started,
+                'timeoutType': timeout_type,
+            }
+        }))
+
     def add_activity_task(self,
                           activity,
                           decision_id,
@@ -280,7 +301,8 @@ class History(swf.models.History):
                           control=None,
                           result=None,
                           reason=DEFAULT_REASON,
-                          details=DEFAULT_DETAILS):
+                          details=DEFAULT_DETAILS,
+                          timeout_type='START_TO_CLOSE'):
         self.add_activity_task_scheduled(
             activity,
             decision_id,
@@ -307,6 +329,11 @@ class History(swf.models.History):
                 started=started_id,
                 reason=reason,
                 details=details)
+        elif last_state == 'timed_out':
+            self.add_activity_task_timed_out(
+                scheduled=scheduled_id,
+                started=started_id,
+                timeout_type=timeout_type)
         else:
             raise ValueError('last state {} is not supported'.format(
                              last_state))
