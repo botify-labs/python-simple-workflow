@@ -6,7 +6,10 @@
 # See the file LICENSE for copying permission.
 
 import os
-from ConfigParser import ConfigParser
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
 
 
 def from_stream(stream):
@@ -129,4 +132,4 @@ def get(path='.swf'):
 def set(**settings):
     """Set settings"""
     from swf.core import SETTINGS
-    SETTINGS.update({k: v for k, v in settings.iteritems() if v is not None})
+    SETTINGS.update({k: v for k, v in settings.items() if v is not None})
