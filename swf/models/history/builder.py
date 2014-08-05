@@ -169,6 +169,7 @@ class History(swf.models.History):
     def add_activity_task_schedule_failed(self,
                                           activity_id,
                                           decision_id,
+                                          activity_type,
                                           cause):
         self.events.append(EventFactory({
             u'eventId': self.next_id,
@@ -176,10 +177,7 @@ class History(swf.models.History):
             u'eventType': u'ScheduleActivityTaskFailed',
             u'scheduleActivityTaskFailedEventAttributes': {
                 u'activityId': activity_id,
-                u'activityType': {
-                    u'name': u'analysis.make_bad_link_counter_file',
-                    u'version': u'2.0'
-                },
+                u'activityType': activity_type.copy(),
                 u'cause': cause,
                 u'decisionTaskCompletedEventId': decision_id,
             }
@@ -302,6 +300,8 @@ class History(swf.models.History):
                           result=None,
                           reason=DEFAULT_REASON,
                           details=DEFAULT_DETAILS,
+                          activity_type=None,
+                          cause=None,
                           timeout_type='START_TO_CLOSE'):
         self.add_activity_task_scheduled(
             activity,
@@ -310,6 +310,14 @@ class History(swf.models.History):
             input,
             control)
         if last_state == 'scheduled':
+            return self
+
+        if last_state == 'schedule_failed':
+            self.add_activity_task_schedule_failed(
+                activity_id,
+                decision_id,
+                activity_type,
+                cause)
             return self
 
         scheduled_id = self.last_id
