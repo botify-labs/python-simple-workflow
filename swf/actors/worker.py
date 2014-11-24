@@ -4,6 +4,7 @@ import boto.exception
 from swf.actors import Actor
 from swf.models import ActivityTask
 from swf.exceptions import PollTimeout, ResponseError, DoesNotExistError
+from swf import format
 
 
 class ActivityWorker(Actor):
@@ -92,8 +93,8 @@ class ActivityWorker(Actor):
         try:
             return self.connection.respond_activity_task_failed(
                 task_token,
-                details,
-                reason
+                details=format.details(details),
+                reason=format.reason(reason),
             )
         except boto.exception.SWFResponseError as e:
             if e.error_code == 'UnknownResourceFault':
