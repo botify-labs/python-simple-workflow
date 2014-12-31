@@ -9,6 +9,7 @@ from boto.swf.exceptions import SWFResponseError
 
 from swf.constants import REGISTERED
 from swf.querysets.base import BaseQuerySet
+from swf.models import Domain
 from swf.models.workflow import (WorkflowType, WorkflowExecution,
                                  CHILD_POLICIES)
 from swf.utils import datetime_timestamp, past_day, get_subkey
@@ -437,7 +438,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         )
 
         return WorkflowExecution(
-            domain,
+            Domain(domain),
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
             workflow_type=workflow_type,
@@ -545,7 +546,6 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         """
         # As WorkflowTypeQuery has to be built against a specific domain
         # name, domain filter is disposable, but not mandatory.
-        domain = domain or self.domain.name
         invalid_kwargs = self._validate_status_parameters(status, kwargs)
 
         if invalid_kwargs:
@@ -560,9 +560,14 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
 
         start_oldest_date = datetime_timestamp(past_day(oldest_date))
         return [self.to_WorkflowExecution(domain, wfe) for wfe in
-                self._list_items(status,
-                                 domain,
-                                 start_oldest_date=int(start_oldest_date))]
+                self._list_items(
+                    status,
+                    self.domain.name,
+                    *args,
+                    start_oldest_date=int(start_oldest_date),
+                    tag=tag,
+                    **kwargs
+                )]
 
     def _list(self, *args, **kwargs):
         return self.list_workflow_executions(*args, **kwargs)
