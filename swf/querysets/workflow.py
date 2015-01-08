@@ -412,8 +412,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         # MANDATORY kwarg, when boto.swf.list_open_workflow_executions awaits a
         # `oldest_date` mandatory arg.
         if status == WorkflowExecution.STATUS_OPEN:
-            oldest_date = kwargs.pop('start_oldest_date')
-            args = args + (oldest_date,)
+            kwargs['oldest_date'] = kwargs.pop('start_oldest_date')
 
         try:
             method = 'list_{}_workflow_executions'.format(statuses[status])
@@ -561,9 +560,12 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         start_oldest_date = datetime_timestamp(past_day(oldest_date))
         return [self.to_WorkflowExecution(domain, wfe) for wfe in
                 self._list_items(
-                    status,
-                    self.domain.name,
                     *args,
+                    domain=self.domain.name,
+                    status=status,
+                    workflow_id=workflow_id,
+                    workflow_name=workflow_type_name,
+                    workflow_version=workflow_type_version,
                     start_oldest_date=int(start_oldest_date),
                     tag=tag,
                     **kwargs
