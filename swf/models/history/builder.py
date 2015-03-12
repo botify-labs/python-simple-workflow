@@ -13,9 +13,26 @@ DEFAULT_DETAILS = 'DETAILS'
 __all__ = ['History']
 
 
+FIRST_TIMESTAMP = None
+LATEST_TIMESTAMP = None
+
+
 def new_timestamp_string():
     from time import time
-    return '{:.3f}'.format(time())
+    import random
+
+    global FIRST_TIMESTAMP
+    global LATEST_TIMESTAMP
+
+    if FIRST_TIMESTAMP is None:
+        FIRST_TIMESTAMP = time()
+        timestamp = FIRST_TIMESTAMP
+        LATEST_TIMESTAMP = timestamp
+    else:
+        LATEST_TIMESTAMP += random.random() * 100
+        timestamp = LATEST_TIMESTAMP
+
+    return timestamp
 
 
 CHILD_WORKFLOW_STATES = set(
