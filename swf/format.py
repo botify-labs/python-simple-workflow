@@ -1,4 +1,8 @@
 import constants
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def wrap(message, max_length):
@@ -6,6 +10,12 @@ def wrap(message, max_length):
         return message
 
     if len(message) > max_length:
+        logger.warning(
+            'message "{}" too long ({} chars), wrapped to {}'.format(
+                message,
+                len(message),
+                max_length,
+            ))
         return message[:max_length]
 
     return message
