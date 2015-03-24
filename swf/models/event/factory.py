@@ -5,6 +5,8 @@
 #
 # See the file LICENSE for copying permission.
 
+import collections
+
 from swf.models.event.workflow import (
     WorkflowExecutionEvent,
     CompiledWorkflowExecutionEvent,
@@ -34,36 +36,37 @@ from swf.models.event.marker import (
 from swf.utils import camel_to_underscore, decapitalize
 
 
-EVENTS = {
-    'WorkflowExecution': {
-        'event': WorkflowExecutionEvent,
-        'compiled_event': CompiledWorkflowExecutionEvent,
-    },
-    'DecisionTask': {
-        'event': DecisionTaskEvent,
-        'compiled_event': CompiledDecisionTaskEvent,
-    },
-    'ActivityTask': {
-        'event': ActivityTaskEvent,
-        'compiled_event': CompiledActivityTaskEvent,
-    },
-    'Marker': {
-        'event': MarkerEvent,
-        'compiled': CompiledMarkerEvent,
-    },
-    'Timer': {
-        'event': TimerEvent,
-        'compiled': CompiledTimerEvent,
-    },
-    'ChildWorkflowExecution': {
+EVENTS = collections.OrderedDict([
+    # At top-level to override 'WorkflowExecution'
+    ('ChildWorkflowExecution', {
         'event': ChildWorkflowExecutionEvent,
         'compiled': CompiledChildWorkflowExecutionEvent,
-    },
-    'ExternalWorkflow': {
+    }),
+    ('ExternalWorkflow', {
         'event': ExternalWorkflowExecutionEvent,
         'compiled': CompiledExternalWorkflowExecutionEvent,
-    },
-}
+    }),
+    ('WorkflowExecution', {
+        'event': WorkflowExecutionEvent,
+        'compiled_event': CompiledWorkflowExecutionEvent,
+    }),
+    ('DecisionTask', {
+        'event': DecisionTaskEvent,
+        'compiled_event': CompiledDecisionTaskEvent,
+    }),
+    ('ActivityTask', {
+        'event': ActivityTaskEvent,
+        'compiled_event': CompiledActivityTaskEvent,
+    }),
+    ('Marker', {
+        'event': MarkerEvent,
+        'compiled': CompiledMarkerEvent,
+    }),
+    ('Timer', {
+        'event': TimerEvent,
+        'compiled': CompiledTimerEvent,
+    }),
+])
 
 
 class EventFactory(object):
@@ -128,31 +131,38 @@ class EventFactory(object):
         """Extracts event type from raw event_name
 
         :param  event_name:
+
+        Example:
+
+            with event_name = 'StartChildWorkflowExecutionInitiated'
+
+        Returns:
+
+            'ChildWorkflowExecution'
+
         """
         for name in klass.events.iterkeys():
-            splitted = event_name.partition(name)
-
-            length = len(splitted)
-
-            if ((length == 2 and splitted[0] == name) or
-                    (length == 3 and splitted[1] == name)):
+            if name in event_name:
                 return name
-
         return
 
     @classmethod
     def _extract_event_state(klass, event_type, event_name):
-        """Extracts event state from raw event type and name"""
-        partitioned = event_name.partition(event_type)
+        """Extracts event state from raw event type and name
 
-        if len(partitioned) == 2:
-            raw_state = partitioned[1]
-        elif len(partitioned) == 3:
-            raw_state = ''.join(partitioned[0::2])
+        Example:
 
-        klass_state = camel_to_underscore(raw_state)
+            With event_name = 'StartChildWorkflowExecutionInitiated'
+             and event_type = 'ChildWorkflowExecution'
+            left == 'Start'
+            sep == 'ChildWorkflowExecution'
+            right == 'Initiated'
 
-        return klass_state
+            Returns: 'start_initiated'
+
+        """
+        left, sep, right = event_name.partition(event_type)
+        return camel_to_underscore(left + right)
 
 
 class CompiledEventFactory(object):
