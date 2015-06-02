@@ -142,6 +142,19 @@ class Domain(BaseModel):
         qs = WorkflowTypeQuerySet(self)
         return qs.all(registration_status=status)
 
+    def activities(self, status=REGISTERED):
+        """Lists the current domain's activity types
+
+        :param      status: Specifies the registration status of the
+                            workflow types to list. Valid values are:
+                            * swf.constants.REGISTERED
+                            * swf.constants.DEPRECATED
+        :type       status: string
+        """
+        from swf.querysets.activity import ActivityTypeQuerySet
+        qs = ActivityTypeQuerySet(self)
+        return qs.all(registration_status=status)
+
     @property
     def executions(self):
         pass
