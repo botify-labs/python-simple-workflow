@@ -13,7 +13,7 @@ from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.utils import immutable
-from swf.models import BaseModel
+from swf.models import BaseModel, Domain
 from swf.models.history import History
 from swf.models.base import ModelDiff
 from swf import exceptions
@@ -344,6 +344,7 @@ class WorkflowExecution(BaseModel):
                  input=None, tag_list=None,
                  decision_tasks_timeout=None,
                  *args, **kwargs):
+        Domain.check(domain)
         self.domain = domain
         self.workflow_id = workflow_id
         self.run_id = run_id
@@ -430,7 +431,7 @@ class WorkflowExecution(BaseModel):
             domain = domain.name
 
         response = self.connection.get_workflow_execution_history(
-            domain,
+            self.domain.name,
             self.run_id,
             self.workflow_id,
             **kwargs
@@ -440,7 +441,7 @@ class WorkflowExecution(BaseModel):
         next_page = response.get('nextPageToken')
         while next_page is not None:
             response = self.connection.get_workflow_execution_history(
-                domain,
+                self.domain.name,
                 self.run_id,
                 self.workflow_id,
                 next_page_token=next_page,

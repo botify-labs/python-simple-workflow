@@ -34,6 +34,7 @@ class BaseWorkflowQuerySet(BaseQuerySet):
 
     def __init__(self, domain, *args, **kwargs):
         super(BaseWorkflowQuerySet, self).__init__(*args, **kwargs)
+        Domain.check(domain)
         self.domain = domain
 
     @property
@@ -437,7 +438,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         )
 
         return WorkflowExecution(
-            Domain(domain),
+            domain,
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
             workflow_type=workflow_type,
@@ -472,16 +473,12 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
         )
 
-    def filter(self, domain=None,
+    def filter(self,
                status=WorkflowExecution.STATUS_OPEN, tag=None,
                workflow_id=None, workflow_type_name=None,
                workflow_type_version=None,
                *args, **kwargs):
         """Filters workflow executions based on kwargs provided criteras
-
-        :param  domain_name: workflow executions attached to domain with
-                             provided domain_name will be kept
-        :type   domain_name: String
 
         :param  status: workflow executions with provided status will be kept.
                         Valid values are:
@@ -558,7 +555,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             oldest_date = kwargs.get('start_oldest_date', 30)
 
         start_oldest_date = datetime_timestamp(past_day(oldest_date))
-        return [self.to_WorkflowExecution(domain, wfe) for wfe in
+        return [self.to_WorkflowExecution(self.domain, wfe) for wfe in
                 self._list_items(
                     *args,
                     domain=self.domain.name,
