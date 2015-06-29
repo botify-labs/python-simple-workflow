@@ -437,7 +437,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         )
 
         return WorkflowExecution(
-            Domain(domain),
+            domain,
             get_subkey(execution_info, ['execution', 'workflowId']),  # workflow_id
             run_id=get_subkey(execution_info, ['execution', 'runId']),
             workflow_type=workflow_type,
@@ -558,7 +558,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             oldest_date = kwargs.get('start_oldest_date', 30)
 
         start_oldest_date = datetime_timestamp(past_day(oldest_date))
-        return [self.to_WorkflowExecution(domain, wfe) for wfe in
+        return [self.to_WorkflowExecution(self.domain, wfe) for wfe in
                 self._list_items(
                     *args,
                     domain=self.domain.name,
