@@ -64,6 +64,18 @@ class Domain(BaseModel):
         # so have to use generice self.__class__
         super(self.__class__, self).__init__(*args, **kwargs)
 
+    @classmethod
+    def check(cls, domain):
+        """
+        Ensures *domain* is a :class:`Domain` object and has a *name* attribute
+        as a string.
+
+        """
+        if (not isinstance(domain, cls) or
+                not hasattr(domain, 'name') or
+                not isinstance(domain.name, basestring)):
+            raise TypeError('invalid type {} for domain'.format(type(domain)))
+
     def _diff(self):
         """Checks for differences between Domain instance
         and upstream version

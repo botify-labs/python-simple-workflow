@@ -34,6 +34,7 @@ class BaseWorkflowQuerySet(BaseQuerySet):
 
     def __init__(self, domain, *args, **kwargs):
         super(BaseWorkflowQuerySet, self).__init__(*args, **kwargs)
+        Domain.check(domain)
         self.domain = domain
 
     @property

@@ -13,7 +13,7 @@ from boto.swf.exceptions import SWFResponseError, SWFTypeAlreadyExistsError
 
 from swf.constants import REGISTERED
 from swf.utils import immutable
-from swf.models import BaseModel
+from swf.models import BaseModel, Domain
 from swf.models.history import History
 from swf.models.base import ModelDiff
 from swf import exceptions
@@ -344,6 +344,7 @@ class WorkflowExecution(BaseModel):
                  input=None, tag_list=None,
                  decision_tasks_timeout=None,
                  *args, **kwargs):
+        Domain.check(domain)
         self.domain = domain
         self.workflow_id = workflow_id
         self.run_id = run_id
