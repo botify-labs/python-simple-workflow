@@ -473,16 +473,12 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
         )
 
-    def filter(self, domain=None,
+    def filter(self,
                status=WorkflowExecution.STATUS_OPEN, tag=None,
                workflow_id=None, workflow_type_name=None,
                workflow_type_version=None,
                *args, **kwargs):
         """Filters workflow executions based on kwargs provided criteras
-
-        :param  domain_name: workflow executions attached to domain with
-                             provided domain_name will be kept
-        :type   domain_name: String
 
         :param  status: workflow executions with provided status will be kept.
                         Valid values are:
