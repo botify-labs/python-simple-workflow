@@ -467,7 +467,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         return self.to_WorkflowExecution(
             self.domain,
             execution_info,
-            task_list=get_subkey(execution_config, ['defaultTaskList', 'name']),
+            task_list=get_subkey(execution_config, ['taskList', 'name']),
             child_policy=execution_config.get('childPolicy'),
             execution_timeout=execution_config.get('executionStartToCloseTimeout'),
             decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
