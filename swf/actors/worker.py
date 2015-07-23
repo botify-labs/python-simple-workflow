@@ -33,7 +33,7 @@ class ActivityWorker(Actor):
             task_list
         )
 
-        self.identity = identity
+        self._identity = identity
 
     def cancel(self, task_token, details=None):
         """Responds to ``swf`` that the activity task was canceled
@@ -151,7 +151,7 @@ class ActivityWorker(Actor):
         :type: swf.models.ActivityTask
         """
         task_list = task_list or self.task_list
-        identity = identity or self.identity
+        identity = identity or self._identity
 
         try:
             polled_activity_data = self.connection.poll_for_activity_task(
