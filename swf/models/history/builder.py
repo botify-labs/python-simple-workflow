@@ -509,11 +509,71 @@ class History(swf.models.History):
         self.events.append(EventFactory({
             'eventId': self.next_id,
             'eventTimestamp': new_timestamp_string(),
-            'eventType': 'ChildWorkflowExecutionFailed',
-            'childWorkflowExecutionFailedEventAttributes': {
+            'eventType': 'ChildWorkflowExecutionTimedOut',
+            'childWorkflowExecutionTimedOutEventAttributes': {
                 'initiatedEventId': initiated_id,
                 'startedEventId': started_id,
                 'timeoutType': timeout_type,
+                'workflowExecution': {
+                    'runId': workflow_execution['runId'],
+                    'workflowId': workflow_id,
+                },
+                'workflowType': {
+                    'name': workflow_type['name'],
+                    'version': workflow_type['version']
+                }
+            }
+        }))
+
+        return self
+
+    def add_child_workflow_canceled(self,
+                                    initiated_id,
+                                    started_id):
+        initiated_event = self.events[initiated_id - 1]
+        workflow_id = initiated_event.workflow_id
+        workflow_type = initiated_event.workflow_type
+
+        started_event = self.events[started_id - 1]
+        workflow_execution = started_event.workflow_execution
+
+        self.events.append(EventFactory({
+            'eventId': self.next_id,
+            'eventTimestamp': new_timestamp_string(),
+            'eventType': 'ChildWorkflowExecutionCanceled',
+            'childWorkflowExecutionCanceledEventAttributes': {
+                'initiatedEventId': initiated_id,
+                'startedEventId': started_id,
+                'workflowExecution': {
+                    'runId': workflow_execution['runId'],
+                    'workflowId': workflow_id,
+                },
+                'workflowType': {
+                    'name': workflow_type['name'],
+                    'version': workflow_type['version']
+                }
+            }
+        }))
+
+        return self
+
+    def add_child_workflow_terminated(self,
+                                      initiated_id,
+                                      started_id):
+        initiated_event = self.events[initiated_id - 1]
+        workflow_id = initiated_event.workflow_id
+        workflow_type = initiated_event.workflow_type
+
+        started_event = self.events[started_id - 1]
+        workflow_execution = started_event.workflow_execution
+
+        self.events.append(EventFactory({
+            'eventId': self.next_id,
+            'eventTimestamp': new_timestamp_string(),
+            'eventType': 'ChildWorkflowExecutionTerminated',
+            'childWorkflowExecutionTerminatedEventAttributes': {
+                'initiatedEventId': initiated_id,
+                'startedEventId': started_id,
                 'workflowExecution': {
                     'runId': workflow_execution['runId'],
                     'workflowId': workflow_id,
@@ -564,10 +624,22 @@ class History(swf.models.History):
             self.add_child_workflow_failed(
                 initiated_id,
                 started_id)
-        elif last_state == 'timed out':
+        elif last_state == 'timed_out':
             self.add_child_workflow_timed_out(
                 initiated_id,
-                started_id)
+                started_id,
+                'START_TO_CLOSE',
+            )
+        elif last_state == 'canceled':
+            self.add_child_workflow_canceled(
+                initiated_id,
+                started_id,
+            )
+        elif last_state == 'terminated':
+            self.add_child_workflow_terminated(
+                initiated_id,
+                started_id,
+            )
 
         return self
 

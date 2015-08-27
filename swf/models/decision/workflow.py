@@ -48,6 +48,13 @@ class WorkflowExecutionDecision(Decision):
         })
 
     @decision_action
+    def terminate(self, reason=None, details=None):
+        self.update_attributes({
+            'reason': reason,
+            'details': details,
+        })
+
+    @decision_action
     def continue_as_new(self, child_policy=CHILD_POLICIES.TERMINATE,
                         execution_timeout='300', task_timeout='300',
                         input=None, tag_list=None, task_list=None,
