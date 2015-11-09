@@ -37,11 +37,13 @@ class TestSettings(unittest.TestCase):
             "region": "eu-west-1",
         })
 
-    # TODO: change that, this is weird and confuses me as for AWS_DEFAULT_REGION handling
     def test_get_aws_settings_without_access_key_id(self):
         """
-        If AWS_DEFAULT_REGION is not set, don't get anything from env.
+        If AWS_DEFAULT_REGION is not set, get AWS_DEFAULT_REGION from env anyway if there.
         """
+        self.assertEqual(from_env(), {})
+
         os.environ["AWS_DEFAULT_REGION"] = "eu-west-1"
-        _settings = from_env()
-        self.assertEqual(_settings, {})
+        self.assertEqual(from_env(), {
+            "region": "eu-west-1",
+        })

@@ -105,13 +105,16 @@ def from_env():
     :rtype: dict
 
     """
-    try:
-        return {'aws_access_key_id': os.environ['AWS_ACCESS_KEY_ID'],
-                'aws_secret_access_key': os.environ.get('AWS_SECRET_ACCESS_KEY'),
-                'region': os.environ.get('AWS_DEFAULT_REGION')
-        }
-    except KeyError:
-        return {}
+    hsh = {}
+
+    if "AWS_ACCESS_KEY_ID" in os.environ:
+        hsh["aws_access_key_id"] = os.environ["AWS_ACCESS_KEY_ID"]
+        hsh["aws_secret_access_key"] = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
+    if "AWS_DEFAULT_REGION" in os.environ:
+        hsh["region"] = os.environ["AWS_DEFAULT_REGION"]
+
+    return hsh
 
 
 def get(path='.swf'):
