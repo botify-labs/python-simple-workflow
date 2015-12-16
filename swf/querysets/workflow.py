@@ -445,6 +445,8 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             status=execution_info.get('executionStatus'),
             close_status=execution_info.get('closeStatus'),
             tag_list=execution_info.get('tagList'),
+            start_timestamp=execution_info.get('startTimestamp'),
+            close_timestamp=execution_info.get('closeTimestamp'),
             **kwargs
         )
 

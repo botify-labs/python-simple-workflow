@@ -335,6 +335,8 @@ class WorkflowExecution(BaseModel):
         'input',
         'tag_list',
         'decision_tasks_timeout',
+        'close_timestamp',
+        'start_timestamp',
     ]
 
     def __init__(self, domain, workflow_id, run_id=None,
@@ -343,6 +345,8 @@ class WorkflowExecution(BaseModel):
                  close_status=None, execution_timeout=None,
                  input=None, tag_list=None,
                  decision_tasks_timeout=None,
+                 close_timestamp=None,
+                 start_timestamp=None,
                  *args, **kwargs):
         Domain.check(domain)
         self.domain = domain
@@ -357,6 +361,8 @@ class WorkflowExecution(BaseModel):
         self.input = input
         self.tag_list = tag_list or []
         self.decision_tasks_timeout = decision_tasks_timeout
+        self.close_timestamp = close_timestamp
+        self.start_timestamp = start_timestamp
 
         # immutable decorator rebinds class name,
         # so have to use generice self.__class__
