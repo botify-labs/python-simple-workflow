@@ -337,6 +337,11 @@ class WorkflowExecution(BaseModel):
         'decision_tasks_timeout',
         'close_timestamp',
         'start_timestamp',
+        'cancel_requested',
+        'latest_execution_context',
+        'latest_activity_task_timestamp',
+        'open_counts',
+        'parent',
     ]
 
     def __init__(self, domain, workflow_id, run_id=None,
@@ -347,6 +352,11 @@ class WorkflowExecution(BaseModel):
                  decision_tasks_timeout=None,
                  close_timestamp=None,
                  start_timestamp=None,
+                 cancel_requested=None,
+                 latest_execution_context=None,
+                 latest_activity_task_timestamp=None,
+                 open_counts=None,
+                 parent=None,
                  *args, **kwargs):
         Domain.check(domain)
         self.domain = domain
@@ -363,6 +373,11 @@ class WorkflowExecution(BaseModel):
         self.decision_tasks_timeout = decision_tasks_timeout
         self.close_timestamp = close_timestamp
         self.start_timestamp = start_timestamp
+        self.cancel_requested = cancel_requested
+        self.latest_execution_context = latest_execution_context
+        self.latest_activity_task_timestamp = latest_activity_task_timestamp
+        self.open_counts = open_counts or {} # so we can query keys in any case
+        self.parent = parent or {} # so we can query keys in any case
 
         # immutable decorator rebinds class name,
         # so have to use generice self.__class__

@@ -447,6 +447,8 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             tag_list=execution_info.get('tagList'),
             start_timestamp=execution_info.get('startTimestamp'),
             close_timestamp=execution_info.get('closeTimestamp'),
+            cancel_requested=execution_info.get('cancelRequested'),
+            parent=execution_info.get('parent'),
             **kwargs
         )
 
@@ -473,6 +475,9 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
             child_policy=execution_config.get('childPolicy'),
             execution_timeout=execution_config.get('executionStartToCloseTimeout'),
             decision_tasks_timeout=execution_config.get('taskStartToCloseTimeout'),
+            latest_activity_task_timestamp=response.get('latestActivityTaskTimestamp'),
+            latest_execution_context=response.get('latestExecutionContext'),
+            open_counts=response['openCounts'],
         )
 
     def filter(self,
