@@ -55,6 +55,10 @@ class Domain(BaseModel):
                  status=REGISTERED,
                  description=None,
                  retention_period=30, *args, **kwargs):
+        if not isinstance(name, basestring):
+            raise ValueError(
+                "Bad value for 'name', should be a string, got: '{}'".format(name)
+            )
         self.name = name
         self.status = status
         self.description = description
