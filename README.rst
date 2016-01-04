@@ -1,8 +1,8 @@
-.. image:: https://travis-ci.org/botify-labs/python-simple-workflow.png?branch=develop
-
 ======================
 Python Simple Workflow
 ======================
+
+.. image:: https://travis-ci.org/botify-labs/python-simple-workflow.png?branch=develop
 
 python-simple-workflow is a wrapper for `Amazon Simple Workflow <http://aws.amazon.com/en/swf/>`_ service.
 It aims to provide some abstractions over the webservice concepts through `Boto <https://boto.readthedocs.org/en/latest/ref/swf.html>`_ library Swf api implementation.
