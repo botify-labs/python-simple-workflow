@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import boto.exception
 
 from swf.models.history import History
+from swf.models.workflow import WorkflowExecution, WorkflowType
 from swf.actors.core import Actor
 from swf.exceptions import PollTimeout, ResponseError, DoesNotExistError
 
@@ -52,7 +52,7 @@ class Decider(Actor):
 
             raise ResponseError(e.body['message'])
 
-    def poll(self, task_list=None,
+    def poll_for_task(self, task_list=None,
              identity=None,
              **kwargs):
         """
@@ -67,8 +67,8 @@ class Decider(Actor):
         workflow history.
         :type identity: string
 
-        :returns: (token, history)
-        :type: swf.models.History
+        :returns: (token, history, execution)
+        :type: (str, swf.models.History, swf.models.WorkflowExecution)
 
         """
         task_list = task_list or self.task_list
@@ -113,4 +113,23 @@ class Decider(Actor):
 
         history = History.from_event_list(events)
 
+        workflow_type = WorkflowType(
+            domain=self.domain,
+            name=task['workflowType']['name'],
+            version=task['workflowType']['version'],
+        )
+        execution = WorkflowExecution(
+            domain=self.domain,
+            workflow_id=task['workflowExecution']['workflowId'],
+            run_id=task['workflowExecution']['runId'],
+            workflow_type=workflow_type,
+        )
+
+        # TODO: wrap that in a PollResponse object
+        # TODO: move history into execution (needs refactoring on WorkflowExecution.history())
+        return token, history, execution
+
+
+    def poll(self, *args, **kwargs):
+        token, history, _ = self.poll_for_task(*args, **kwargs)
         return token, history

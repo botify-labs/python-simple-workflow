@@ -27,13 +27,13 @@ class TestActor(unittest.TestCase):
         pass
 
     @mock_swf
-    def test_poll_empty(self):
+    def test_poll_with_no_decision_to_take(self):
         conn = self.make_swf_environment()
         with self.assertRaises(PollTimeout):
             self.actor.poll()
 
     @mock_swf
-    def test_poll_decision(self):
+    def test_poll_with_decision_to_take(self):
         conn = self.make_swf_environment()
         conn.start_workflow_execution("TestDomain", "wfe-1234", "test-workflow", "v1.2")
 
@@ -44,3 +44,24 @@ class TestActor(unittest.TestCase):
             [evt.type for evt in history],
             ['WorkflowExecution', 'DecisionTask', 'DecisionTask']
         )
+
+    @mock_swf
+    def test_poll_for_task_with_no_decision_to_take(self):
+        conn = self.make_swf_environment()
+        with self.assertRaises(PollTimeout):
+            self.actor.poll_for_task()
+
+    @mock_swf
+    def test_poll_for_task_with_decision_to_take(self):
+        conn = self.make_swf_environment()
+        conn.start_workflow_execution("TestDomain", "wfe-1234", "test-workflow", "v1.2")
+
+        token, history, execution = self.actor.poll_for_task()
+
+        self.assertIsNotNone(token)
+        self.assertEquals(
+            [evt.type for evt in history],
+            ['WorkflowExecution', 'DecisionTask', 'DecisionTask']
+        )
+        self.assertEquals(execution.workflow_id, 'wfe-1234')
+        self.assertIsNotNone(execution.run_id)
