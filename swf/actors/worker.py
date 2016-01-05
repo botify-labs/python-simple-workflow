@@ -1,4 +1,4 @@
-#! -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import boto.exception
 from swf.actors import Actor
