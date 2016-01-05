@@ -27,8 +27,12 @@ setup(
     zip_safe=True,
     install_requires=[
         'boto',
-        'mock==1.0.1',
         'xworkflows==1.0.0',
+    ],
+
+    tests_require=[
+        'mock==1.0.1',
+        'py.test>=2.8.5',
     ],
 
     package_dir={'': '.'},
