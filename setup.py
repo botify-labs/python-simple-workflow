@@ -31,6 +31,7 @@ setup(
 
     tests_require=[
         'mock==1.0.1',
+        'moto>=0.4.19',
         'py.test>=2.8.5',
     ],
 
