@@ -27,7 +27,6 @@ setup(
     zip_safe=True,
     install_requires=[
         'boto',
-        'xworkflows==1.0.0',
     ],
 
     tests_require=[
