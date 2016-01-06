@@ -5,6 +5,7 @@ from swf.models.history import History
 from swf.models.workflow import WorkflowExecution, WorkflowType
 from swf.actors.core import Actor
 from swf.exceptions import PollTimeout, ResponseError, DoesNotExistError
+from swf.responses import Response
 
 
 class Decider(Actor):
@@ -67,8 +68,8 @@ class Decider(Actor):
         workflow history.
         :type identity: string
 
-        :returns: (token, history, execution)
-        :type: (str, swf.models.History, swf.models.WorkflowExecution)
+        :returns: a Response object with history, token, and execution set
+        :rtype: swf.responses.Response(token, history, execution)
 
         """
         task_list = task_list or self.task_list
@@ -125,11 +126,10 @@ class Decider(Actor):
             workflow_type=workflow_type,
         )
 
-        # TODO: wrap that in a PollResponse object
         # TODO: move history into execution (needs refactoring on WorkflowExecution.history())
-        return token, history, execution
+        return Response(token=token, history=history, execution=execution)
 
 
     def poll(self, *args, **kwargs):
-        token, history, _ = self.poll_for_task(*args, **kwargs)
-        return token, history
+        response = self.poll_for_task(*args, **kwargs)
+        return response.token, response.history

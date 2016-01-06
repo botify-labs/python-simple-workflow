@@ -56,12 +56,12 @@ class TestActor(unittest.TestCase):
         conn = self.make_swf_environment()
         conn.start_workflow_execution("TestDomain", "wfe-1234", "test-workflow", "v1.2")
 
-        token, history, execution = self.actor.poll_for_task()
+        response = self.actor.poll_for_task()
 
-        self.assertIsNotNone(token)
+        self.assertIsNotNone(response.token)
         self.assertEquals(
-            [evt.type for evt in history],
+            [evt.type for evt in response.history],
             ['WorkflowExecution', 'DecisionTask', 'DecisionTask']
         )
-        self.assertEquals(execution.workflow_id, 'wfe-1234')
-        self.assertIsNotNone(execution.run_id)
+        self.assertEquals(response.execution.workflow_id, 'wfe-1234')
+        self.assertIsNotNone(response.execution.run_id)
