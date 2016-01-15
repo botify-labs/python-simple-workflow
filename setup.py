@@ -12,6 +12,12 @@ version = __import__('swf').__version__
 with open(os.path.join(root, 'README.rst')) as f:
     README = f.read()
 
+with open('./requirements-test.txt') as f:
+    test_requirements = [line for line in f]
+
+with open('./requirements.txt') as f:
+    install_requirements = [line for line in f]
+
 setup(
     name='simple-workflow',
     version=version,
@@ -25,11 +31,9 @@ setup(
     url='http://github.com/botify-labs/python-simple-workflow',
     keywords='amazon simple wokflow swf python',
     zip_safe=True,
-    install_requires=[
-        'boto',
-        'mock==1.0.1',
-        'xworkflows==1.0.0',
-    ],
+
+    install_requires=install_requirements,
+    tests_requires=test_requirements,
 
     package_dir={'': '.'},
     include_package_data=False,

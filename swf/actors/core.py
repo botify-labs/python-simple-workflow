@@ -1,4 +1,4 @@
-#! -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 from swf.core import ConnectedSWFObject
 from swf.models import Domain
