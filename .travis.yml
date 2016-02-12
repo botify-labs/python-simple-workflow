@@ -2,6 +2,9 @@ language: python
 python:
   - "2.7"
 
+# run on container-based infrastructure
+sudo: false
+
 # command to install dependencies
 install:
   - pip install -UI pip==7.1.2
