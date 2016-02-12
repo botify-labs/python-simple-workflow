@@ -2,7 +2,7 @@
 
 import unittest
 
-from mock import patch
+from mock import patch, Mock
 from boto.swf.layer1 import Layer1
 from boto.exception import SWFResponseError
 
@@ -317,3 +317,19 @@ class TestWorkflowExecutionQuerySet(unittest.TestCase):
                     }
                 )
                 self.weq.get("mocked-workflow-id", "mocked-run-id")
+
+    def test_filter_without_close_time_filter(self):
+        self.weq._list_items = Mock(return_value=[])
+        qs = self.weq.filter()
+        self.weq._list_items.assert_called_once()
+        kwargs = self.weq._list_items.call_args[1]
+        self.assertIsInstance(kwargs["start_oldest_date"], int)
+
+    def test_filter_with_close_time_filter(self):
+        self.weq._list_items = Mock(return_value=[])
+        qs = self.weq.filter(status=WorkflowExecution.STATUS_CLOSED,
+                             close_latest_date=5)
+        self.weq._list_items.assert_called_once()
+        kwargs = self.weq._list_items.call_args[1]
+        self.assertIsNone(kwargs["start_oldest_date"])
+        self.assertIsInstance(kwargs["close_latest_date"], int)

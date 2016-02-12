@@ -568,9 +568,27 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
         if status == WorkflowExecution.STATUS_OPEN:
             oldest_date = kwargs.pop('oldest_date', 30)
         else:
-            oldest_date = kwargs.pop('start_oldest_date', 30)
+            # The SWF docs on ListClosedWorkflowExecutions state that:
+            #
+            #   "startTimeFilter and closeTimeFilter are mutually exclusive"
+            #
+            # so we must figure out if we have to add a default value for
+            # start_oldest_date or not.
+            if "close_latest_date" in kwargs or "close_oldest_date" in kwargs:
+                default_oldest_date = None
+            else:
+                default_oldest_date = 30
+            oldest_date = kwargs.pop('start_oldest_date', default_oldest_date)
 
-        start_oldest_date = datetime_timestamp(past_day(oldest_date))
+        # Compute a timestamp from the delta in days we got from params
+        # If oldest_date is blank at this point, it's because we didn't want
+        # it, so let's leave it blank and assume the user provided an other
+        # time filter.
+        if oldest_date:
+            start_oldest_date = int(datetime_timestamp(past_day(oldest_date)))
+        else:
+            start_oldest_date = None
+
         return [self.to_WorkflowExecution(self.domain, wfe) for wfe in
                 self._list_items(
                     *args,
@@ -579,7 +597,7 @@ class WorkflowExecutionQuerySet(BaseWorkflowQuerySet):
                     workflow_id=workflow_id,
                     workflow_name=workflow_type_name,
                     workflow_version=workflow_type_version,
-                    start_oldest_date=int(start_oldest_date),
+                    start_oldest_date=start_oldest_date,
                     tag=tag,
                     **kwargs
                 )]
