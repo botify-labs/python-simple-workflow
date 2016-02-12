@@ -55,8 +55,8 @@ class WorkflowExecutionDecision(Decision):
         })
 
     @decision_action
-    def continue_as_new(self, child_policy=CHILD_POLICIES.TERMINATE,
-                        execution_timeout='300', task_timeout='300',
+    def continue_as_new(self, child_policy=None,
+                        execution_timeout=None, task_timeout=None,
                         input=None, tag_list=None, task_list=None,
                         workflow_type_version=None):
         """Coninue as new workflow execution decision builder

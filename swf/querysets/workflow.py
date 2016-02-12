@@ -14,7 +14,7 @@ from swf.models.workflow import (WorkflowType, WorkflowExecution,
                                  CHILD_POLICIES)
 from swf.utils import datetime_timestamp, past_day, get_subkey
 from swf.exceptions import (ResponseError, DoesNotExistError,
-                            InvalidKeywordArgumentError)
+                            InvalidKeywordArgumentError, AlreadyExistsError)
 
 
 class BaseWorkflowQuerySet(BaseQuerySet):
@@ -229,18 +229,27 @@ class WorkflowTypeQuerySet(BaseWorkflowQuerySet):
                             decision_tasks_timeout=decision_tasks_timeout)
 
         except DoesNotExistError:
-            return self.create(
-                name,
-                version,
-                status=status,
-                creation_date=creation_date,
-                deprecation_date=deprecation_date,
-                task_list=task_list,
-                child_policy=child_policy,
-                execution_timeout=execution_timeout,
-                decision_tasks_timeout=decision_tasks_timeout,
-                description=description,
-            )
+            try:
+                return self.create(
+                    name,
+                    version,
+                    status=status,
+                    creation_date=creation_date,
+                    deprecation_date=deprecation_date,
+                    task_list=task_list,
+                    child_policy=child_policy,
+                    execution_timeout=execution_timeout,
+                    decision_tasks_timeout=decision_tasks_timeout,
+                    description=description,
+                )
+            # race conditon could happen if two workflows trying to register the same type
+            except AlreadyExistsError:
+                return self.get(name,
+                            version,
+                            task_list=task_list,
+                            child_policy=child_policy,
+                            execution_timeout=execution_timeout,
+                            decision_tasks_timeout=decision_tasks_timeout)
 
     def _list(self, *args, **kwargs):
         return self.connection.list_workflow_types(*args, **kwargs)

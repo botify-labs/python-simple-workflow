@@ -117,6 +117,21 @@ def from_env():
     return hsh
 
 
+def from_home(path='.swf'):
+    """Retrieves settings from home environment
+
+    If HOME environment is applicapable, search for any files in *path*.
+
+    :rtype: dict
+
+    """
+    if 'HOME' in os.environ:
+        swf_path = os.path.join(os.environ['HOME'], path)
+        return from_file(swf_path)
+
+    return {}
+
+
 def get(path='.swf'):
     """Retrieves settings from a file or the environment.
 
@@ -128,8 +143,8 @@ def get(path='.swf'):
     :rtype: dict
 
     """
-    home_directory = os.environ['HOME']
-    return from_file(os.path.join(home_directory, path)) or from_env()
+
+    return from_home(path) or from_env()
 
 
 def set(**settings):
