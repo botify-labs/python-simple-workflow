@@ -12,10 +12,10 @@ version = __import__('swf').__version__
 with open(os.path.join(root, 'README.rst')) as f:
     README = f.read()
 
-with open('./requirements-test.txt') as f:
+with open(os.path.join(root, 'requirements-test.txt')) as f:
     test_requirements = [line for line in f]
 
-with open('./requirements.txt') as f:
+with open(os.path.join(root, 'requirements.txt')) as f:
     install_requirements = [line for line in f]
 
 setup(

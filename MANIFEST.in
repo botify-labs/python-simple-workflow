@@ -2,5 +2,7 @@ include MANIFEST.in
 include README.rst
 include LICENSE
 include setup.py
+include requirements.txt
+include requirements-test.txt
 include docs/*
 include tests/*
