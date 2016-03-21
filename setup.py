@@ -42,7 +42,7 @@ setup(
         'swf',
         'swf.actors',
         'swf.querysets',
-
+        'swf.responses',
         'swf.models',
         'swf.models.event',
         'swf.models.decision',
